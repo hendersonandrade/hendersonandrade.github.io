@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AzureUtils — Release &amp; publishing | Henderson Andrade</title>
+  <meta name="description" content="AzureUtils release, publishing and development workflow — manifest-driven versioning, auto-tag and PowerShell Gallery publishing.">
+  <meta property="og:title" content="AzureUtils — Release &amp; publishing">
+  <meta property="og:description" content="Manifest-driven versioning, auto-tag and PowerShell Gallery publishing for AzureUtils.">
+  <meta property="og:type" content="article">
+  <link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container navbar">
+    <a class="brand" href="../../index.html" aria-label="Henderson Andrade — home">
+      <img class="brand-mark" src="../../assets/img/ha-monogram.svg" alt="">
+      <span>Henderson Andrade<span class="brand-sub">Azure Cloud Architect</span></span>
+    </a>
+    <button class="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-menu">
+      <li><a class="nav-link" href="../../index.html">Home</a></li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Solutions <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="../../solutions/index.html"><span class="dropdown-kicker">Portfolio</span><span class="dropdown-title">All solutions</span></a></li>
+          <li><a href="index.html"><span class="dropdown-kicker">Personal · PowerShell</span><span class="dropdown-title">AzureUtils module</span></a></li>
+          <li><a href="https://trimtechbr.github.io" target="_blank" rel="noopener"><span class="dropdown-kicker">TrimTechBR ↗</span><span class="dropdown-title">AER — Azure Estate Report</span></a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Docs <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="index.html"><span class="dropdown-kicker">Start here</span><span class="dropdown-title">Overview &amp; install</span></a></li>
+          <li><a href="tag-inventory.html"><span class="dropdown-kicker">Reference</span><span class="dropdown-title">Tag inventory</span></a></li>
+          <li><a href="find-commands.html"><span class="dropdown-kicker">Reference</span><span class="dropdown-title">Find commands</span></a></li>
+          <li><a href="release-publishing.html"><span class="dropdown-kicker">Internals</span><span class="dropdown-title">Release &amp; publishing</span></a></li>
+        </ul>
+      </li>
+      <li><a class="nav-link" href="../../contact.html">Contact</a></li>
+      <li><a class="btn btn-secondary" href="https://github.com/hendersonandrade/powershell-module-azureUtils" target="_blank" rel="noopener">GitHub ↗</a></li>
+      <li class="nav-item lang-switch">
+        <a class="lang-link is-active" href="release-publishing.html">EN</a>
+        <span class="lang-sep">/</span>
+        <a class="lang-link" href="release-publishing.pt-br.html">PT</a>
+      </li>
+    </ul>
+  </div>
+</header>
+
+<main class="container">
+  <div class="docs-shell">
+
+    <aside class="docs-sidebar reveal">
+      <div class="side-group">
+        <p class="side-title">AzureUtils</p>
+        <ul>
+          <li><a href="index.html">Overview &amp; install</a></li>
+          <li><a href="tag-inventory.html">Tag inventory</a></li>
+          <li><a href="find-commands.html">Find commands</a></li>
+          <li><a href="release-publishing.html" class="is-active">Release &amp; publishing</a></li>
+        </ul>
+      </div>
+      <div class="side-group">
+        <p class="side-title">On this page</p>
+        <ul class="anchor-list">
+          <li><a href="#versioning">Versioning flow</a></li>
+          <li><a href="#secrets">Repository secrets</a></li>
+          <li><a href="#dev">Development</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <article class="docs-content">
+      <nav class="breadcrumb">
+        <a href="../../index.html">Home</a><span class="sep">/</span>
+        <a href="index.html">AzureUtils</a><span class="sep">/</span>
+        <span>Release &amp; publishing</span>
+      </nav>
+
+      <span class="eyebrow">Internals</span>
+      <h1>Release &amp; publishing</h1>
+      <p class="docs-lede">
+        Versioning is driven by the manifest (<code>AzureUtils/AzureUtils.psd1</code>). Merging
+        <code>develop → main</code> auto-tags a release and publishes to the PowerShell Gallery — no
+        personal access token required.
+      </p>
+
+      <h2 id="versioning">Versioning flow</h2>
+      <ol>
+        <li>Work happens on <code>develop</code>. Bump <code>ModuleVersion</code> (and <code>PrivateData.PSData.Prerelease</code> for pre-releases) there.</li>
+        <li>
+          Merging <code>develop → main</code> (which changes <code>AzureUtils/AzureUtils.psd1</code>) runs
+          <strong>Auto-tag release on main</strong>, which:
+          <ul>
+            <li>resolves the version from the manifest and creates the git tag — stable <code>v{ModuleVersion}</code>, pre-release <code>v{ModuleVersion}-{Prerelease}</code> — only if it does not already exist;</li>
+            <li>triggers the publish workflow via <code>gh workflow run</code> using the built-in <code>github.token</code>.</li>
+          </ul>
+        </li>
+        <li>
+          <strong>Publish PowerShell Gallery</strong> then runs a <code>guard → validate → publish</code>
+          pipeline: it publishes <strong>only when</strong> the tag commit is reachable from
+          <code>main</code> and the tag matches the manifest version. The publish step is idempotent (an
+          already-published version is treated as success).
+        </li>
+      </ol>
+      <div class="note">
+        <span class="ico">ℹ</span>
+        <div>
+          No personal access token is required: the tag is pushed with the default
+          <code>github.token</code> and the publish workflow is started explicitly via
+          <code>gh workflow run</code> (it also accepts <code>workflow_dispatch</code> with a
+          <code>release_tag</code> input for manual re-runs).
+        </div>
+      </div>
+
+      <h2 id="secrets">Required repository secrets</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Secret</th><th>Used by</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td><code>PSGALLERY_API_KEY</code></td><td>Publish PowerShell Gallery</td><td>PowerShell Gallery API key.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        The <code>auto-tag</code> workflow needs <code>permissions: contents: write</code> and
+        <code>actions: write</code> (already declared in the workflow) so it can push the tag and dispatch
+        the publish workflow with the built-in token.
+      </p>
+
+      <h2 id="dev">Development</h2>
+      <div class="code-card">
+        <div class="code-head"><div class="dots"><i></i><i></i><i></i></div><span class="file">pwsh — run the tests</span></div>
+<pre><code><span class="tok-cmd">Install-Module</span> Pester <span class="tok-flag">-MinimumVersion</span> <span class="tok-num">5.5.0</span> <span class="tok-flag">-Scope</span> CurrentUser
+<span class="tok-cmd">Invoke-Pester</span> <span class="tok-str">./AzureUtils/Tests</span></code></pre>
+      </div>
+
+      <div class="next-prev">
+        <a href="find-commands.html">
+          <span class="np-kicker">← Previous</span>
+          <span class="np-title">Find commands</span>
+        </a>
+        <a class="is-next" href="https://github.com/hendersonandrade/powershell-module-azureUtils" target="_blank" rel="noopener">
+          <span class="np-kicker">Source →</span>
+          <span class="np-title">GitHub repository ↗</span>
+        </a>
+      </div>
+    </article>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container footer-grid">
+    <p>© <span data-current-year></span> Henderson Andrade · Microsoft Azure Cloud Architect.</p>
+    <div class="footer-links">
+      <a href="../../solutions/index.html">Solutions</a>
+      <a href="index.html">AzureUtils docs</a>
+      <a href="https://github.com/hendersonandrade/powershell-module-azureUtils" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../../assets/js/main.js"></script>
+</body>
+</html>

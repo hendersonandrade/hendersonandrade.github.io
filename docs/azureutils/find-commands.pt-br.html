@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AzureUtils — Comandos Find | Henderson Andrade</title>
+  <meta name="description" content="Find-AzureUtilsOrphanResource, Find-AzureUtilsEmptyResourceGroup e Find-AzureUtilsPublicResource — cmdlets de descoberta sobre Azure Resource Graph.">
+  <meta property="og:title" content="AzureUtils — Comandos Find">
+  <meta property="og:description" content="Descubra recursos órfãos, resource groups vazios e recursos expostos à internet no Azure.">
+  <meta property="og:type" content="article">
+  <link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container navbar">
+    <a class="brand" href="../../index.pt-br.html" aria-label="Henderson Andrade — início">
+      <img class="brand-mark" src="../../assets/img/ha-monogram.svg" alt="">
+      <span>Henderson Andrade<span class="brand-sub">Arquiteto de Nuvem Azure</span></span>
+    </a>
+    <button class="nav-toggle" aria-label="Abrir menu de navegação" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-menu">
+      <li><a class="nav-link" href="../../index.pt-br.html">Início</a></li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Soluções <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="../../solutions/index.pt-br.html"><span class="dropdown-kicker">Portfólio</span><span class="dropdown-title">Todas as soluções</span></a></li>
+          <li><a href="index.pt-br.html"><span class="dropdown-kicker">Pessoal · PowerShell</span><span class="dropdown-title">Módulo AzureUtils</span></a></li>
+          <li><a href="https://trimtechbr.github.io/index.pt-br.html" target="_blank" rel="noopener"><span class="dropdown-kicker">TrimTechBR ↗</span><span class="dropdown-title">AER — Azure Estate Report</span></a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Docs <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="index.pt-br.html"><span class="dropdown-kicker">Comece aqui</span><span class="dropdown-title">Visão geral &amp; instalação</span></a></li>
+          <li><a href="tag-inventory.pt-br.html"><span class="dropdown-kicker">Referência</span><span class="dropdown-title">Inventário de tags</span></a></li>
+          <li><a href="find-commands.pt-br.html"><span class="dropdown-kicker">Referência</span><span class="dropdown-title">Comandos Find</span></a></li>
+          <li><a href="release-publishing.pt-br.html"><span class="dropdown-kicker">Bastidores</span><span class="dropdown-title">Release &amp; publicação</span></a></li>
+        </ul>
+      </li>
+      <li><a class="nav-link" href="../../contact.pt-br.html">Contato</a></li>
+      <li><a class="btn btn-secondary" href="https://github.com/hendersonandrade/powershell-module-azureUtils" target="_blank" rel="noopener">GitHub ↗</a></li>
+      <li class="nav-item lang-switch">
+        <a class="lang-link" href="find-commands.html">EN</a>
+        <span class="lang-sep">/</span>
+        <a class="lang-link is-active" href="find-commands.pt-br.html">PT</a>
+      </li>
+    </ul>
+  </div>
+</header>
+
+<main class="container">
+  <div class="docs-shell">
+
+    <aside class="docs-sidebar reveal">
+      <div class="side-group">
+        <p class="side-title">AzureUtils</p>
+        <ul>
+          <li><a href="index.pt-br.html">Visão geral &amp; instalação</a></li>
+          <li><a href="tag-inventory.pt-br.html">Inventário de tags</a></li>
+          <li><a href="find-commands.pt-br.html" class="is-active">Comandos Find</a></li>
+          <li><a href="release-publishing.pt-br.html">Release &amp; publicação</a></li>
+        </ul>
+      </div>
+      <div class="side-group">
+        <p class="side-title">Nesta página</p>
+        <ul class="anchor-list">
+          <li><a href="#scope">Escopo comum</a></li>
+          <li><a href="#orphan">Find-…OrphanResource</a></li>
+          <li><a href="#empty">Find-…EmptyResourceGroup</a></li>
+          <li><a href="#public">Find-…PublicResource</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <article class="docs-content">
+      <nav class="breadcrumb">
+        <a href="../../index.pt-br.html">Início</a><span class="sep">/</span>
+        <a href="index.pt-br.html">AzureUtils</a><span class="sep">/</span>
+        <span>Comandos Find</span>
+      </nav>
+
+      <span class="eyebrow">Referência</span>
+      <h1>Comandos Find</h1>
+      <p class="docs-lede">
+        Cmdlets de descoberta que trazem à tona o que merece sua atenção num ambiente Azure — recursos
+        órfãos, resource groups vazios e recursos expostos à internet pública. Cada um retorna objetos para
+        o pipeline e também imprime uma tabela colorida no console.
+      </p>
+
+      <h2 id="scope">Escopo comum</h2>
+      <p>
+        Todos os cmdlets <code>Find-*</code> aceitam <code>-SubscriptionId</code> (padrão: todas
+        habilitadas) ou <code>-ManagementGroupId</code> (mutuamente exclusivos) e emitem objetos para o
+        pipeline, então você pode filtrar, formatar ou exportar.
+      </p>
+      <div class="note warn">
+        <span class="ico">⚠</span>
+        <div>Estes comandos usam <strong>heurísticas</strong>. Sempre revise os resultados antes de excluir ou alterar qualquer coisa — um recurso pode legitimamente bater numa regra.</div>
+      </div>
+
+      <h2 id="orphan">Find-AzureUtilsOrphanResource</h2>
+      <p>
+        Encontra recursos que parecem órfãos (sem uso / não associados) via Azure Resource Graph e explica
+        cada um numa coluna <code>Reason</code>. Retorna objetos (também mostrados como tabela colorida no
+        console). Todas as categorias são checadas por padrão; restrinja com <code>-Type</code>.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Valor de <code>-Type</code></th><th>Órfão quando…</th></tr></thead>
+          <tbody>
+            <tr><td><code>Disk</code></td><td>disco gerenciado com <code>diskState = Unattached</code></td></tr>
+            <tr><td><code>NetworkInterface</code></td><td>NIC sem VM e sem private endpoint</td></tr>
+            <tr><td><code>PublicIP</code></td><td>IP público sem configuração de IP e sem NAT gateway</td></tr>
+            <tr><td><code>NetworkSecurityGroup</code></td><td>NSG não associado a nenhuma NIC ou subnet</td></tr>
+            <tr><td><code>RouteTable</code></td><td>route table não associada a nenhuma subnet</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="code-card">
+        <div class="code-head"><div class="dots"><i></i><i></i><i></i></div><span class="file">pwsh — Find-AzureUtilsOrphanResource</span></div>
+<pre><code><span class="tok-com"># contexto atual, todas as categorias</span>
+<span class="tok-cmd">Find-AzureUtilsOrphanResource</span>
+
+<span class="tok-com"># um management group, apenas duas categorias</span>
+<span class="tok-cmd">Find-AzureUtilsOrphanResource</span> <span class="tok-flag">-ManagementGroupId</span> <span class="tok-str">'PLAT'</span> <span class="tok-flag">-Type</span> Disk, PublicIP
+
+<span class="tok-com"># exporta para CSV</span>
+<span class="tok-cmd">Find-AzureUtilsOrphanResource</span> | <span class="tok-cmd">Export-Csv</span> <span class="tok-str">.\orphans.csv</span> <span class="tok-flag">-NoTypeInformation</span></code></pre>
+      </div>
+
+      <h2 id="empty">Find-AzureUtilsEmptyResourceGroup</h2>
+      <p>Lista os resource groups cuja contagem de recursos (de <code>resources</code>) é zero, no escopo escolhido.</p>
+      <div class="code-card">
+        <div class="code-head"><div class="dots"><i></i><i></i><i></i></div><span class="file">pwsh — Find-AzureUtilsEmptyResourceGroup</span></div>
+<pre><code><span class="tok-cmd">Find-AzureUtilsEmptyResourceGroup</span>
+<span class="tok-cmd">Find-AzureUtilsEmptyResourceGroup</span> <span class="tok-flag">-SubscriptionId</span> $sub1, $sub2</code></pre>
+      </div>
+
+      <h2 id="public">Find-AzureUtilsPublicResource</h2>
+      <p>
+        Traz à tona recursos expostos à internet pública via Azure Resource Graph, com uma coluna
+        <code>Exposure</code> explicando cada achado. Retorna objetos (também tabela colorida no console).
+        Todas as categorias são checadas por padrão; restrinja com <code>-Type</code>.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Valor de <code>-Type</code></th><th>Sinaliza</th></tr></thead>
+          <tbody>
+            <tr><td><code>PublicIp</code></td><td>endereços IP públicos que estão associados (em uso)</td></tr>
+            <tr><td><code>PublicNetworkAccess</code></td><td>recursos com <code>properties.publicNetworkAccess = Enabled</code> (discos gerenciados excluídos — <code>Enabled</code> por padrão e não é exposição real)</td></tr>
+            <tr><td><code>StorageOpen</code></td><td>storage com acesso anônimo a blob ou <code>networkAcls.defaultAction = Allow</code></td></tr>
+            <tr><td><code>NsgInternetInbound</code></td><td>regras inbound Allow de NSG originadas da Internet (<code>*</code> / <code>0.0.0.0/0</code>)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="code-card">
+        <div class="code-head"><div class="dots"><i></i><i></i><i></i></div><span class="file">pwsh — Find-AzureUtilsPublicResource</span></div>
+<pre><code><span class="tok-cmd">Find-AzureUtilsPublicResource</span>
+<span class="tok-cmd">Find-AzureUtilsPublicResource</span> <span class="tok-flag">-ManagementGroupId</span> <span class="tok-str">'PLAT'</span> <span class="tok-flag">-Type</span> StorageOpen, NsgInternetInbound
+<span class="tok-cmd">Find-AzureUtilsPublicResource</span> | <span class="tok-cmd">Export-Csv</span> <span class="tok-str">.\public-exposure.csv</span> <span class="tok-flag">-NoTypeInformation</span></code></pre>
+      </div>
+      <div class="note">
+        <span class="ico">ℹ</span>
+        <div>Um recurso pode aparecer mais de uma vez quando várias categorias se aplicam. Revise antes de agir.</div>
+      </div>
+
+      <div class="next-prev">
+        <a href="tag-inventory.pt-br.html">
+          <span class="np-kicker">← Anterior</span>
+          <span class="np-title">Inventário de tags</span>
+        </a>
+        <a class="is-next" href="release-publishing.pt-br.html">
+          <span class="np-kicker">Próximo →</span>
+          <span class="np-title">Release &amp; publicação</span>
+        </a>
+      </div>
+    </article>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container footer-grid">
+    <p>© <span data-current-year></span> Henderson Andrade · Arquiteto de Nuvem Microsoft Azure.</p>
+    <div class="footer-links">
+      <a href="../../solutions/index.pt-br.html">Soluções</a>
+      <a href="index.pt-br.html">Docs AzureUtils</a>
+      <a href="https://github.com/hendersonandrade/powershell-module-azureUtils" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../../assets/js/main.js"></script>
+</body>
+</html>

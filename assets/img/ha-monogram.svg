@@ -1,0 +1,12 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Henderson Andrade monogram">
+  <defs>
+    <linearGradient id="ha-g" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5cb4ff"/>
+      <stop offset="0.55" stop-color="#38d3ff"/>
+      <stop offset="1" stop-color="#3ad29f"/>
+    </linearGradient>
+  </defs>
+  <rect x="1" y="1" width="38" height="38" rx="11" fill="#0c1324" stroke="url(#ha-g)" stroke-width="1.5"/>
+  <path d="M11 28V12M11 20H18M18 12V28" stroke="url(#ha-g)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M23 28L28 12L33 28M24.7 23H31.3" stroke="url(#ha-g)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

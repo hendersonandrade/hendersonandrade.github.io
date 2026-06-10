@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Henderson Andrade — Microsoft Azure Cloud Architect</title>
+  <meta name="description" content="Henderson Andrade — Microsoft Azure Cloud Architect focused on DevOps, Infrastructure as Code, automation and Microsoft 365. Home of the AzureUtils PowerShell module.">
+  <meta property="og:title" content="Henderson Andrade — Azure Cloud Architect">
+  <meta property="og:description" content="Cloud architecture, automation and open-source tooling for Microsoft Azure. Documentation for the AzureUtils PowerShell module.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container navbar">
+    <a class="brand" href="index.html" aria-label="Henderson Andrade — home">
+      <img class="brand-mark" src="assets/img/ha-monogram.svg" alt="">
+      <span>Henderson Andrade<span class="brand-sub">Azure Cloud Architect</span></span>
+    </a>
+
+    <button class="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+
+    <ul class="nav-menu">
+      <li><a class="nav-link is-active" href="index.html">Home</a></li>
+
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Solutions <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="solutions/index.html"><span class="dropdown-kicker">Portfolio</span><span class="dropdown-title">All solutions</span></a></li>
+          <li><a href="docs/azureutils/index.html"><span class="dropdown-kicker">Personal · PowerShell</span><span class="dropdown-title">AzureUtils module</span></a></li>
+          <li><a href="https://trimtechbr.github.io" target="_blank" rel="noopener"><span class="dropdown-kicker">TrimTechBR ↗</span><span class="dropdown-title">AER — Azure Estate Report</span></a></li>
+        </ul>
+      </li>
+
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Docs <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="docs/azureutils/index.html"><span class="dropdown-kicker">Start here</span><span class="dropdown-title">Overview &amp; install</span></a></li>
+          <li><a href="docs/azureutils/tag-inventory.html"><span class="dropdown-kicker">Reference</span><span class="dropdown-title">Tag inventory</span></a></li>
+          <li><a href="docs/azureutils/find-commands.html"><span class="dropdown-kicker">Reference</span><span class="dropdown-title">Find commands</span></a></li>
+          <li><a href="docs/azureutils/release-publishing.html"><span class="dropdown-kicker">Internals</span><span class="dropdown-title">Release &amp; publishing</span></a></li>
+        </ul>
+      </li>
+
+      <li><a class="nav-link" href="contact.html">Contact</a></li>
+      <li><a class="btn btn-secondary" href="https://github.com/hendersonandrade" target="_blank" rel="noopener">GitHub ↗</a></li>
+      <li class="nav-item lang-switch">
+        <a class="lang-link is-active" href="index.html">EN</a>
+        <span class="lang-sep">/</span>
+        <a class="lang-link" href="index.pt-br.html">PT</a>
+      </li>
+    </ul>
+  </div>
+</header>
+
+<main>
+
+<section class="hero">
+  <div class="container hero-grid">
+    <div class="reveal">
+      <span class="eyebrow">Microsoft Azure · DevOps · Automation</span>
+      <h1>Designing, automating and operating <span class="text-gradient">Microsoft Cloud</span> environments.</h1>
+      <div class="role-tags">
+        <span class="role-tag"><span>#</span> Azure Landing Zones</span>
+        <span class="role-tag"><span>#</span> Infrastructure as Code</span>
+        <span class="role-tag"><span>#</span> PowerShell</span>
+        <span class="role-tag"><span>#</span> FinOps</span>
+        <span class="role-tag"><span>#</span> Microsoft 365</span>
+      </div>
+      <p class="lead">
+        I'm <strong>Henderson Andrade</strong>, a Microsoft Azure Cloud Architect focused on cloud
+        governance, security, automation and observability. I build tools, scripts and open-source
+        projects that help teams understand and evolve their Azure estates.
+      </p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="docs/azureutils/index.html">Explore AzureUtils <span class="arrow">→</span></a>
+        <a class="btn btn-secondary" href="solutions/index.html">View all solutions</a>
+      </div>
+
+      <div class="stats-strip">
+        <div class="stat"><strong>7+</strong><span>cmdlets in AzureUtils</span></div>
+        <div class="stat"><strong>2</strong><span>open-source ecosystems</span></div>
+        <div class="stat"><strong>100%</strong><span>practitioner-built</span></div>
+      </div>
+    </div>
+
+    <div class="hero-portrait reveal" data-delay="1">
+      <div class="ring" aria-hidden="true"></div>
+      <img src="assets/img/avatar.png" alt="Henderson Andrade" width="340" height="340">
+      <div class="badge-float"><span class="dot-live"></span> Open to collaborate</div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="code-card reveal" style="max-width:760px;margin-inline:auto">
+      <div class="code-head">
+        <div class="dots"><i></i><i></i><i></i></div>
+        <span class="file">pwsh — install the personal module</span>
+      </div>
+<pre><code><span class="tok-com"># Install AzureUtils from the PowerShell Gallery</span>
+<span class="tok-cmd">Install-Module</span> AzureUtils <span class="tok-flag">-Scope</span> CurrentUser
+
+<span class="tok-com"># Connect and export a tag inventory to Excel</span>
+<span class="tok-cmd">Connect-AzAccount</span>
+<span class="tok-cmd">Export-AzureUtilsTagInventory</span> <span class="tok-flag">-OutputPath</span> <span class="tok-str">'.\inventory.xlsx'</span></code></pre>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="focus">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="eyebrow">What I work on</span>
+      <h2>Areas of focus</h2>
+      <p>Engineering practices applied across the Microsoft Cloud — from landing zones and IaC to FinOps and reporting.</p>
+    </div>
+
+    <div class="focus-grid">
+      <div class="focus-item reveal">
+        <h4>☁ Azure Architecture</h4>
+        <ul><li>Landing Zones</li><li>Governance &amp; policy</li><li>Networking</li><li>Security</li><li>Monitoring</li></ul>
+      </div>
+      <div class="focus-item reveal" data-delay="1">
+        <h4>⚙ DevOps</h4>
+        <ul><li>CI/CD pipelines</li><li>GitHub Actions</li><li>Azure DevOps</li><li>Automation</li></ul>
+      </div>
+      <div class="focus-item reveal" data-delay="2">
+        <h4>▣ Infrastructure as Code</h4>
+        <ul><li>Terraform</li><li>Bicep</li><li>ARM Templates</li></ul>
+      </div>
+      <div class="focus-item reveal" data-delay="3">
+        <h4>◷ Cloud Operations</h4>
+        <ul><li>Observability</li><li>FinOps &amp; cost</li><li>Reporting</li><li>PowerShell</li></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="section-header center reveal">
+      <span class="eyebrow">Toolbox</span>
+      <h2>Cloud &amp; DevOps stack</h2>
+    </div>
+    <div class="tech-strip reveal">
+      <span class="tech-pill"><b></b> Microsoft Azure</span>
+      <span class="tech-pill"><b></b> Microsoft 365</span>
+      <span class="tech-pill"><b></b> Entra ID</span>
+      <span class="tech-pill"><b></b> PowerShell</span>
+      <span class="tech-pill"><b></b> Terraform</span>
+      <span class="tech-pill"><b></b> Bicep</span>
+      <span class="tech-pill"><b></b> Azure DevOps</span>
+      <span class="tech-pill"><b></b> GitHub Actions</span>
+      <span class="tech-pill"><b></b> Azure Resource Graph</span>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="projects">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="eyebrow">Featured projects</span>
+      <h2>Open-source solutions</h2>
+      <p>Personal projects on my GitHub, plus collaborative work under TrimTechBR with Henrique Mizael.</p>
+    </div>
+
+    <div class="grid-2">
+      <article class="card solution-card reveal">
+        <span class="card-icon">⌘</span>
+        <h3>AzureUtils — PowerShell module</h3>
+        <p>
+          Practical utility cmdlets for Azure administration, governance, inventory and operational
+          automation. Tag inventory round-trips to Excel, orphan-resource discovery, public-exposure
+          checks and more — all with normalized, automation-ready output.
+        </p>
+        <div class="badge-row">
+          <span class="badge badge-oss">Open Source</span>
+          <span class="badge badge-primary">PowerShell 7+</span>
+          <span class="badge">Azure</span>
+          <span class="badge">PSGallery</span>
+        </div>
+        <div class="card-links">
+          <a class="btn btn-primary" href="docs/azureutils/index.html">Documentation <span class="arrow">→</span></a>
+          <a class="btn btn-secondary" href="https://github.com/hendersonandrade/powershell-module-azureUtils" target="_blank" rel="noopener">GitHub ↗</a>
+        </div>
+      </article>
+
+      <article class="card solution-card reveal" data-delay="1">
+        <span class="card-icon">▦</span>
+        <h3>AER — Azure Estate Report</h3>
+        <p>
+          A TrimTechBR project: a PowerShell 7 module that connects to Azure with your existing
+          credentials, collects a read-only inventory via Azure Resource Graph and ARM, and renders a
+          rich, self-contained HTML report — plus Excel and PDF exports.
+        </p>
+        <div class="badge-row">
+          <span class="badge badge-oss">Open Source</span>
+          <span class="badge badge-primary">PowerShell 7</span>
+          <span class="badge">Offline HTML</span>
+          <span class="badge">TrimTechBR</span>
+        </div>
+        <div class="card-links">
+          <a class="btn btn-primary" href="https://trimtechbr.github.io" target="_blank" rel="noopener">Visit AER site ↗</a>
+          <a class="btn btn-secondary" href="https://github.com/TrimTechBR/azure-estate-report" target="_blank" rel="noopener">GitHub ↗</a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="callout reveal">
+      <span class="eyebrow" style="justify-content:center">Let's build something</span>
+      <h2>Built by a practitioner, for practitioners.</h2>
+      <p>
+        I'm open to collaborating on PowerShell modules, Azure assessment and reporting tools, landing
+        zone documentation, IaC templates and cloud governance automation.
+      </p>
+      <a class="btn btn-primary" href="contact.html">Get in touch <span class="arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="container footer-grid">
+    <p>© <span data-current-year></span> Henderson Andrade · Microsoft Azure Cloud Architect.</p>
+    <div class="footer-links">
+      <a href="solutions/index.html">Solutions</a>
+      <a href="docs/azureutils/index.html">AzureUtils docs</a>
+      <a href="https://github.com/hendersonandrade" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://br.linkedin.com/in/henderson-andrade-%E2%98%81%EF%B8%8F-22b1ba33/pt" target="_blank" rel="noopener">LinkedIn ↗</a>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+</body>
+</html>

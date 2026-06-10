@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Solutions — Henderson Andrade</title>
+  <meta name="description" content="Open-source solutions by Henderson Andrade: the AzureUtils PowerShell module and TrimTechBR's AER — Azure Estate Report.">
+  <meta property="og:title" content="Solutions — Henderson Andrade">
+  <meta property="og:description" content="Open-source solutions: AzureUtils PowerShell module and AER — Azure Estate Report.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container navbar">
+    <a class="brand" href="../index.html" aria-label="Henderson Andrade — home">
+      <img class="brand-mark" src="../assets/img/ha-monogram.svg" alt="">
+      <span>Henderson Andrade<span class="brand-sub">Azure Cloud Architect</span></span>
+    </a>
+    <button class="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-menu">
+      <li><a class="nav-link" href="../index.html">Home</a></li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Solutions <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="index.html"><span class="dropdown-kicker">Portfolio</span><span class="dropdown-title">All solutions</span></a></li>
+          <li><a href="../docs/azureutils/index.html"><span class="dropdown-kicker">Personal · PowerShell</span><span class="dropdown-title">AzureUtils module</span></a></li>
+          <li><a href="https://trimtechbr.github.io" target="_blank" rel="noopener"><span class="dropdown-kicker">TrimTechBR ↗</span><span class="dropdown-title">AER — Azure Estate Report</span></a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Docs <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="../docs/azureutils/index.html"><span class="dropdown-kicker">Start here</span><span class="dropdown-title">Overview &amp; install</span></a></li>
+          <li><a href="../docs/azureutils/tag-inventory.html"><span class="dropdown-kicker">Reference</span><span class="dropdown-title">Tag inventory</span></a></li>
+          <li><a href="../docs/azureutils/find-commands.html"><span class="dropdown-kicker">Reference</span><span class="dropdown-title">Find commands</span></a></li>
+          <li><a href="../docs/azureutils/release-publishing.html"><span class="dropdown-kicker">Internals</span><span class="dropdown-title">Release &amp; publishing</span></a></li>
+        </ul>
+      </li>
+      <li><a class="nav-link" href="../contact.html">Contact</a></li>
+      <li><a class="btn btn-secondary" href="https://github.com/hendersonandrade" target="_blank" rel="noopener">GitHub ↗</a></li>
+      <li class="nav-item lang-switch">
+        <a class="lang-link is-active" href="index.html">EN</a>
+        <span class="lang-sep">/</span>
+        <a class="lang-link" href="index.pt-br.html">PT</a>
+      </li>
+    </ul>
+  </div>
+</header>
+
+<main>
+
+<section class="section">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="eyebrow">Portfolio</span>
+      <h2>Open-source solutions</h2>
+      <p>
+        Everything here is open source. <strong>AzureUtils</strong> is my personal PowerShell module;
+        <strong>AER</strong> is a TrimTechBR project built together with Henrique Mizael. More to come as
+        time allows.
+      </p>
+    </div>
+
+    <div class="grid-2">
+      <article class="card solution-card reveal">
+        <span class="card-icon">⌘</span>
+        <h3>AzureUtils</h3>
+        <p>
+          Practical utility cmdlets for Azure administration, governance, inventory, troubleshooting and
+          operational automation. It does not replace the <code>Az</code> modules — it wraps real
+          day-to-day pain behind simple commands with normalized, automation-ready output.
+        </p>
+        <ul style="color:var(--muted);font-size:0.92rem;padding-left:1.1rem;margin:0 0 0.4rem">
+          <li><code>Export</code> / <code>Set-AzureUtilsTagInventory</code> — Excel tag round-trip</li>
+          <li><code>Find-AzureUtilsOrphanResource</code> — unused disks, NICs, IPs, NSGs, routes</li>
+          <li><code>Find-AzureUtilsEmptyResourceGroup</code> — empty resource groups</li>
+          <li><code>Find-AzureUtilsPublicResource</code> — internet-exposed resources</li>
+        </ul>
+        <div class="badge-row">
+          <span class="badge badge-oss">Open Source</span>
+          <span class="badge badge-primary">PowerShell 7+</span>
+          <span class="badge">Azure Resource Graph</span>
+          <span class="badge">PSGallery</span>
+        </div>
+        <div class="card-links">
+          <a class="btn btn-primary" href="../docs/azureutils/index.html">Documentation <span class="arrow">→</span></a>
+          <a class="btn btn-secondary" href="https://github.com/hendersonandrade/powershell-module-azureUtils" target="_blank" rel="noopener">GitHub ↗</a>
+          <a class="btn btn-secondary" href="https://www.powershellgallery.com/packages/AzureUtils" target="_blank" rel="noopener">PSGallery ↗</a>
+        </div>
+      </article>
+
+      <article class="card solution-card reveal" data-delay="1">
+        <span class="card-icon">▦</span>
+        <h3>AER — Azure Estate Report</h3>
+        <p>
+          A TrimTechBR open-source project. A PowerShell 7 module that connects to Azure with your
+          existing credentials, collects a read-only inventory through Azure Resource Graph and ARM REST
+          APIs, and renders a rich, multi-page, self-contained HTML report — plus Excel and PDF exports.
+        </p>
+        <p style="color:var(--muted-2);font-size:0.88rem">
+          AER has its own dedicated website and documentation hub at TrimTechBR.
+        </p>
+        <div class="badge-row">
+          <span class="badge badge-oss">Open Source</span>
+          <span class="badge badge-primary">PowerShell 7</span>
+          <span class="badge">Offline HTML</span>
+          <span class="badge">Read-only</span>
+          <span class="badge">TrimTechBR</span>
+        </div>
+        <div class="card-links">
+          <a class="btn btn-primary" href="https://trimtechbr.github.io" target="_blank" rel="noopener">Visit AER site ↗</a>
+          <a class="btn btn-secondary" href="https://github.com/TrimTechBr/azure-estate-report" target="_blank" rel="noopener">GitHub ↗</a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="callout reveal">
+      <span class="eyebrow" style="justify-content:center">Where to find more</span>
+      <h2>More across GitHub &amp; Azure DevOps</h2>
+      <p>
+        Additional personal projects, experiments and scripts live on my GitHub profile, the TrimTechBR
+        organization, and my Azure DevOps.
+      </p>
+      <div class="hero-actions" style="justify-content:center">
+        <a class="btn btn-secondary" href="https://github.com/hendersonandrade?tab=repositories" target="_blank" rel="noopener">Personal repos ↗</a>
+        <a class="btn btn-secondary" href="https://github.com/trimtechbr?tab=repositories" target="_blank" rel="noopener">TrimTechBR ↗</a>
+        <a class="btn btn-secondary" href="https://dev.azure.com/hendersonandrade/" target="_blank" rel="noopener">Azure DevOps ↗</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="container footer-grid">
+    <p>© <span data-current-year></span> Henderson Andrade · Microsoft Azure Cloud Architect.</p>
+    <div class="footer-links">
+      <a href="index.html">Solutions</a>
+      <a href="../docs/azureutils/index.html">AzureUtils docs</a>
+      <a href="https://github.com/hendersonandrade" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://br.linkedin.com/in/henderson-andrade-%E2%98%81%EF%B8%8F-22b1ba33/pt" target="_blank" rel="noopener">LinkedIn ↗</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

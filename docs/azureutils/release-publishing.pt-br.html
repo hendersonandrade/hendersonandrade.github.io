@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AzureUtils — Release &amp; publicação | Henderson Andrade</title>
+  <meta name="description" content="Fluxo de release, publicação e desenvolvimento do AzureUtils — versionamento pelo manifesto, auto-tag e publicação na PowerShell Gallery.">
+  <meta property="og:title" content="AzureUtils — Release &amp; publicação">
+  <meta property="og:description" content="Versionamento pelo manifesto, auto-tag e publicação na PowerShell Gallery para o AzureUtils.">
+  <meta property="og:type" content="article">
+  <link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container navbar">
+    <a class="brand" href="../../index.pt-br.html" aria-label="Henderson Andrade — início">
+      <img class="brand-mark" src="../../assets/img/ha-monogram.svg" alt="">
+      <span>Henderson Andrade<span class="brand-sub">Arquiteto de Nuvem Azure</span></span>
+    </a>
+    <button class="nav-toggle" aria-label="Abrir menu de navegação" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-menu">
+      <li><a class="nav-link" href="../../index.pt-br.html">Início</a></li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Soluções <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="../../solutions/index.pt-br.html"><span class="dropdown-kicker">Portfólio</span><span class="dropdown-title">Todas as soluções</span></a></li>
+          <li><a href="index.pt-br.html"><span class="dropdown-kicker">Pessoal · PowerShell</span><span class="dropdown-title">Módulo AzureUtils</span></a></li>
+          <li><a href="https://trimtechbr.github.io/index.pt-br.html" target="_blank" rel="noopener"><span class="dropdown-kicker">TrimTechBR ↗</span><span class="dropdown-title">AER — Azure Estate Report</span></a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Docs <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="index.pt-br.html"><span class="dropdown-kicker">Comece aqui</span><span class="dropdown-title">Visão geral &amp; instalação</span></a></li>
+          <li><a href="tag-inventory.pt-br.html"><span class="dropdown-kicker">Referência</span><span class="dropdown-title">Inventário de tags</span></a></li>
+          <li><a href="find-commands.pt-br.html"><span class="dropdown-kicker">Referência</span><span class="dropdown-title">Comandos Find</span></a></li>
+          <li><a href="release-publishing.pt-br.html"><span class="dropdown-kicker">Bastidores</span><span class="dropdown-title">Release &amp; publicação</span></a></li>
+        </ul>
+      </li>
+      <li><a class="nav-link" href="../../contact.pt-br.html">Contato</a></li>
+      <li><a class="btn btn-secondary" href="https://github.com/hendersonandrade/powershell-module-azureUtils" target="_blank" rel="noopener">GitHub ↗</a></li>
+      <li class="nav-item lang-switch">
+        <a class="lang-link" href="release-publishing.html">EN</a>
+        <span class="lang-sep">/</span>
+        <a class="lang-link is-active" href="release-publishing.pt-br.html">PT</a>
+      </li>
+    </ul>
+  </div>
+</header>
+
+<main class="container">
+  <div class="docs-shell">
+
+    <aside class="docs-sidebar reveal">
+      <div class="side-group">
+        <p class="side-title">AzureUtils</p>
+        <ul>
+          <li><a href="index.pt-br.html">Visão geral &amp; instalação</a></li>
+          <li><a href="tag-inventory.pt-br.html">Inventário de tags</a></li>
+          <li><a href="find-commands.pt-br.html">Comandos Find</a></li>
+          <li><a href="release-publishing.pt-br.html" class="is-active">Release &amp; publicação</a></li>
+        </ul>
+      </div>
+      <div class="side-group">
+        <p class="side-title">Nesta página</p>
+        <ul class="anchor-list">
+          <li><a href="#versioning">Fluxo de versionamento</a></li>
+          <li><a href="#secrets">Secrets do repositório</a></li>
+          <li><a href="#dev">Desenvolvimento</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <article class="docs-content">
+      <nav class="breadcrumb">
+        <a href="../../index.pt-br.html">Início</a><span class="sep">/</span>
+        <a href="index.pt-br.html">AzureUtils</a><span class="sep">/</span>
+        <span>Release &amp; publicação</span>
+      </nav>
+
+      <span class="eyebrow">Bastidores</span>
+      <h1>Release &amp; publicação</h1>
+      <p class="docs-lede">
+        O versionamento é dirigido pelo manifesto (<code>AzureUtils/AzureUtils.psd1</code>). O merge de
+        <code>develop → main</code> cria a tag de release e publica na PowerShell Gallery
+        automaticamente — sem necessidade de personal access token.
+      </p>
+
+      <h2 id="versioning">Fluxo de versionamento</h2>
+      <ol>
+        <li>O trabalho acontece em <code>develop</code>. Suba o <code>ModuleVersion</code> (e <code>PrivateData.PSData.Prerelease</code> para pré-lançamentos) lá.</li>
+        <li>
+          O merge <code>develop → main</code> (que altera <code>AzureUtils/AzureUtils.psd1</code>) executa
+          o <strong>Auto-tag release on main</strong>, que:
+          <ul>
+            <li>resolve a versão a partir do manifesto e cria a tag git — estável <code>v{ModuleVersion}</code>, pré-lançamento <code>v{ModuleVersion}-{Prerelease}</code> — apenas se ela ainda não existir;</li>
+            <li>dispara o workflow de publicação via <code>gh workflow run</code> usando o <code>github.token</code> embutido.</li>
+          </ul>
+        </li>
+        <li>
+          O <strong>Publish PowerShell Gallery</strong> então roda um pipeline
+          <code>guard → validate → publish</code>: publica <strong>apenas quando</strong> o commit da tag
+          é alcançável a partir de <code>main</code> e a tag bate com a versão do manifesto. O passo de
+          publicação é idempotente (uma versão já publicada é tratada como sucesso).
+        </li>
+      </ol>
+      <div class="note">
+        <span class="ico">ℹ</span>
+        <div>
+          Nenhum personal access token é necessário: a tag é enviada com o <code>github.token</code> padrão
+          e o workflow de publicação é iniciado explicitamente via <code>gh workflow run</code> (ele
+          também aceita <code>workflow_dispatch</code> com uma entrada <code>release_tag</code> para
+          re-execuções manuais).
+        </div>
+      </div>
+
+      <h2 id="secrets">Secrets do repositório necessários</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Secret</th><th>Usado por</th><th>Notas</th></tr></thead>
+          <tbody>
+            <tr><td><code>PSGALLERY_API_KEY</code></td><td>Publish PowerShell Gallery</td><td>Chave de API da PowerShell Gallery.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        O workflow <code>auto-tag</code> precisa de <code>permissions: contents: write</code> e
+        <code>actions: write</code> (já declarados no workflow) para poder enviar a tag e disparar o
+        workflow de publicação com o token embutido.
+      </p>
+
+      <h2 id="dev">Desenvolvimento</h2>
+      <div class="code-card">
+        <div class="code-head"><div class="dots"><i></i><i></i><i></i></div><span class="file">pwsh — rodar os testes</span></div>
+<pre><code><span class="tok-cmd">Install-Module</span> Pester <span class="tok-flag">-MinimumVersion</span> <span class="tok-num">5.5.0</span> <span class="tok-flag">-Scope</span> CurrentUser
+<span class="tok-cmd">Invoke-Pester</span> <span class="tok-str">./AzureUtils/Tests</span></code></pre>
+      </div>
+
+      <div class="next-prev">
+        <a href="find-commands.pt-br.html">
+          <span class="np-kicker">← Anterior</span>
+          <span class="np-title">Comandos Find</span>
+        </a>
+        <a class="is-next" href="https://github.com/hendersonandrade/powershell-module-azureUtils" target="_blank" rel="noopener">
+          <span class="np-kicker">Código →</span>
+          <span class="np-title">Repositório no GitHub ↗</span>
+        </a>
+      </div>
+    </article>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container footer-grid">
+    <p>© <span data-current-year></span> Henderson Andrade · Arquiteto de Nuvem Microsoft Azure.</p>
+    <div class="footer-links">
+      <a href="../../solutions/index.pt-br.html">Soluções</a>
+      <a href="index.pt-br.html">Docs AzureUtils</a>
+      <a href="https://github.com/hendersonandrade/powershell-module-azureUtils" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../../assets/js/main.js"></script>
+</body>
+</html>

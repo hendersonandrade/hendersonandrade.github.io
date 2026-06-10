@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AzureUtils — Tag inventory | Henderson Andrade</title>
+  <meta name="description" content="Export-AzureUtilsTagInventory and Set-AzureUtilsTagInventory — export an Azure resource + tag inventory to Excel and apply edits back onto Azure.">
+  <meta property="og:title" content="AzureUtils — Tag inventory">
+  <meta property="og:description" content="Export an Azure tag inventory to Excel and apply edits back to Azure.">
+  <meta property="og:type" content="article">
+  <link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container navbar">
+    <a class="brand" href="../../index.html" aria-label="Henderson Andrade — home">
+      <img class="brand-mark" src="../../assets/img/ha-monogram.svg" alt="">
+      <span>Henderson Andrade<span class="brand-sub">Azure Cloud Architect</span></span>
+    </a>
+    <button class="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-menu">
+      <li><a class="nav-link" href="../../index.html">Home</a></li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Solutions <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="../../solutions/index.html"><span class="dropdown-kicker">Portfolio</span><span class="dropdown-title">All solutions</span></a></li>
+          <li><a href="index.html"><span class="dropdown-kicker">Personal · PowerShell</span><span class="dropdown-title">AzureUtils module</span></a></li>
+          <li><a href="https://trimtechbr.github.io" target="_blank" rel="noopener"><span class="dropdown-kicker">TrimTechBR ↗</span><span class="dropdown-title">AER — Azure Estate Report</span></a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Docs <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="index.html"><span class="dropdown-kicker">Start here</span><span class="dropdown-title">Overview &amp; install</span></a></li>
+          <li><a href="tag-inventory.html"><span class="dropdown-kicker">Reference</span><span class="dropdown-title">Tag inventory</span></a></li>
+          <li><a href="find-commands.html"><span class="dropdown-kicker">Reference</span><span class="dropdown-title">Find commands</span></a></li>
+          <li><a href="release-publishing.html"><span class="dropdown-kicker">Internals</span><span class="dropdown-title">Release &amp; publishing</span></a></li>
+        </ul>
+      </li>
+      <li><a class="nav-link" href="../../contact.html">Contact</a></li>
+      <li><a class="btn btn-secondary" href="https://github.com/hendersonandrade/powershell-module-azureUtils" target="_blank" rel="noopener">GitHub ↗</a></li>
+      <li class="nav-item lang-switch">
+        <a class="lang-link is-active" href="tag-inventory.html">EN</a>
+        <span class="lang-sep">/</span>
+        <a class="lang-link" href="tag-inventory.pt-br.html">PT</a>
+      </li>
+    </ul>
+  </div>
+</header>
+
+<main class="container">
+  <div class="docs-shell">
+
+    <aside class="docs-sidebar reveal">
+      <div class="side-group">
+        <p class="side-title">AzureUtils</p>
+        <ul>
+          <li><a href="index.html">Overview &amp; install</a></li>
+          <li><a href="tag-inventory.html" class="is-active">Tag inventory</a></li>
+          <li><a href="find-commands.html">Find commands</a></li>
+          <li><a href="release-publishing.html">Release &amp; publishing</a></li>
+        </ul>
+      </div>
+      <div class="side-group">
+        <p class="side-title">On this page</p>
+        <ul class="anchor-list">
+          <li><a href="#export">Export-…TagInventory</a></li>
+          <li><a href="#export-params">Parameters</a></li>
+          <li><a href="#export-examples">Examples</a></li>
+          <li><a href="#export-output">Console &amp; Excel output</a></li>
+          <li><a href="#set">Set-…TagInventory</a></li>
+          <li><a href="#roundtrip">Round-trip</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <article class="docs-content">
+      <nav class="breadcrumb">
+        <a href="../../index.html">Home</a><span class="sep">/</span>
+        <a href="index.html">AzureUtils</a><span class="sep">/</span>
+        <span>Tag inventory</span>
+      </nav>
+
+      <span class="eyebrow">Reference</span>
+      <h1>Tag inventory</h1>
+      <p class="docs-lede">
+        Export an Azure resource + tag inventory to an Excel workbook, edit it, and apply the changes back
+        onto Azure. Two cmdlets form a safe round-trip:
+        <span class="cmd-name">Export-AzureUtilsTagInventory</span> and
+        <span class="cmd-name">Set-AzureUtilsTagInventory</span>.
+      </p>
+
+      <h2 id="export">Export-AzureUtilsTagInventory</h2>
+      <p>
+        Exports an Azure resource + tag inventory to an Excel workbook via Azure Resource Graph. The
+        cmdlet <strong>does not emit objects</strong> — it writes the <code>.xlsx</code> and prints a
+        console report. Scope can be narrowed by <strong>management group(s)</strong>,
+        <strong>subscription(s)</strong>, <strong>resource group(s)</strong>, and a case-insensitive
+        <code>-NameContains</code> match.
+      </p>
+
+      <h3 id="export-params">Parameters</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Parameter</th><th>Multiple?</th><th>Purpose</th></tr></thead>
+          <tbody>
+            <tr><td><code>-ManagementGroupId</code></td><td>yes (<code>string[]</code>)</td><td>One or more management groups.</td></tr>
+            <tr><td><code>-SubscriptionId</code></td><td>yes (<code>string[]</code>)</td><td>One or more subscriptions (default: all enabled in the context).</td></tr>
+            <tr><td><code>-ResourceGroupName</code></td><td>yes (<code>string[]</code>)</td><td>Filter by resource group name(s).</td></tr>
+            <tr><td><code>-NameContains</code></td><td>no (single term)</td><td>Keep resources whose name contains this text.</td></tr>
+            <tr><td><code>-FilterTags</code></td><td>yes (<code>string[]</code>)</td><td>Export only these tag keys, in this order (default: all tags found).</td></tr>
+            <tr><td><code>-IncludeSubscription</code></td><td>—</td><td>Also add the subscriptions themselves as rows (their own tags).</td></tr>
+            <tr><td><code>-IncludeResourceGroup</code></td><td>—</td><td>Also add the resource groups themselves as rows (their own tags).</td></tr>
+            <tr><td><code>-IncludeTagUnsupported</code></td><td>—</td><td>Keep resources whose type doesn't support tags and add a colored <code>Tag Support</code> column.</td></tr>
+            <tr><td><code>-OutputPath</code></td><td>required</td><td>Destination <code>.xlsx</code> file.</td></tr>
+            <tr><td><code>-TableStyle</code></td><td>—</td><td>Excel table style (default neutral <code>Light1</code>).</td></tr>
+            <tr><td><code>-Quiet</code></td><td>—</td><td>Suppress per-resource log lines (show a progress bar instead).</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note warn">
+        <span class="ico">⚠</span>
+        <div><code>-ManagementGroupId</code> and <code>-SubscriptionId</code> are mutually exclusive (separate parameter sets). Requires the <code>ImportExcel</code> module.</div>
+      </div>
+
+      <h3 id="export-examples">Examples</h3>
+      <div class="code-card">
+        <div class="code-head"><div class="dots"><i></i><i></i><i></i></div><span class="file">pwsh — Export-AzureUtilsTagInventory</span></div>
+<pre><code><span class="tok-cmd">Connect-AzAccount</span>
+
+<span class="tok-com"># 1) Everything in the current context, all tags as columns</span>
+<span class="tok-cmd">Export-AzureUtilsTagInventory</span> <span class="tok-flag">-OutputPath</span> <span class="tok-str">'.\inventory.xlsx'</span>
+
+<span class="tok-com"># 2) A management group, only two tags (columns in this order)</span>
+<span class="tok-cmd">Export-AzureUtilsTagInventory</span> <span class="tok-flag">-ManagementGroupId</span> <span class="tok-str">'PLAT'</span> `
+    <span class="tok-flag">-FilterTags</span> <span class="tok-str">'costCenter'</span>, <span class="tok-str">'environment'</span> `
+    <span class="tok-flag">-OutputPath</span> <span class="tok-str">'C:\Temp\report.xlsx'</span>
+
+<span class="tok-com"># 3) Several management groups at once</span>
+<span class="tok-cmd">Export-AzureUtilsTagInventory</span> <span class="tok-flag">-ManagementGroupId</span> <span class="tok-str">'PLAT'</span>, <span class="tok-str">'SANDBOX'</span> <span class="tok-flag">-OutputPath</span> <span class="tok-str">'.\all.xlsx'</span>
+
+<span class="tok-com"># 4) Narrow scope + suppress the per-resource log (progress bar instead)</span>
+<span class="tok-cmd">Export-AzureUtilsTagInventory</span> <span class="tok-flag">-SubscriptionId</span> $sub1, $sub2 `
+    <span class="tok-flag">-ResourceGroupName</span> <span class="tok-str">'rg-prod'</span> <span class="tok-flag">-NameContains</span> <span class="tok-str">'sql'</span> `
+    <span class="tok-flag">-OutputPath</span> <span class="tok-str">'.\sql-prod.xlsx'</span> <span class="tok-flag">-Quiet</span>
+
+<span class="tok-com"># 5) Also inventory the subscriptions and resource groups themselves</span>
+<span class="tok-cmd">Export-AzureUtilsTagInventory</span> <span class="tok-flag">-ManagementGroupId</span> <span class="tok-str">'PLAT'</span> `
+    <span class="tok-flag">-IncludeSubscription</span> <span class="tok-flag">-IncludeResourceGroup</span> `
+    <span class="tok-flag">-OutputPath</span> <span class="tok-str">'.\full.xlsx'</span>
+
+<span class="tok-com"># 6) Keep tag-unsupported resource types and flag them</span>
+<span class="tok-cmd">Export-AzureUtilsTagInventory</span> <span class="tok-flag">-IncludeTagUnsupported</span> <span class="tok-flag">-OutputPath</span> <span class="tok-str">'.\inventory.xlsx'</span></code></pre>
+      </div>
+      <div class="note">
+        <span class="ico">ℹ</span>
+        <div>
+          By default only resource-level tags are inventoried. <code>-IncludeSubscription</code> and
+          <code>-IncludeResourceGroup</code> add the subscriptions / resource groups as extra rows (from
+          <code>resourcecontainers</code>) so tags applied at those scopes are captured too. Resources
+          whose <strong>type does not support tags</strong> (e.g. <code>networkWatchers</code>, classic
+          resources) are <strong>omitted</strong> by default — <code>-IncludeTagUnsupported</code> keeps
+          them and adds a <code>Tag Support</code> column (<code>Supported</code> green /
+          <code>Not supported</code> red), resolved from the ARM Resource Providers API.
+        </div>
+      </div>
+
+      <h3 id="export-output">Console &amp; Excel output</h3>
+      <div class="code-card">
+        <div class="code-head"><div class="dots"><i></i><i></i><i></i></div><span class="file">console report</span></div>
+<pre><code>Azure Tag Inventory Export
+---------------------------------------------------
+    Scope: PLAT [Management Group]
+    Number of Subscriptions: <span class="tok-num">22</span>
+    Number of Resources: <span class="tok-num">1432</span>
+
+Starting export...
+    [INFO] 1 of 1432 collecting tags of /subscriptions/.../networkWatchers/NetworkWatcher_brazilsouth
+   [ERROR] &lt;message shown for any resource that fails&gt;
+    [INFO] Collect Finish
+Report exported to C:\Temp\report.xlsx</code></pre>
+      </div>
+      <p>
+        <strong>Excel layout:</strong> fixed columns <code>resourceId</code>, <code>Resource Name</code>,
+        <code>Sub Name</code>, <code>Resource Group Name</code>, <code>Resource Type</code>,
+        <code>Region</code>, followed by one <code>TAG_&lt;name&gt;</code> column per tag. Without
+        <code>-FilterTags</code> every tag key found is a column (sorted union); with
+        <code>-FilterTags</code>, only the listed keys appear, in the given order (blank where a resource
+        lacks that tag). Change the look with <code>-TableStyle</code> (any ImportExcel style name).
+      </p>
+
+      <h2 id="set">Set-AzureUtilsTagInventory</h2>
+      <p>
+        Reads an inventory <code>.xlsx</code> (the one produced by
+        <code>Export-AzureUtilsTagInventory</code>, optionally edited) and <strong>applies</strong> the
+        <code>TAG_&lt;name&gt;</code> values back onto each resource identified by its
+        <code>resourceId</code>. The operation is a <strong>merge</strong>
+        (<code>Update-AzTag -Operation Merge</code>):
+      </p>
+      <ul>
+        <li>tags present on the resource but <strong>absent from the file are kept</strong> (never removed);</li>
+        <li>a <code>TAG_&lt;name&gt;</code> cell left <strong>empty is ignored</strong> (never created or changed);</li>
+        <li>a <strong>manually added</strong> <code>TAG_&lt;name&gt;</code> column (with a value) <strong>creates</strong> that tag.</li>
+      </ul>
+      <p>
+        This cmdlet changes Azure resources, so it supports <code>-WhatIf</code> and <code>-Confirm</code>.
+        Rows are grouped by subscription (the context is switched per group). Requires
+        <code>Az.Resources</code>.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Parameter</th><th>Purpose</th></tr></thead>
+          <tbody>
+            <tr><td><code>-InputPath</code> (required, pos. 0)</td><td>Path to the <code>.xlsx</code> to read (alias <code>-Path</code>).</td></tr>
+            <tr><td><code>-WorksheetName</code></td><td>Worksheet to read (default <code>TagInventory</code>).</td></tr>
+            <tr><td><code>-Quiet</code></td><td>Suppress the per-resource log lines (errors still shown).</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="code-card">
+        <div class="code-head"><div class="dots"><i></i><i></i><i></i></div><span class="file">pwsh — Set-AzureUtilsTagInventory</span></div>
+<pre><code><span class="tok-com"># Preview the changes without touching anything</span>
+<span class="tok-cmd">Set-AzureUtilsTagInventory</span> <span class="tok-flag">-InputPath</span> <span class="tok-str">'C:\Temp\report.xlsx'</span> <span class="tok-flag">-WhatIf</span>
+
+<span class="tok-com"># Apply (edit the TAG_* cells / add TAG_&lt;new&gt; columns first)</span>
+<span class="tok-cmd">Set-AzureUtilsTagInventory</span> <span class="tok-str">'C:\Temp\report.xlsx'</span></code></pre>
+      </div>
+
+      <h2 id="roundtrip">Round-trip</h2>
+      <div class="note">
+        <span class="ico">↻</span>
+        <div>
+          <code>Export-AzureUtilsTagInventory</code> → edit the workbook (change tag values, add
+          <code>TAG_&lt;new&gt;</code> columns) → <code>Set-AzureUtilsTagInventory</code> to apply. The
+          merge semantics make this safe: blanks and untouched tags are never destroyed.
+        </div>
+      </div>
+
+      <div class="next-prev">
+        <a href="index.html">
+          <span class="np-kicker">← Previous</span>
+          <span class="np-title">Overview &amp; install</span>
+        </a>
+        <a class="is-next" href="find-commands.html">
+          <span class="np-kicker">Next →</span>
+          <span class="np-title">Find commands</span>
+        </a>
+      </div>
+    </article>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container footer-grid">
+    <p>© <span data-current-year></span> Henderson Andrade · Microsoft Azure Cloud Architect.</p>
+    <div class="footer-links">
+      <a href="../../solutions/index.html">Solutions</a>
+      <a href="index.html">AzureUtils docs</a>
+      <a href="https://github.com/hendersonandrade/powershell-module-azureUtils" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../../assets/js/main.js"></script>
+</body>
+</html>

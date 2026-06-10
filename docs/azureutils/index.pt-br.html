@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AzureUtils — Visão geral &amp; instalação | Henderson Andrade</title>
+  <meta name="description" content="Módulo PowerShell AzureUtils — visão geral, requisitos e instalação. Cmdlets utilitários para administração, governança e automação do Azure.">
+  <meta property="og:title" content="AzureUtils — Visão geral &amp; instalação">
+  <meta property="og:description" content="Cmdlets utilitários práticos para administração, governança, inventário e automação do Azure.">
+  <meta property="og:type" content="article">
+  <link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container navbar">
+    <a class="brand" href="../../index.pt-br.html" aria-label="Henderson Andrade — início">
+      <img class="brand-mark" src="../../assets/img/ha-monogram.svg" alt="">
+      <span>Henderson Andrade<span class="brand-sub">Arquiteto de Nuvem Azure</span></span>
+    </a>
+    <button class="nav-toggle" aria-label="Abrir menu de navegação" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-menu">
+      <li><a class="nav-link" href="../../index.pt-br.html">Início</a></li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Soluções <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="../../solutions/index.pt-br.html"><span class="dropdown-kicker">Portfólio</span><span class="dropdown-title">Todas as soluções</span></a></li>
+          <li><a href="index.pt-br.html"><span class="dropdown-kicker">Pessoal · PowerShell</span><span class="dropdown-title">Módulo AzureUtils</span></a></li>
+          <li><a href="https://trimtechbr.github.io/index.pt-br.html" target="_blank" rel="noopener"><span class="dropdown-kicker">TrimTechBR ↗</span><span class="dropdown-title">AER — Azure Estate Report</span></a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Docs <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="index.pt-br.html"><span class="dropdown-kicker">Comece aqui</span><span class="dropdown-title">Visão geral &amp; instalação</span></a></li>
+          <li><a href="tag-inventory.pt-br.html"><span class="dropdown-kicker">Referência</span><span class="dropdown-title">Inventário de tags</span></a></li>
+          <li><a href="find-commands.pt-br.html"><span class="dropdown-kicker">Referência</span><span class="dropdown-title">Comandos Find</span></a></li>
+          <li><a href="release-publishing.pt-br.html"><span class="dropdown-kicker">Bastidores</span><span class="dropdown-title">Release &amp; publicação</span></a></li>
+        </ul>
+      </li>
+      <li><a class="nav-link" href="../../contact.pt-br.html">Contato</a></li>
+      <li><a class="btn btn-secondary" href="https://github.com/hendersonandrade/powershell-module-azureUtils" target="_blank" rel="noopener">GitHub ↗</a></li>
+      <li class="nav-item lang-switch">
+        <a class="lang-link" href="index.html">EN</a>
+        <span class="lang-sep">/</span>
+        <a class="lang-link is-active" href="index.pt-br.html">PT</a>
+      </li>
+    </ul>
+  </div>
+</header>
+
+<main class="container">
+  <div class="docs-shell">
+
+    <aside class="docs-sidebar reveal">
+      <div class="side-group">
+        <p class="side-title">AzureUtils</p>
+        <ul>
+          <li><a href="index.pt-br.html" class="is-active">Visão geral &amp; instalação</a></li>
+          <li><a href="tag-inventory.pt-br.html">Inventário de tags</a></li>
+          <li><a href="find-commands.pt-br.html">Comandos Find</a></li>
+          <li><a href="release-publishing.pt-br.html">Release &amp; publicação</a></li>
+        </ul>
+      </div>
+      <div class="side-group">
+        <p class="side-title">Nesta página</p>
+        <ul class="anchor-list">
+          <li><a href="#about">O que é</a></li>
+          <li><a href="#conventions">Convenções</a></li>
+          <li><a href="#requirements">Requisitos</a></li>
+          <li><a href="#install">Instalação</a></li>
+          <li><a href="#commands">Índice de comandos</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <article class="docs-content">
+      <nav class="breadcrumb">
+        <a href="../../index.pt-br.html">Início</a><span class="sep">/</span>
+        <a href="../../solutions/index.pt-br.html">Soluções</a><span class="sep">/</span>
+        <span>AzureUtils</span>
+      </nav>
+
+      <span class="eyebrow">Módulo PowerShell · PowerShell 7+</span>
+      <h1>AzureUtils</h1>
+      <p class="docs-lede">
+        Cmdlets utilitários práticos para <strong>administração, governança, inventário, troubleshooting
+        e automação operacional do Azure</strong>. O AzureUtils não substitui os módulos <code>Az</code> —
+        ele encapsula a dor real do dia a dia (inventário em escala, diagnósticos transversais, checagens
+        de governança, correções seguras) atrás de <strong>comandos simples, com saída normalizada e
+        pronta para automação</strong>.
+      </p>
+
+      <div class="badge-row">
+        <span class="badge badge-oss">Licença MIT</span>
+        <span class="badge badge-primary">PowerShell 7+</span>
+        <span class="badge">PSGallery: AzureUtils</span>
+        <span class="badge">Az.ResourceGraph</span>
+      </div>
+
+      <div class="hero-actions" style="margin:1.4rem 0 0">
+        <a class="btn btn-primary" href="https://www.powershellgallery.com/packages/AzureUtils" target="_blank" rel="noopener">PowerShell Gallery ↗</a>
+        <a class="btn btn-secondary" href="https://github.com/hendersonandrade/powershell-module-azureUtils" target="_blank" rel="noopener">Código no GitHub ↗</a>
+      </div>
+
+      <h2 id="about">O que é</h2>
+      <p>
+        O AzureUtils é uma caixa de ferramentas focada em quem opera Azure todos os dias. Onde os módulos
+        oficiais <code>Az</code> entregam os blocos crus, o AzureUtils entrega os <em>resultados</em> — um
+        inventário de tags que você edita no Excel e devolve, uma lista de recursos que parecem órfãos, os
+        recursos expostos à internet pública — cada um atrás de um único comando com saída limpa e
+        amigável ao pipeline.
+      </p>
+
+      <h2 id="conventions">Convenções</h2>
+      <ul>
+        <li><strong>Somente PowerShell 7+</strong> (<code>CompatiblePSEditions = Core</code>).</li>
+        <li>Comandos <code>Get-*</code> retornam objetos; comandos <code>Export-*</code> escrevem arquivos e imprimem um relatório no console.</li>
+        <li>Comandos de leitura usam <code>Get-*</code> / <code>Find-*</code>; comandos que alteram suportam <code>-WhatIf</code> / <code>-Confirm</code>.</li>
+        <li>Toda a saída e as mensagens dos comandos estão em <strong>en-US</strong>.</li>
+      </ul>
+
+      <h2 id="requirements">Requisitos</h2>
+      <p>Os três módulos abaixo são declarados como <code>RequiredModules</code>, então o <code>Install-Module</code> os instala automaticamente.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Módulo</th><th>Obrigatório</th><th>Finalidade</th></tr></thead>
+          <tbody>
+            <tr><td><code>Az.Accounts</code></td><td>Sim</td><td>Resolve o contexto do Azure (<code>Connect-AzAccount</code>).</td></tr>
+            <tr><td><code>Az.ResourceGraph</code></td><td>Sim</td><td>Alimenta a consulta de inventário (multi-escopo, auto-paginada).</td></tr>
+            <tr><td><code>ImportExcel</code></td><td>Sim</td><td>Usado por <code>Export-AzureUtilsTagInventory</code> para escrever o <code>.xlsx</code>.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note">
+        <span class="ico">ℹ</span>
+        <div>O <code>Set-AzureUtilsTagInventory</code> requer adicionalmente <code>Az.Resources</code> para aplicar as tags de volta no Azure.</div>
+      </div>
+
+      <h2 id="install">Instalação</h2>
+      <div class="code-card">
+        <div class="code-head"><div class="dots"><i></i><i></i><i></i></div><span class="file">pwsh</span></div>
+<pre><code><span class="tok-com"># Estável — instala também Az.Accounts, Az.ResourceGraph, ImportExcel</span>
+<span class="tok-cmd">Install-Module</span> AzureUtils <span class="tok-flag">-Scope</span> CurrentUser
+
+<span class="tok-com"># Pré-lançamento</span>
+<span class="tok-cmd">Install-Module</span> AzureUtils <span class="tok-flag">-AllowPrerelease</span> <span class="tok-flag">-Scope</span> CurrentUser</code></pre>
+      </div>
+
+      <h2 id="commands">Índice de comandos</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Comando</th><th>Tipo</th><th>O que faz</th></tr></thead>
+          <tbody>
+            <tr><td><a class="cmd-name" href="tag-inventory.pt-br.html#export">Export-AzureUtilsTagInventory</a></td><td>Export</td><td>Inventário de recursos + tags para uma planilha Excel.</td></tr>
+            <tr><td><a class="cmd-name" href="tag-inventory.pt-br.html#set">Set-AzureUtilsTagInventory</a></td><td>Alteração</td><td>Aplica uma planilha de inventário editada de volta no Azure.</td></tr>
+            <tr><td><a class="cmd-name" href="find-commands.pt-br.html#orphan">Find-AzureUtilsOrphanResource</a></td><td>Find</td><td>Recursos que parecem órfãos, com a razão.</td></tr>
+            <tr><td><a class="cmd-name" href="find-commands.pt-br.html#empty">Find-AzureUtilsEmptyResourceGroup</a></td><td>Find</td><td>Resource groups sem nenhum recurso.</td></tr>
+            <tr><td><a class="cmd-name" href="find-commands.pt-br.html#public">Find-AzureUtilsPublicResource</a></td><td>Find</td><td>Recursos expostos à internet pública.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="next-prev">
+        <span></span>
+        <a class="is-next" href="tag-inventory.pt-br.html">
+          <span class="np-kicker">Próximo →</span>
+          <span class="np-title">Inventário de tags</span>
+        </a>
+      </div>
+    </article>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container footer-grid">
+    <p>© <span data-current-year></span> Henderson Andrade · Arquiteto de Nuvem Microsoft Azure.</p>
+    <div class="footer-links">
+      <a href="../../solutions/index.pt-br.html">Soluções</a>
+      <a href="index.pt-br.html">Docs AzureUtils</a>
+      <a href="https://github.com/hendersonandrade/powershell-module-azureUtils" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../../assets/js/main.js"></script>
+</body>
+</html>
