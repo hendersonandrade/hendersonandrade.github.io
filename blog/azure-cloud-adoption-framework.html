@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cloud Adoption Framework for Azure — A Practitioner's Deep Dive | Henderson Andrade</title>
+  <meta name="description" content="A complete, diagram-rich guide to the Microsoft Cloud Adoption Framework (CAF) for Azure: the Strategy, Plan, Ready, Adopt, Govern, Manage and Secure methodologies, with practical patterns, tooling and official Microsoft references.">
+  <meta property="og:title" content="Cloud Adoption Framework for Azure — A Practitioner's Deep Dive">
+  <meta property="og:description" content="The CAF methodologies explained with diagrams, Azure tooling and a practical adoption roadmap.">
+  <meta property="og:type" content="article">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container navbar">
+    <a class="brand" href="../index.html" aria-label="Henderson Andrade — home">
+      <img class="brand-mark" src="../assets/img/ha-monogram.svg" alt="">
+      <span>Henderson Andrade<span class="brand-sub">Azure Cloud Architect</span></span>
+    </a>
+    <button class="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-menu">
+      <li><a class="nav-link" href="../index.html">Home</a></li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Solutions <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="../solutions/index.html"><span class="dropdown-kicker">Portfolio</span><span class="dropdown-title">All solutions</span></a></li>
+          <li><a href="../docs/azureutils/index.html"><span class="dropdown-kicker">Personal · PowerShell</span><span class="dropdown-title">AzureUtils module</span></a></li>
+          <li><a href="https://trimtechbr.github.io" target="_blank" rel="noopener"><span class="dropdown-kicker">TrimTechBR ↗</span><span class="dropdown-title">AER — Azure Estate Report</span></a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Docs <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="../docs/azureutils/index.html"><span class="dropdown-kicker">Start here</span><span class="dropdown-title">Overview &amp; install</span></a></li>
+          <li><a href="../docs/azureutils/tag-inventory.html"><span class="dropdown-kicker">Reference</span><span class="dropdown-title">Tag inventory</span></a></li>
+          <li><a href="../docs/azureutils/find-commands.html"><span class="dropdown-kicker">Reference</span><span class="dropdown-title">Find commands</span></a></li>
+          <li><a href="../docs/azureutils/release-publishing.html"><span class="dropdown-kicker">Internals</span><span class="dropdown-title">Release &amp; publishing</span></a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Blog <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="index.html"><span class="dropdown-kicker">All posts</span><span class="dropdown-title">Technical blog</span></a></li>
+          <li><a href="azure-well-architected-framework.html"><span class="dropdown-kicker">Architecture</span><span class="dropdown-title">Azure Well-Architected Framework</span></a></li>
+          <li><a href="azure-cloud-adoption-framework.html"><span class="dropdown-kicker">Methodology</span><span class="dropdown-title">Cloud Adoption Framework</span></a></li>
+          <li><a href="azure-landing-zones.html"><span class="dropdown-kicker">Platform</span><span class="dropdown-title">Azure Landing Zones</span></a></li>
+        </ul>
+      </li>
+      <li><a class="nav-link" href="../contact.html">Contact</a></li>
+      <li><a class="btn btn-secondary" href="https://github.com/hendersonandrade" target="_blank" rel="noopener">GitHub ↗</a></li>
+      <li class="nav-item lang-switch">
+        <a class="lang-link is-active" href="azure-cloud-adoption-framework.html">EN</a>
+        <span class="lang-sep">/</span>
+        <a class="lang-link" href="azure-cloud-adoption-framework.pt-br.html">PT</a>
+      </li>
+    </ul>
+  </div>
+</header>
+
+<main class="container">
+  <div class="docs-shell">
+
+    <aside class="docs-sidebar reveal">
+      <div class="side-group">
+        <p class="side-title">On this page</p>
+        <ul class="anchor-list">
+          <li><a href="#what">What it is</a></li>
+          <li><a href="#caf-vs-waf">CAF vs WAF</a></li>
+          <li><a href="#lifecycle">The methodologies</a></li>
+          <li><a href="#strategy">1 · Strategy</a></li>
+          <li><a href="#plan">2 · Plan</a></li>
+          <li><a href="#ready">3 · Ready</a></li>
+          <li><a href="#adopt">4 · Adopt</a></li>
+          <li><a href="#govern">Govern</a></li>
+          <li><a href="#manage">Manage</a></li>
+          <li><a href="#secure">Secure</a></li>
+          <li><a href="#getting-started">Getting started</a></li>
+          <li><a href="#checklist">Quick checklist</a></li>
+          <li><a href="#references">Microsoft references</a></li>
+        </ul>
+      </div>
+      <div class="side-group">
+        <p class="side-title">More from the blog</p>
+        <ul>
+          <li><a href="azure-well-architected-framework.html">Well-Architected Framework</a></li>
+          <li><a href="azure-landing-zones.html">Azure Landing Zones</a></li>
+          <li><a href="index.html">← All posts</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <article class="docs-content">
+      <nav class="breadcrumb">
+        <a href="../index.html">Home</a><span class="sep">/</span>
+        <a href="index.html">Blog</a><span class="sep">/</span>
+        <span>Cloud Adoption Framework</span>
+      </nav>
+
+      <span class="eyebrow">Methodology · Governance</span>
+      <h1>Cloud Adoption Framework for Azure: a practitioner's deep dive</h1>
+      <p class="docs-lede">
+        The <strong>Microsoft Cloud Adoption Framework (CAF)</strong> is the end-to-end guidance for
+        taking an organization to Azure — from business <strong>strategy</strong> all the way to ongoing
+        <strong>operations and governance</strong>. Where the Well-Architected Framework makes a single
+        workload excellent, CAF makes the <strong>whole cloud journey</strong> deliberate. This guide
+        walks every methodology with diagrams, practical patterns, the supporting tools and the official
+        Microsoft references.
+      </p>
+
+      <div class="article-meta">
+        <span><span class="am-dot"></span> Henderson Andrade</span>
+        <span>Published 17 Jun 2026</span>
+        <span>~17 min read</span>
+        <span>Azure · CAF · Cloud adoption</span>
+      </div>
+
+      <div class="badge-row">
+        <span class="badge badge-primary">Cloud Adoption</span>
+        <span class="badge">Strategy</span>
+        <span class="badge">Plan</span>
+        <span class="badge">Ready</span>
+        <span class="badge">Adopt</span>
+        <span class="badge">Govern · Manage · Secure</span>
+      </div>
+
+      <h2 id="what">What the Cloud Adoption Framework is</h2>
+      <p>
+        Most failed cloud programs don't fail on technology — they fail on <strong>alignment</strong>: a
+        migration with no business case, a platform built before anyone agreed on governance, costs that
+        nobody owns. The Cloud Adoption Framework is Microsoft's answer to that. It is a collection of
+        <strong>documentation, best practices, tools and reference implementations</strong> that take you
+        through the cloud journey in a structured, repeatable way, aligning <em>business, people and
+        technology</em> at each step.
+      </p>
+      <p>
+        CAF is organized into <strong>methodologies</strong>. Four are <strong>sequential phases</strong>
+        of the journey — Strategy, Plan, Ready and Adopt — and three are <strong>continuous</strong>
+        disciplines that run for as long as you're in the cloud — Govern, Manage and Secure. You don't
+        do CAF once; you cycle through it as your estate grows.
+      </p>
+
+      <figure class="figure reveal">
+        <svg viewBox="0 0 900 360" role="img" aria-label="The Cloud Adoption Framework lifecycle: Strategy, Plan, Ready and Adopt as sequential phases flowing left to right, with Govern, Manage and Secure as continuous bands running underneath all phases.">
+          <defs>
+            <linearGradient id="cafHead" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#38d3ff"/><stop offset="0.5" stop-color="#2f9bff"/><stop offset="1" stop-color="#3ad29f"/>
+            </linearGradient>
+            <marker id="cah" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 Z" fill="#647495"/></marker>
+          </defs>
+          <rect x="0" y="0" width="900" height="360" fill="#0c1324"/>
+          <text x="450" y="40" text-anchor="middle" fill="url(#cafHead)" font-family="Sora,sans-serif" font-size="20" font-weight="800">The Cloud Adoption Framework lifecycle</text>
+          <!-- sequential phases -->
+          <g font-family="Sora,sans-serif" font-size="14" font-weight="700" text-anchor="middle">
+            <g>
+              <rect x="40" y="70" width="180" height="92" rx="12" fill="#111a30" stroke="#38d3ff"/>
+              <rect x="40" y="70" width="180" height="6" rx="3" fill="#38d3ff"/>
+              <text x="130" y="108" fill="#38d3ff">Strategy</text>
+              <text x="130" y="132" fill="#97a7c6" font-family="JetBrains Mono,monospace" font-size="10" font-weight="500">why &amp; outcomes</text>
+            </g>
+            <g>
+              <rect x="240" y="70" width="180" height="92" rx="12" fill="#111a30" stroke="#2f9bff"/>
+              <rect x="240" y="70" width="180" height="6" rx="3" fill="#2f9bff"/>
+              <text x="330" y="108" fill="#2f9bff">Plan</text>
+              <text x="330" y="132" fill="#97a7c6" font-family="JetBrains Mono,monospace" font-size="10" font-weight="500">estate &amp; roadmap</text>
+            </g>
+            <g>
+              <rect x="440" y="70" width="180" height="92" rx="12" fill="#111a30" stroke="#3ad29f"/>
+              <rect x="440" y="70" width="180" height="6" rx="3" fill="#3ad29f"/>
+              <text x="530" y="108" fill="#3ad29f">Ready</text>
+              <text x="530" y="132" fill="#97a7c6" font-family="JetBrains Mono,monospace" font-size="10" font-weight="500">landing zones</text>
+            </g>
+            <g>
+              <rect x="640" y="70" width="220" height="92" rx="12" fill="#111a30" stroke="#f5b942"/>
+              <rect x="640" y="70" width="220" height="6" rx="3" fill="#f5b942"/>
+              <text x="750" y="104" fill="#f5b942">Adopt</text>
+              <text x="750" y="128" fill="#97a7c6" font-family="JetBrains Mono,monospace" font-size="10" font-weight="500">migrate · innovate</text>
+            </g>
+          </g>
+          <g stroke="#647495" stroke-width="2" fill="none">
+            <path d="M220 116 L240 116" marker-end="url(#cah)"/>
+            <path d="M420 116 L440 116" marker-end="url(#cah)"/>
+            <path d="M620 116 L640 116" marker-end="url(#cah)"/>
+          </g>
+          <!-- continuous bands -->
+          <text x="450" y="200" text-anchor="middle" fill="#647495" font-family="JetBrains Mono,monospace" font-size="11" letter-spacing="2">CONTINUOUS — FOR AS LONG AS YOU'RE IN THE CLOUD</text>
+          <g font-family="Sora,sans-serif" font-size="13" font-weight="700" text-anchor="middle">
+            <rect x="40" y="218" width="820" height="34" rx="9" fill="#16213b" stroke="#ff7a8a"/>
+            <text x="450" y="240" fill="#ff7a8a">Govern — guardrails, policy &amp; cost control across everything</text>
+            <rect x="40" y="260" width="820" height="34" rx="9" fill="#16213b" stroke="#5cb4ff"/>
+            <text x="450" y="282" fill="#5cb4ff">Manage — operations baseline, reliability &amp; support</text>
+            <rect x="40" y="302" width="820" height="34" rx="9" fill="#16213b" stroke="#3ad29f"/>
+            <text x="450" y="324" fill="#3ad29f">Secure — protect the estate end to end (Zero Trust)</text>
+          </g>
+        </svg>
+        <figcaption><b>Figure 1.</b> Strategy → Plan → Ready → Adopt move you onto the cloud; Govern, Manage and Secure keep you there safely — they never stop.</figcaption>
+      </figure>
+
+      <h2 id="caf-vs-waf">CAF vs. Well-Architected — two altitudes</h2>
+      <p>
+        These two frameworks are constantly confused. The simplest mental model: <strong>CAF is about the
+        organization and the platform; WAF is about the workload.</strong> CAF gets your tenant,
+        subscriptions, governance and operating model ready and moves applications in. WAF then makes
+        each of those applications reliable, secure, cost-effective, operable and performant.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th></th><th>Cloud Adoption Framework</th><th>Well-Architected Framework</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Altitude</strong></td><td>Organization &amp; platform</td><td>A single workload</td></tr>
+            <tr><td><strong>Question</strong></td><td>"How do we adopt and run Azure?"</td><td>"Is this workload built well?"</td></tr>
+            <tr><td><strong>Output</strong></td><td>Strategy, landing zones, operating model</td><td>Pillar scores &amp; recommendations</td></tr>
+            <tr><td><strong>Owner</strong></td><td>Cloud / platform team, leadership</td><td>Workload team / architect</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note">
+        <span class="ico">ℹ</span>
+        <div>New to the pillars? Read the companion piece — <a href="azure-well-architected-framework.html">Azure Well-Architected Framework: a practitioner's deep dive</a> — then come back here for the org-level view.</div>
+      </div>
+
+      <h2 id="lifecycle">The seven methodologies</h2>
+      <div class="pillar-grid">
+        <div class="pillar-card" style="--p-color:#38d3ff">
+          <span class="p-ico">◷</span>
+          <h4>Strategy</h4>
+          <p>Define the motivations, business outcomes and justification for going to the cloud.</p>
+          <span class="p-tag">Phase 1</span>
+        </div>
+        <div class="pillar-card" style="--p-color:#2f9bff">
+          <span class="p-ico">▤</span>
+          <h4>Plan</h4>
+          <p>Turn strategy into an actionable plan: digital estate, skilling and a prioritized backlog.</p>
+          <span class="p-tag">Phase 2</span>
+        </div>
+        <div class="pillar-card" style="--p-color:#3ad29f">
+          <span class="p-ico">▣</span>
+          <h4>Ready</h4>
+          <p>Prepare the environment with Azure landing zones before workloads arrive.</p>
+          <span class="p-tag">Phase 3</span>
+        </div>
+        <div class="pillar-card" style="--p-color:#f5b942">
+          <span class="p-ico">⇪</span>
+          <h4>Adopt</h4>
+          <p>Migrate existing workloads and/or innovate with cloud-native solutions.</p>
+          <span class="p-tag">Phase 4</span>
+        </div>
+        <div class="pillar-card" style="--p-color:#ff7a8a">
+          <span class="p-ico">⛨</span>
+          <h4>Govern</h4>
+          <p>Continuous guardrails: cost, security baseline, identity, resource and deployment consistency.</p>
+          <span class="p-tag">Continuous</span>
+        </div>
+        <div class="pillar-card" style="--p-color:#5cb4ff">
+          <span class="p-ico">⟲</span>
+          <h4>Manage</h4>
+          <p>An operations baseline for reliability, monitoring and ongoing support of the estate.</p>
+          <span class="p-tag">Continuous</span>
+        </div>
+        <div class="pillar-card" style="--p-color:#3ad29f">
+          <span class="p-ico">⛉</span>
+          <h4>Secure</h4>
+          <p>End-to-end security across the journey, aligned to Zero Trust and the security baseline.</p>
+          <span class="p-tag">Continuous</span>
+        </div>
+      </div>
+
+      <!-- ===================== STRATEGY ===================== -->
+      <h2 id="strategy" class="pillar-head" style="--p-color:#38d3ff"><span class="ph-badge">Phase 1</span> Strategy</h2>
+      <p>
+        Everything starts with <strong>why</strong>. The Strategy methodology forces you to document your
+        <strong>motivations</strong> (cost savings, exiting a datacenter, agility, new markets, scale,
+        risk reduction) and translate them into <strong>measurable business outcomes</strong>. Without
+        this, every later decision is a guess — and you'll struggle to know if the program is succeeding.
+      </p>
+      <h3>What you produce</h3>
+      <ul class="principle-list">
+        <li><strong>Documented motivations.</strong> Why now, and what business pressure is driving the move.</li>
+        <li><strong>Business outcomes &amp; KPIs.</strong> Concrete, measurable goals tied to revenue, cost, agility or risk.</li>
+        <li><strong>A business case.</strong> The financial justification — TCO, expected ROI and timeline.</li>
+        <li><strong>First project.</strong> A well-chosen initial workload that proves value and builds momentum.</li>
+      </ul>
+
+      <figure class="figure reveal">
+        <svg viewBox="0 0 820 220" role="img" aria-label="Strategy flow: motivations feed into business outcomes, which feed into a business case, which selects a first adoption project.">
+          <rect x="0" y="0" width="820" height="220" fill="#0c1324"/>
+          <g font-family="Sora,sans-serif" font-size="13" font-weight="700" text-anchor="middle">
+            <g><rect x="30" y="64" width="160" height="92" rx="12" fill="#111a30" stroke="#38d3ff"/><text x="110" y="100" fill="#e9eefc">Motivations</text><text x="110" y="124" fill="#97a7c6" font-size="9.5" font-family="JetBrains Mono,monospace" font-weight="500">cost · agility · exit DC</text></g>
+            <g><rect x="230" y="64" width="160" height="92" rx="12" fill="#111a30" stroke="#2f9bff"/><text x="310" y="100" fill="#e9eefc">Outcomes</text><text x="310" y="124" fill="#97a7c6" font-size="9.5" font-family="JetBrains Mono,monospace" font-weight="500">measurable KPIs</text></g>
+            <g><rect x="430" y="64" width="160" height="92" rx="12" fill="#111a30" stroke="#3ad29f"/><text x="510" y="100" fill="#e9eefc">Business case</text><text x="510" y="124" fill="#97a7c6" font-size="9.5" font-family="JetBrains Mono,monospace" font-weight="500">TCO · ROI</text></g>
+            <g><rect x="630" y="64" width="160" height="92" rx="12" fill="#111a30" stroke="#f5b942"/><text x="710" y="100" fill="#e9eefc">First project</text><text x="710" y="124" fill="#97a7c6" font-size="9.5" font-family="JetBrains Mono,monospace" font-weight="500">prove value</text></g>
+          </g>
+          <g stroke="#647495" stroke-width="2" fill="none">
+            <path d="M190 110 L230 110" marker-end="url(#cah)"/>
+            <path d="M390 110 L430 110" marker-end="url(#cah)"/>
+            <path d="M590 110 L630 110" marker-end="url(#cah)"/>
+          </g>
+        </svg>
+        <figcaption><b>Figure 2.</b> Strategy is a chain: motivations become outcomes, outcomes justify a business case, and the case picks a first project.</figcaption>
+      </figure>
+      <div class="takeaway">
+        <span class="tk-label">Key takeaway</span>
+        <p><strong>No outcome, no project.</strong> If you can't state the measurable business result a move to Azure will deliver, you're not ready to spend on it yet.</p>
+      </div>
+
+      <!-- ===================== PLAN ===================== -->
+      <h2 id="plan" class="pillar-head" style="--p-color:#2f9bff"><span class="ph-badge">Phase 2</span> Plan</h2>
+      <p>
+        Plan converts strategy into an <strong>actionable, rational plan</strong>. The centrepiece is the
+        <strong>digital estate</strong> — an inventory and rationalization of everything you might move —
+        combined with organizational alignment and a skilling plan, all rolled into a prioritized
+        backlog you can actually execute.
+      </p>
+      <h3>The "5 Rs" of rationalization</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Strategy</th><th>What it means</th><th>When</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Rehost</strong></td><td>"Lift &amp; shift" the workload as-is to IaaS.</td><td>Speed over optimization; datacenter exit.</td></tr>
+            <tr><td><strong>Refactor</strong></td><td>Minor changes to use PaaS (e.g. App Service, managed DB).</td><td>Quick efficiency wins.</td></tr>
+            <tr><td><strong>Rearchitect</strong></td><td>Significantly evolve the app (e.g. to microservices).</td><td>App can't scale / is hard to maintain.</td></tr>
+            <tr><td><strong>Rebuild</strong></td><td>Rewrite cloud-native from scratch.</td><td>Legacy beyond saving; big upside.</td></tr>
+            <tr><td><strong>Replace</strong></td><td>Retire and adopt SaaS instead.</td><td>A commodity capability (email, CRM).</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>What you produce</h3>
+      <ul class="principle-list">
+        <li><strong>Digital estate.</strong> Inventory + rationalization (the 5 Rs) of workloads and assets.</li>
+        <li><strong>Organizational alignment.</strong> Who owns the cloud — a cloud team / center of excellence.</li>
+        <li><strong>Skills readiness plan.</strong> Close the gap between today's skills and what the plan needs.</li>
+        <li><strong>Cloud adoption plan.</strong> A prioritized, time-boxed backlog (often in Azure Boards).</li>
+      </ul>
+
+      <!-- ===================== READY ===================== -->
+      <h2 id="ready" class="pillar-head" style="--p-color:#3ad29f"><span class="ph-badge">Phase 3</span> Ready</h2>
+      <p>
+        Ready prepares the <strong>environment</strong> before workloads arrive. Its core deliverable is
+        the <strong>Azure landing zone</strong>: an environment that already has identity, networking,
+        governance, security and management baked in, so every workload lands somewhere safe, consistent
+        and ready to scale — instead of teams hand-rolling subscriptions in a hundred different ways.
+      </p>
+      <div class="note">
+        <span class="ico">ℹ</span>
+        <div>Landing zones are deep enough to deserve their own article. This is the summary — for the management-group hierarchy, the eight design areas, network topology and implementation options, read <a href="azure-landing-zones.html">Azure Landing Zones: the platform foundation</a>.</div>
+      </div>
+      <h3>What "Ready" gives you</h3>
+      <ul class="principle-list">
+        <li><strong>Azure landing zones.</strong> Platform foundation (identity, management, connectivity) + application landing zones.</li>
+        <li><strong>A scalable structure.</strong> Management groups and subscriptions designed to grow without rework.</li>
+        <li><strong>Policy-driven guardrails.</strong> Azure Policy enforcing the baseline from day one.</li>
+        <li><strong>Accelerators.</strong> Reference implementations (portal accelerator, Bicep, Terraform) instead of a blank page.</li>
+      </ul>
+
+      <!-- ===================== ADOPT ===================== -->
+      <h2 id="adopt" class="pillar-head" style="--p-color:#f5b942"><span class="ph-badge">Phase 4</span> Adopt</h2>
+      <p>
+        Adopt is where workloads actually move. It splits into two motions that usually run in parallel:
+        <strong>Migrate</strong> (bring existing workloads over) and <strong>Innovate</strong> (build new,
+        cloud-native capabilities). Most organizations do both — migrate the estate to get out of the
+        datacenter, and innovate where the cloud unlocks new business value.
+      </p>
+
+      <figure class="figure reveal">
+        <svg viewBox="0 0 820 280" role="img" aria-label="Adopt splits into two parallel paths: Migrate, using the assess-migrate-optimize wave cycle, and Innovate, using build-measure-learn with cloud-native services.">
+          <rect x="0" y="0" width="820" height="280" fill="#0c1324"/>
+          <text x="410" y="36" text-anchor="middle" fill="#f5b942" font-family="Sora,sans-serif" font-size="15" font-weight="800">Two adoption motions</text>
+          <!-- migrate -->
+          <rect x="30" y="58" width="370" height="190" rx="14" fill="#0f1830" stroke="#f5b942" stroke-dasharray="4 4"/>
+          <text x="215" y="84" text-anchor="middle" fill="#f5b942" font-family="Sora,sans-serif" font-size="13" font-weight="700">Migrate · existing workloads</text>
+          <g font-family="Sora,sans-serif" font-size="11.5" font-weight="700" text-anchor="middle">
+            <g><rect x="56" y="108" width="92" height="56" rx="10" fill="#111a30" stroke="#f5b942"/><text x="102" y="140" fill="#e9eefc">Assess</text></g>
+            <g><rect x="170" y="108" width="92" height="56" rx="10" fill="#111a30" stroke="#f5b942"/><text x="216" y="140" fill="#e9eefc">Migrate</text></g>
+            <g><rect x="284" y="108" width="92" height="56" rx="10" fill="#111a30" stroke="#f5b942"/><text x="330" y="132" fill="#e9eefc">Optimize</text><text x="330" y="150" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">&amp; secure</text></g>
+          </g>
+          <text x="215" y="196" text-anchor="middle" fill="#97a7c6" font-family="JetBrains Mono,monospace" font-size="10">iterative migration waves</text>
+          <text x="215" y="222" text-anchor="middle" fill="#97a7c6" font-family="Manrope,sans-serif" font-size="11">Azure Migrate · the 5 Rs in action</text>
+          <!-- innovate -->
+          <rect x="420" y="58" width="370" height="190" rx="14" fill="#0f1830" stroke="#38d3ff" stroke-dasharray="4 4"/>
+          <text x="605" y="84" text-anchor="middle" fill="#38d3ff" font-family="Sora,sans-serif" font-size="13" font-weight="700">Innovate · cloud-native</text>
+          <g font-family="Sora,sans-serif" font-size="11.5" font-weight="700" text-anchor="middle">
+            <g><rect x="446" y="108" width="92" height="56" rx="10" fill="#111a30" stroke="#38d3ff"/><text x="492" y="140" fill="#e9eefc">Build</text></g>
+            <g><rect x="560" y="108" width="92" height="56" rx="10" fill="#111a30" stroke="#38d3ff"/><text x="606" y="140" fill="#e9eefc">Measure</text></g>
+            <g><rect x="674" y="108" width="92" height="56" rx="10" fill="#111a30" stroke="#38d3ff"/><text x="720" y="140" fill="#e9eefc">Learn</text></g>
+          </g>
+          <text x="605" y="196" text-anchor="middle" fill="#97a7c6" font-family="JetBrains Mono,monospace" font-size="10">build · measure · learn loop</text>
+          <text x="605" y="222" text-anchor="middle" fill="#97a7c6" font-family="Manrope,sans-serif" font-size="11">AKS · Functions · data &amp; AI services</text>
+          <text x="410" y="268" text-anchor="middle" fill="#647495" font-family="Manrope,sans-serif" font-size="11">Most estates run both motions in parallel — migrate to exit the datacenter, innovate to create new value.</text>
+        </svg>
+        <figcaption><b>Figure 3.</b> Migrate follows assess → migrate → optimize in waves; Innovate follows a build → measure → learn loop on cloud-native services.</figcaption>
+      </figure>
+
+      <!-- ===================== GOVERN ===================== -->
+      <h2 id="govern" class="pillar-head" style="--p-color:#ff7a8a"><span class="ph-badge">Continuous</span> Govern</h2>
+      <p>
+        Governance is the set of <strong>guardrails</strong> that keep cloud adoption from turning into
+        cloud chaos. CAF frames it as <strong>five disciplines</strong> — areas of corporate policy you
+        translate into automated controls (largely via Azure Policy). Governance is risk-driven: you
+        invest in the disciplines proportional to the risk each one is mitigating, and you tighten them
+        as the estate grows.
+      </p>
+
+      <figure class="figure reveal">
+        <svg viewBox="0 0 820 250" role="img" aria-label="The five disciplines of cloud governance arranged around a central governance core: cost management, security baseline, identity baseline, resource consistency and deployment acceleration.">
+          <rect x="0" y="0" width="820" height="250" fill="#0c1324"/>
+          <g text-anchor="middle" font-family="Sora,sans-serif">
+            <circle cx="410" cy="125" r="56" fill="#16213b" stroke="#ff7a8a"/>
+            <text x="410" y="120" fill="#ff7a8a" font-size="13" font-weight="800">Cloud</text>
+            <text x="410" y="138" fill="#ff7a8a" font-size="13" font-weight="800">governance</text>
+          </g>
+          <g font-family="Sora,sans-serif" font-size="11.5" font-weight="700" text-anchor="middle">
+            <g><rect x="60" y="40" width="160" height="50" rx="10" fill="#111a30" stroke="#f5b942"/><text x="140" y="62" fill="#f5b942">Cost Management</text><text x="140" y="79" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace" font-weight="500">budgets · tags</text></g>
+            <g><rect x="600" y="40" width="160" height="50" rx="10" fill="#111a30" stroke="#3ad29f"/><text x="680" y="62" fill="#3ad29f">Security Baseline</text><text x="680" y="79" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace" font-weight="500">Defender · policy</text></g>
+            <g><rect x="60" y="160" width="160" height="50" rx="10" fill="#111a30" stroke="#2f9bff"/><text x="140" y="182" fill="#2f9bff">Identity Baseline</text><text x="140" y="199" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace" font-weight="500">Entra · RBAC</text></g>
+            <g><rect x="600" y="160" width="160" height="50" rx="10" fill="#111a30" stroke="#5cb4ff"/><text x="680" y="178" fill="#5cb4ff">Resource</text><text x="680" y="194" fill="#5cb4ff">Consistency</text></g>
+            <g><rect x="330" y="200" width="160" height="44" rx="10" fill="#111a30" stroke="#38d3ff"/><text x="410" y="220" fill="#38d3ff">Deployment</text><text x="410" y="236" fill="#38d3ff">Acceleration</text></g>
+          </g>
+          <g stroke="#647495" stroke-width="1.5" stroke-dasharray="4 3">
+            <path d="M220 70 L360 110"/>
+            <path d="M600 70 L460 110"/>
+            <path d="M220 180 L360 140"/>
+            <path d="M600 180 L460 140"/>
+            <path d="M410 200 L410 181"/>
+          </g>
+        </svg>
+        <figcaption><b>Figure 4.</b> The five disciplines of cloud governance — corporate policy translated into automated, enforced controls around a single governance core.</figcaption>
+      </figure>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Discipline</th><th>Mitigates</th><th>Azure controls</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Cost Management</strong></td><td>Budget overruns, waste</td><td>Budgets, Cost Management, tag policy.</td></tr>
+            <tr><td><strong>Security Baseline</strong></td><td>Data &amp; config exposure</td><td>Azure Policy, Defender for Cloud, Secure Score.</td></tr>
+            <tr><td><strong>Identity Baseline</strong></td><td>Unauthorized access</td><td>Entra ID, RBAC, Conditional Access, PIM.</td></tr>
+            <tr><td><strong>Resource Consistency</strong></td><td>Config drift, orphans</td><td>Policy, management groups, naming/tagging.</td></tr>
+            <tr><td><strong>Deployment Acceleration</strong></td><td>Manual, inconsistent deploys</td><td>IaC (Bicep/Terraform), blueprints, CI/CD.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note">
+        <span class="ico">ℹ</span>
+        <div>Tooling plug: tag policy gaps and orphaned resources are governance smells you can find today with my <a href="../docs/azureutils/index.html">AzureUtils</a> module and the <a href="https://trimtechbr.github.io" target="_blank" rel="noopener">Azure Estate Report</a>.</div>
+      </div>
+
+      <!-- ===================== MANAGE ===================== -->
+      <h2 id="manage" class="pillar-head" style="--p-color:#5cb4ff"><span class="ph-badge">Continuous</span> Manage</h2>
+      <p>
+        Manage establishes an <strong>operations baseline</strong> — the minimum, consistent operations
+        management applied across the whole estate — and then layers richer operations on top for the
+        workloads that justify it. It's where CAF hands off to day-2 reliability and where the
+        Well-Architected <em>Operational Excellence</em> pillar lives in practice.
+      </p>
+      <h3>What you establish</h3>
+      <ul class="principle-list">
+        <li><strong>Operations baseline.</strong> Inventory, monitoring, patching, backup and DR applied estate-wide.</li>
+        <li><strong>Business commitments.</strong> Map workloads to criticality, then to SLA / RTO / RPO targets.</li>
+        <li><strong>Operations maturity.</strong> Advance from reactive break-fix toward platform &amp; workload operations.</li>
+        <li><strong>Tooling.</strong> Azure Monitor, Update Manager, Azure Backup, Site Recovery and Azure Arc for hybrid.</li>
+      </ul>
+
+      <!-- ===================== SECURE ===================== -->
+      <h2 id="secure" class="pillar-head" style="--p-color:#3ad29f"><span class="ph-badge">Continuous</span> Secure</h2>
+      <p>
+        Secure is CAF's <strong>end-to-end security methodology</strong>, aligned to <strong>Zero
+        Trust</strong>. It isn't a one-off phase — it threads security through strategy, planning, the
+        landing zone and operations, covering risk insights, security controls and continuous resilience.
+        It complements the Well-Architected <em>Security</em> pillar at the organizational scale.
+      </p>
+      <h3>What it covers</h3>
+      <ul class="principle-list">
+        <li><strong>Risk insights.</strong> Understand business risk and feed it into security priorities.</li>
+        <li><strong>Security controls.</strong> Identity, network, data and application protections as baseline policy.</li>
+        <li><strong>Security operations (SecOps).</strong> Detect, respond and recover — Defender for Cloud + Sentinel.</li>
+        <li><strong>Continuous improvement.</strong> Track Secure Score and raise the baseline over time.</li>
+      </ul>
+
+      <!-- ===================== GETTING STARTED ===================== -->
+      <h2 id="getting-started">Getting started — a pragmatic roadmap</h2>
+      <p>You don't need to "finish" Strategy before touching Azure. A practical sequence:</p>
+      <figure class="figure reveal">
+        <svg viewBox="0 0 820 200" role="img" aria-label="A five-step getting started roadmap: define motivations and one outcome, rationalize a first workload, deploy a small landing zone, migrate or build the first workload, then institute governance and operations and iterate.">
+          <rect x="0" y="0" width="820" height="200" fill="#0c1324"/>
+          <g font-family="Sora,sans-serif" font-size="11" font-weight="700" text-anchor="middle">
+            <g><rect x="20" y="64" width="142" height="70" rx="11" fill="#111a30" stroke="#38d3ff"/><text x="91" y="92" fill="#e9eefc">1 · Why</text><text x="91" y="110" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">1 outcome</text></g>
+            <g><rect x="178" y="64" width="142" height="70" rx="11" fill="#111a30" stroke="#2f9bff"/><text x="249" y="92" fill="#e9eefc">2 · Plan</text><text x="249" y="110" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">first workload</text></g>
+            <g><rect x="336" y="64" width="142" height="70" rx="11" fill="#111a30" stroke="#3ad29f"/><text x="407" y="92" fill="#e9eefc">3 · Ready</text><text x="407" y="110" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">landing zone</text></g>
+            <g><rect x="494" y="64" width="142" height="70" rx="11" fill="#111a30" stroke="#f5b942"/><text x="565" y="92" fill="#e9eefc">4 · Adopt</text><text x="565" y="110" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">migrate/build</text></g>
+            <g><rect x="652" y="64" width="148" height="70" rx="11" fill="#111a30" stroke="#ff7a8a"/><text x="726" y="92" fill="#e9eefc">5 · Operate</text><text x="726" y="110" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">govern + iterate</text></g>
+          </g>
+          <g stroke="#647495" stroke-width="2" fill="none">
+            <path d="M162 99 L178 99" marker-end="url(#cah)"/>
+            <path d="M320 99 L336 99" marker-end="url(#cah)"/>
+            <path d="M478 99 L494 99" marker-end="url(#cah)"/>
+            <path d="M636 99 L652 99" marker-end="url(#cah)"/>
+          </g>
+          <path d="M726 134 Q726 174 400 174 Q91 174 91 134" fill="none" stroke="#38d3ff" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#cah2)"/>
+          <defs><marker id="cah2" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 Z" fill="#38d3ff"/></marker></defs>
+          <text x="410" y="168" text-anchor="middle" fill="#38d3ff" font-family="JetBrains Mono,monospace" font-size="10">each workload makes the platform &amp; governance better</text>
+        </svg>
+        <figcaption><b>Figure 5.</b> Start narrow — one outcome, one workload, a small landing zone — then let each iteration harden the platform and the governance.</figcaption>
+      </figure>
+      <h3>The tools to know</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Tool</th><th>Where it helps</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Cloud Adoption Framework hub</strong></td><td>Guidance, templates and the Strategy/Plan templates.</td></tr>
+            <tr><td><strong>Azure landing zone accelerator</strong></td><td>Deploy a conformant platform foundation fast (portal / IaC).</td></tr>
+            <tr><td><strong>Azure Migrate</strong></td><td>Discovery, assessment and migration of servers, DBs and apps.</td></tr>
+            <tr><td><strong>Governance benchmark &amp; Azure Policy</strong></td><td>Assess governance maturity; enforce the five disciplines.</td></tr>
+            <tr><td><strong>Microsoft Cost Management</strong></td><td>Visibility and accountability for spend (FinOps).</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ===================== CHECKLIST ===================== -->
+      <h2 id="checklist">A quick self-review checklist</h2>
+      <ul class="principle-list">
+        <li><strong>Strategy —</strong> Motivations documented? At least one measurable business outcome with a KPI?</li>
+        <li><strong>Plan —</strong> Digital estate inventoried and rationalized (5 Rs)? A cloud team / CoE named? Skilling plan?</li>
+        <li><strong>Ready —</strong> Azure landing zone deployed via an accelerator? Management groups &amp; policy baseline in place?</li>
+        <li><strong>Adopt —</strong> Migrate and innovate motions defined? Azure Migrate used for assessment?</li>
+        <li><strong>Govern —</strong> The five disciplines mapped to Azure Policy? Budgets and tagging enforced?</li>
+        <li><strong>Manage —</strong> Operations baseline (monitor, patch, backup, DR) applied estate-wide?</li>
+        <li><strong>Secure —</strong> Defender for Cloud on, Secure Score tracked, SecOps responsibilities clear?</li>
+      </ul>
+
+      <!-- ===================== REFERENCES ===================== -->
+      <h2 id="references">Official Microsoft references</h2>
+      <ul class="ref-list">
+        <li><a href="https://learn.microsoft.com/azure/cloud-adoption-framework/" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Cloud Adoption Framework — home</span></a><span class="ref-desc">The canonical entry point for all CAF methodologies and tools.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/cloud-adoption-framework/strategy/" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Strategy methodology</span></a><span class="ref-desc">Motivations, business outcomes and the business case.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/cloud-adoption-framework/plan/" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Plan methodology</span></a><span class="ref-desc">Digital estate, rationalization (5 Rs), skilling and the adoption plan.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/cloud-adoption-framework/ready/" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Ready methodology &amp; landing zones</span></a><span class="ref-desc">Preparing the environment with Azure landing zones.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/cloud-adoption-framework/adopt/" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Adopt — Migrate &amp; Innovate</span></a><span class="ref-desc">The two adoption motions and their methodologies.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/cloud-adoption-framework/govern/" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Govern methodology</span></a><span class="ref-desc">The five disciplines of cloud governance.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/cloud-adoption-framework/manage/" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Manage methodology</span></a><span class="ref-desc">Operations baseline and management maturity.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/cloud-adoption-framework/secure/" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Secure methodology</span></a><span class="ref-desc">End-to-end security aligned to Zero Trust.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/migrate/migrate-services-overview" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Azure Migrate</span></a><span class="ref-desc">Discovery, assessment and migration tooling.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/well-architected/" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Well-Architected Framework</span></a><span class="ref-desc">The workload-level companion to CAF.</span></li>
+      </ul>
+
+      <div class="next-prev">
+        <a class="is-prev" href="azure-well-architected-framework.html">
+          <span class="np-kicker">← Related</span>
+          <span class="np-title">Well-Architected Framework</span>
+        </a>
+        <a class="is-next" href="azure-landing-zones.html">
+          <span class="np-kicker">Next →</span>
+          <span class="np-title">Azure Landing Zones</span>
+        </a>
+      </div>
+    </article>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container footer-grid">
+    <p>© <span data-current-year></span> Henderson Andrade · Microsoft Azure Cloud Architect.</p>
+    <div class="footer-links">
+      <a href="index.html">Blog</a>
+      <a href="../solutions/index.html">Solutions</a>
+      <a href="https://github.com/hendersonandrade" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://br.linkedin.com/in/henderson-andrade-%E2%98%81%EF%B8%8F-22b1ba33/pt" target="_blank" rel="noopener">LinkedIn ↗</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

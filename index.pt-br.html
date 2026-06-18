@@ -49,6 +49,15 @@
         </ul>
       </li>
 
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Blog <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="blog/index.pt-br.html"><span class="dropdown-kicker">Todos os posts</span><span class="dropdown-title">Blog técnico</span></a></li>
+          <li><a href="blog/azure-well-architected-framework.pt-br.html"><span class="dropdown-kicker">Arquitetura</span><span class="dropdown-title">Azure Well-Architected Framework</span></a></li>
+          <li><a href="blog/azure-cloud-adoption-framework.pt-br.html"><span class="dropdown-kicker">Metodologia</span><span class="dropdown-title">Cloud Adoption Framework</span></a></li>
+          <li><a href="blog/azure-landing-zones.pt-br.html"><span class="dropdown-kicker">Plataforma</span><span class="dropdown-title">Azure Landing Zones</span></a></li>
+        </ul>
+      </li>
       <li><a class="nav-link" href="contact.pt-br.html">Contato</a></li>
       <li><a class="btn btn-secondary" href="https://github.com/hendersonandrade" target="_blank" rel="noopener">GitHub ↗</a></li>
       <li class="nav-item lang-switch">
@@ -76,17 +85,18 @@
       </div>
       <p class="lead">
         Sou <strong>Henderson Andrade</strong>, Arquiteto de Nuvem Microsoft Azure com foco em governança,
-        segurança, automação e observabilidade em cloud. Crio ferramentas, scripts e projetos open source
-        que ajudam times a entender e evoluir seus ambientes Azure.
+        segurança, automação e observabilidade em cloud. <strong>Escrevo guias técnicos
+        aprofundados</strong> sobre arquitetura Azure e construo ferramentas open source que ajudam
+        times a desenhar, entender e evoluir seus ambientes Azure.
       </p>
       <div class="hero-actions">
-        <a class="btn btn-primary" href="docs/azureutils/index.pt-br.html">Explorar o AzureUtils <span class="arrow">→</span></a>
-        <a class="btn btn-secondary" href="solutions/index.pt-br.html">Ver todas as soluções</a>
+        <a class="btn btn-primary" href="blog/index.pt-br.html">Ler o blog <span class="arrow">→</span></a>
+        <a class="btn btn-secondary" href="contact.pt-br.html">Fale comigo</a>
       </div>
 
       <div class="stats-strip">
-        <div class="stat"><strong>7+</strong><span>cmdlets no AzureUtils</span></div>
-        <div class="stat"><strong>2</strong><span>ecossistemas open source</span></div>
+        <div class="stat"><strong>3</strong><span>guias Azure aprofundados</span></div>
+        <div class="stat"><strong>2</strong><span>idiomas (EN · PT)</span></div>
         <div class="stat"><strong>100%</strong><span>feito por quem opera</span></div>
       </div>
     </div>
@@ -99,19 +109,54 @@
   </div>
 </section>
 
-<section class="section" style="padding-top:0">
+<section class="section" id="writing" style="padding-top:0">
   <div class="container">
-    <div class="code-card reveal" style="max-width:760px;margin-inline:auto">
-      <div class="code-head">
-        <div class="dots"><i></i><i></i><i></i></div>
-        <span class="file">pwsh — instale o módulo pessoal</span>
-      </div>
-<pre><code><span class="tok-com"># Instale o AzureUtils a partir da PowerShell Gallery</span>
-<span class="tok-cmd">Install-Module</span> AzureUtils <span class="tok-flag">-Scope</span> CurrentUser
+    <div class="section-header reveal">
+      <span class="eyebrow">Do blog</span>
+      <h2>Mergulhos técnicos</h2>
+      <p>Guias aprofundados e cheios de diagramas sobre arquitetura e governança no Azure — os frameworks que uso para desenhar, construir e operar ambientes de nuvem. Bilíngue (EN · PT).</p>
+    </div>
 
-<span class="tok-com"># Conecte e exporte um inventário de tags para Excel</span>
-<span class="tok-cmd">Connect-AzAccount</span>
-<span class="tok-cmd">Export-AzureUtilsTagInventory</span> <span class="tok-flag">-OutputPath</span> <span class="tok-str">'.\inventory.xlsx'</span></code></pre>
+    <div class="blog-grid">
+      <article class="card blog-card reveal">
+        <span class="post-kicker">Arquitetura · Governança</span>
+        <h3><a href="blog/azure-well-architected-framework.pt-br.html">Azure Well-Architected Framework</a></h3>
+        <p class="post-excerpt">Um mergulho prático nos cinco pilares — Confiabilidade, Segurança, Custos, Excelência Operacional e Desempenho — com diagramas, padrões no Azure e um checklist de revisão.</p>
+        <div class="post-meta">
+          <span>5 pilares</span><span>7 diagramas</span><span>~18 min</span>
+        </div>
+        <div class="card-links">
+          <a class="btn btn-primary" href="blog/azure-well-architected-framework.pt-br.html">Ler artigo <span class="arrow">→</span></a>
+        </div>
+      </article>
+
+      <article class="card blog-card reveal" data-delay="1">
+        <span class="post-kicker">Metodologia · Governança</span>
+        <h3><a href="blog/azure-cloud-adoption-framework.pt-br.html">Cloud Adoption Framework</a></h3>
+        <p class="post-excerpt">A jornada ponta-a-ponta para o Azure — Strategy, Plan, Ready, Adopt e as disciplinas contínuas Govern, Manage e Secure — com os 5 Rs e um roteiro de início.</p>
+        <div class="post-meta">
+          <span>7 metodologias</span><span>5 diagramas</span><span>~17 min</span>
+        </div>
+        <div class="card-links">
+          <a class="btn btn-primary" href="blog/azure-cloud-adoption-framework.pt-br.html">Ler artigo <span class="arrow">→</span></a>
+        </div>
+      </article>
+
+      <article class="card blog-card reveal" data-delay="2">
+        <span class="post-kicker">Plataforma · Arquitetura</span>
+        <h3><a href="blog/azure-landing-zones.pt-br.html">Azure Landing Zones</a></h3>
+        <p class="post-excerpt">A fundação de plataforma sob todo workload — a hierarquia de management groups, as oito áreas de design, rede hub-and-spoke e as opções de acelerador / Bicep / Terraform.</p>
+        <div class="post-meta">
+          <span>8 áreas de design</span><span>5 diagramas</span><span>~18 min</span>
+        </div>
+        <div class="card-links">
+          <a class="btn btn-primary" href="blog/azure-landing-zones.pt-br.html">Ler artigo <span class="arrow">→</span></a>
+        </div>
+      </article>
+    </div>
+
+    <div class="hero-actions" style="margin-top:2rem">
+      <a class="btn btn-secondary" href="blog/index.pt-br.html">Visitar o blog <span class="arrow">→</span></a>
     </div>
   </div>
 </section>
@@ -168,9 +213,9 @@
 <section class="section" id="projects">
   <div class="container">
     <div class="section-header reveal">
-      <span class="eyebrow">Projetos em destaque</span>
-      <h2>Soluções open source</h2>
-      <p>Projetos pessoais no meu GitHub, além do trabalho colaborativo na TrimTechBR com Henrique Mizael.</p>
+      <span class="eyebrow">Também na bancada</span>
+      <h2>Open source que eu construo &amp; mantenho</h2>
+      <p>Além da escrita, algumas ferramentas open source — projetos pessoais no meu GitHub, além do trabalho colaborativo na TrimTechBR com Henrique Mizael.</p>
     </div>
 
     <div class="grid-2">

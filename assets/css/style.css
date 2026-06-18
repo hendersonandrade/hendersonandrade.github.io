@@ -27,6 +27,11 @@
   --muted: #97a7c6;
   --muted-2: #647495;
 
+  /* links */
+  --link: #5cb4ff;
+  --link-hover: #38d3ff;
+  --link-visited: #b58cff;
+
   /* effects */
   --glow-primary: 0 0 0 1px rgba(47, 155, 255, 0.35), 0 18px 50px -18px rgba(47, 155, 255, 0.5);
   --glow-accent: 0 0 40px -8px rgba(56, 211, 255, 0.45);
@@ -83,7 +88,6 @@ body::before {
 
 main, .site-header, .footer { position: relative; z-index: 1; }
 
-a { color: inherit; text-decoration: none; }
 img, svg { max-width: 100%; display: block; }
 
 h1, h2, h3, h4 {
@@ -97,6 +101,47 @@ h1, h2, h3, h4 {
 p { margin: 0 0 1rem; }
 
 ::selection { background: rgba(56, 211, 255, 0.3); color: #fff; }
+
+/* ---- links / accessibility ---------------------------------------------- */
+/*
+   Global anchors are reset because navigation, cards and buttons have their
+   own visual language. Inline content links are styled below so article links
+   remain visibly clickable.
+*/
+a { color: inherit; text-decoration: none; }
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+/* Inline links inside articles/docs */
+.article-link,
+.docs-content :where(p, li, .docs-lede, .note, .takeaway, .article-meta) a:not(.btn),
+.docs-content > div:not(.breadcrumb):not(.next-prev):not(.table-wrap):not(.code-card):not(.figure):not(.ref-list):not(.pillar-grid):not(.blog-grid):not(.grid-2):not(.grid-3):not(.contact-grid) a:not(.btn) {
+  color: var(--link);
+  text-decoration-line: underline;
+  text-decoration-color: rgba(92, 180, 255, 0.75);
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+  font-weight: 600;
+  transition: color 0.2s, text-decoration-color 0.2s;
+}
+
+.article-link:hover,
+.docs-content :where(p, li, .docs-lede, .note, .takeaway, .article-meta) a:not(.btn):hover,
+.docs-content > div:not(.breadcrumb):not(.next-prev):not(.table-wrap):not(.code-card):not(.figure):not(.ref-list):not(.pillar-grid):not(.blog-grid):not(.grid-2):not(.grid-3):not(.contact-grid) a:not(.btn):hover {
+  color: var(--link-hover);
+  text-decoration-color: currentColor;
+}
+
+.article-link:visited,
+.docs-content :where(p, li, .docs-lede, .note, .takeaway, .article-meta) a:not(.btn):visited,
+.docs-content > div:not(.breadcrumb):not(.next-prev):not(.table-wrap):not(.code-card):not(.figure):not(.ref-list):not(.pillar-grid):not(.blog-grid):not(.grid-2):not(.grid-3):not(.contact-grid) a:not(.btn):visited {
+  color: var(--link-visited);
+}
 
 /* ---- layout -------------------------------------------------------------- */
 .container {
@@ -786,3 +831,181 @@ tbody td code { white-space: nowrap; }
   .stats-strip { gap: 1.4rem; }
   .next-prev { flex-direction: column; }
 }
+
+/* ==========================================================================
+   Blog & technical articles
+   ========================================================================== */
+
+/* ---- blog index ---------------------------------------------------------- */
+.blog-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; }
+
+.blog-card { display: flex; flex-direction: column; gap: 0.9rem; padding: 1.7rem; }
+.blog-card .post-kicker {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.blog-card h3 { font-size: 1.28rem; margin: 0; }
+.blog-card .post-excerpt { color: var(--muted); font-size: 0.96rem; margin: 0; }
+.blog-card .post-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--muted-2);
+  margin-top: auto;
+}
+.blog-card .post-meta span { display: inline-flex; align-items: center; gap: 0.35rem; }
+
+/* ---- article meta -------------------------------------------------------- */
+.article-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1.4rem;
+  margin: 1.3rem 0 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--muted-2);
+}
+.article-meta span { display: inline-flex; align-items: center; gap: 0.45rem; }
+.article-meta .am-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+/* ---- figures / diagrams -------------------------------------------------- */
+.figure {
+  margin: 1.8rem 0;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  background:
+    radial-gradient(700px circle at 50% -30%, rgba(47, 155, 255, 0.07), transparent 60%),
+    var(--bg-2);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+.figure svg { width: 100%; height: auto; display: block; }
+.figure figcaption {
+  padding: 0.75rem 1.1rem;
+  border-top: 1px solid var(--border-soft);
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--muted-2);
+  background: rgba(255, 255, 255, 0.012);
+}
+.figure figcaption b { color: var(--accent); font-weight: 600; }
+
+/* ---- pillars ------------------------------------------------------------- */
+.pillar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.1rem; margin: 1.6rem 0; }
+.pillar-card {
+  position: relative;
+  padding: 1.4rem 1.4rem 1.5rem;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, var(--surface), transparent);
+  overflow: hidden;
+}
+.pillar-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--p-color, var(--accent));
+}
+.pillar-card .p-ico {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  margin-bottom: 0.85rem;
+  color: var(--p-color, var(--accent));
+  background: color-mix(in srgb, var(--p-color, var(--accent)) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--p-color, var(--accent)) 40%, transparent);
+}
+.pillar-card h4 { font-size: 1.05rem; margin-bottom: 0.4rem; color: var(--text); }
+.pillar-card p { color: var(--muted); font-size: 0.9rem; margin: 0; }
+.pillar-card .p-tag {
+  display: inline-block;
+  margin-top: 0.8rem;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--p-color, var(--accent));
+}
+
+/* a heading that announces a pillar section */
+.pillar-head { display: flex; align-items: center; gap: 0.7rem; }
+.pillar-head .ph-badge {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  color: var(--p-color, var(--accent));
+  background: color-mix(in srgb, var(--p-color, var(--accent)) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--p-color, var(--accent)) 35%, transparent);
+}
+
+/* ---- design-principle / checklist lists ---------------------------------- */
+.principle-list { list-style: none; padding: 0 !important; margin: 1.2rem 0; display: grid; gap: 0.7rem; }
+.principle-list li {
+  position: relative;
+  padding: 0.85rem 1rem 0.85rem 2.6rem;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: var(--surface-3);
+  color: var(--muted);
+  font-size: 0.93rem;
+}
+.principle-list li::before {
+  content: "✓";
+  position: absolute;
+  left: 0.95rem;
+  top: 0.85rem;
+  color: var(--green);
+  font-weight: 800;
+}
+.principle-list li strong { color: var(--text); }
+
+/* ---- reference list ------------------------------------------------------ */
+.ref-list { list-style: none; padding: 0 !important; margin: 1.2rem 0; display: grid; gap: 0.6rem; }
+.ref-list li {
+  margin: 0 !important;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  transition: border-color 0.2s, background 0.2s;
+}
+.ref-list li:hover { border-color: var(--accent); background: rgba(56, 211, 255, 0.04); }
+.ref-list a { display: flex; align-items: baseline; gap: 0.6rem; color: var(--text); font-weight: 600; font-size: 0.95rem; }
+.ref-list .ref-src { font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); flex-shrink: 0; }
+.ref-list .ref-desc { display: block; color: var(--muted); font-size: 0.85rem; font-weight: 400; margin-top: 0.25rem; }
+
+/* ---- key-takeaway banner ------------------------------------------------- */
+.takeaway {
+  margin: 1.8rem 0;
+  padding: 1.3rem 1.5rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background:
+    radial-gradient(500px circle at 0% 0%, rgba(58, 210, 159, 0.1), transparent 60%),
+    var(--surface);
+}
+.takeaway .tk-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--green);
+  margin-bottom: 0.5rem;
+  display: block;
+}
+.takeaway p { margin: 0; color: var(--muted); }
+.takeaway strong { color: var(--text); }

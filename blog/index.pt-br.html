@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Blog — Artigos técnicos sobre Azure &amp; Cloud | Henderson Andrade</title>
+  <meta name="description" content="Artigos técnicos sobre arquitetura, governança, automação e DevOps no Microsoft Azure por Henderson Andrade — anotações de quem coloca a mão na massa.">
+  <meta property="og:title" content="Henderson Andrade — Blog Técnico">
+  <meta property="og:description" content="Artigos práticos sobre arquitetura Azure, governança, FinOps e automação.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container navbar">
+    <a class="brand" href="../index.pt-br.html" aria-label="Henderson Andrade — início">
+      <img class="brand-mark" src="../assets/img/ha-monogram.svg" alt="">
+      <span>Henderson Andrade<span class="brand-sub">Azure Cloud Architect</span></span>
+    </a>
+    <button class="nav-toggle" aria-label="Alternar menu de navegação" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-menu">
+      <li><a class="nav-link" href="../index.pt-br.html">Início</a></li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Soluções <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="../solutions/index.pt-br.html"><span class="dropdown-kicker">Portfólio</span><span class="dropdown-title">Todas as soluções</span></a></li>
+          <li><a href="../docs/azureutils/index.pt-br.html"><span class="dropdown-kicker">Pessoal · PowerShell</span><span class="dropdown-title">Módulo AzureUtils</span></a></li>
+          <li><a href="https://trimtechbr.github.io" target="_blank" rel="noopener"><span class="dropdown-kicker">TrimTechBR ↗</span><span class="dropdown-title">AER — Azure Estate Report</span></a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Docs <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="../docs/azureutils/index.pt-br.html"><span class="dropdown-kicker">Comece aqui</span><span class="dropdown-title">Visão geral &amp; instalação</span></a></li>
+          <li><a href="../docs/azureutils/tag-inventory.pt-br.html"><span class="dropdown-kicker">Referência</span><span class="dropdown-title">Inventário de tags</span></a></li>
+          <li><a href="../docs/azureutils/find-commands.pt-br.html"><span class="dropdown-kicker">Referência</span><span class="dropdown-title">Comandos Find</span></a></li>
+          <li><a href="../docs/azureutils/release-publishing.pt-br.html"><span class="dropdown-kicker">Internals</span><span class="dropdown-title">Release &amp; publicação</span></a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Blog <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="index.pt-br.html"><span class="dropdown-kicker">Todos os posts</span><span class="dropdown-title">Blog técnico</span></a></li>
+          <li><a href="azure-well-architected-framework.pt-br.html"><span class="dropdown-kicker">Arquitetura</span><span class="dropdown-title">Azure Well-Architected Framework</span></a></li>
+          <li><a href="azure-cloud-adoption-framework.pt-br.html"><span class="dropdown-kicker">Metodologia</span><span class="dropdown-title">Cloud Adoption Framework</span></a></li>
+          <li><a href="azure-landing-zones.pt-br.html"><span class="dropdown-kicker">Plataforma</span><span class="dropdown-title">Azure Landing Zones</span></a></li>
+        </ul>
+      </li>
+      <li><a class="nav-link" href="../contact.pt-br.html">Contato</a></li>
+      <li><a class="btn btn-secondary" href="https://github.com/hendersonandrade" target="_blank" rel="noopener">GitHub ↗</a></li>
+      <li class="nav-item lang-switch">
+        <a class="lang-link" href="index.html">EN</a>
+        <span class="lang-sep">/</span>
+        <a class="lang-link is-active" href="index.pt-br.html">PT</a>
+      </li>
+    </ul>
+  </div>
+</header>
+
+<main>
+<section class="section">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="eyebrow">Blog técnico</span>
+      <h2>Anotações da prática</h2>
+      <p>Artigos práticos sobre arquitetura, governança, FinOps, automação e DevOps no Microsoft Azure — os padrões, tradeoffs e ferramentas que uso no dia a dia.</p>
+    </div>
+
+    <div class="blog-grid">
+      <article class="card blog-card reveal">
+        <span class="post-kicker">Arquitetura · Governança</span>
+        <h3><a href="azure-well-architected-framework.pt-br.html">Azure Well-Architected Framework: um mergulho prático</a></h3>
+        <p class="post-excerpt">
+          Um guia completo e cheio de diagramas pelos cinco pilares — Confiabilidade, Segurança,
+          Otimização de Custos, Excelência Operacional e Eficiência de Desempenho — com padrões
+          concretos no Azure, os tradeoffs entre eles, um checklist de autoavaliação e as referências
+          oficiais da Microsoft.
+        </p>
+        <div class="badge-row">
+          <span class="badge badge-primary">Well-Architected</span>
+          <span class="badge">5 pilares</span>
+          <span class="badge">7 diagramas</span>
+        </div>
+        <div class="post-meta">
+          <span>17 jun 2026</span>
+          <span>~18 min de leitura</span>
+          <span><a href="azure-well-architected-framework.html">EN</a> · PT</span>
+        </div>
+        <div class="card-links">
+          <a class="btn btn-primary" href="azure-well-architected-framework.pt-br.html">Ler artigo <span class="arrow">→</span></a>
+        </div>
+      </article>
+
+      <article class="card blog-card reveal" data-delay="1">
+        <span class="post-kicker">Metodologia · Governança</span>
+        <h3><a href="azure-cloud-adoption-framework.pt-br.html">Cloud Adoption Framework para Azure: um mergulho prático</a></h3>
+        <p class="post-excerpt">
+          A jornada ponta-a-ponta para o Azure — Strategy, Plan, Ready, Adopt e as disciplinas
+          contínuas Govern, Manage e Secure — com as cinco disciplinas de governança, os 5 Rs, as duas
+          motions de adoção e um roteiro pragmático de início.
+        </p>
+        <div class="badge-row">
+          <span class="badge badge-primary">Cloud Adoption</span>
+          <span class="badge">7 metodologias</span>
+          <span class="badge">5 diagramas</span>
+        </div>
+        <div class="post-meta">
+          <span>17 jun 2026</span>
+          <span>~17 min de leitura</span>
+          <span><a href="azure-cloud-adoption-framework.html">EN</a> · PT</span>
+        </div>
+        <div class="card-links">
+          <a class="btn btn-primary" href="azure-cloud-adoption-framework.pt-br.html">Ler artigo <span class="arrow">→</span></a>
+        </div>
+      </article>
+
+      <article class="card blog-card reveal" data-delay="2">
+        <span class="post-kicker">Plataforma · Arquitetura</span>
+        <h3><a href="azure-landing-zones.pt-br.html">Azure Landing Zones: a fundação de plataforma</a></h3>
+        <p class="post-excerpt">
+          A fundação de plataforma sob todo workload — platform vs application landing zones, a
+          hierarquia de management groups, as oito áreas de design, rede hub-and-spoke, os princípios
+          de design e as opções de implementação com acelerador / Bicep / Terraform.
+        </p>
+        <div class="badge-row">
+          <span class="badge badge-primary">Landing Zones</span>
+          <span class="badge">8 áreas de design</span>
+          <span class="badge">5 diagramas</span>
+        </div>
+        <div class="post-meta">
+          <span>17 jun 2026</span>
+          <span>~18 min de leitura</span>
+          <span><a href="azure-landing-zones.html">EN</a> · PT</span>
+        </div>
+        <div class="card-links">
+          <a class="btn btn-primary" href="azure-landing-zones.pt-br.html">Ler artigo <span class="arrow">→</span></a>
+        </div>
+      </article>
+    </div>
+
+    <div class="note" style="margin-top:2rem">
+      <span class="ico">ℹ</span>
+      <div>Mais artigos a caminho — FinOps na prática, padrões de rede no Azure e Infraestrutura como Código com Bicep. Acompanhe no <a href="https://github.com/hendersonandrade" target="_blank" rel="noopener">GitHub</a> ou <a href="https://br.linkedin.com/in/henderson-andrade-%E2%98%81%EF%B8%8F-22b1ba33/pt" target="_blank" rel="noopener">LinkedIn</a>.</div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer">
+  <div class="container footer-grid">
+    <p>© <span data-current-year></span> Henderson Andrade · Microsoft Azure Cloud Architect.</p>
+    <div class="footer-links">
+      <a href="index.pt-br.html">Blog</a>
+      <a href="../solutions/index.pt-br.html">Soluções</a>
+      <a href="https://github.com/hendersonandrade" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://br.linkedin.com/in/henderson-andrade-%E2%98%81%EF%B8%8F-22b1ba33/pt" target="_blank" rel="noopener">LinkedIn ↗</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

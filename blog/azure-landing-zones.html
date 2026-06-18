@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Azure Landing Zones — The Platform Foundation | Henderson Andrade</title>
+  <meta name="description" content="A complete, diagram-rich guide to Azure landing zones: platform vs application landing zones, the management group hierarchy, the eight design areas, network topology, design principles and implementation options (accelerator, Bicep, Terraform), with official Microsoft references.">
+  <meta property="og:title" content="Azure Landing Zones — The Platform Foundation">
+  <meta property="og:description" content="The Azure landing zone conceptual architecture, the eight design areas and implementation options explained with diagrams.">
+  <meta property="og:type" content="article">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container navbar">
+    <a class="brand" href="../index.html" aria-label="Henderson Andrade — home">
+      <img class="brand-mark" src="../assets/img/ha-monogram.svg" alt="">
+      <span>Henderson Andrade<span class="brand-sub">Azure Cloud Architect</span></span>
+    </a>
+    <button class="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-menu">
+      <li><a class="nav-link" href="../index.html">Home</a></li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Solutions <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="../solutions/index.html"><span class="dropdown-kicker">Portfolio</span><span class="dropdown-title">All solutions</span></a></li>
+          <li><a href="../docs/azureutils/index.html"><span class="dropdown-kicker">Personal · PowerShell</span><span class="dropdown-title">AzureUtils module</span></a></li>
+          <li><a href="https://trimtechbr.github.io" target="_blank" rel="noopener"><span class="dropdown-kicker">TrimTechBR ↗</span><span class="dropdown-title">AER — Azure Estate Report</span></a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Docs <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="../docs/azureutils/index.html"><span class="dropdown-kicker">Start here</span><span class="dropdown-title">Overview &amp; install</span></a></li>
+          <li><a href="../docs/azureutils/tag-inventory.html"><span class="dropdown-kicker">Reference</span><span class="dropdown-title">Tag inventory</span></a></li>
+          <li><a href="../docs/azureutils/find-commands.html"><span class="dropdown-kicker">Reference</span><span class="dropdown-title">Find commands</span></a></li>
+          <li><a href="../docs/azureutils/release-publishing.html"><span class="dropdown-kicker">Internals</span><span class="dropdown-title">Release &amp; publishing</span></a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Blog <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="index.html"><span class="dropdown-kicker">All posts</span><span class="dropdown-title">Technical blog</span></a></li>
+          <li><a href="azure-well-architected-framework.html"><span class="dropdown-kicker">Architecture</span><span class="dropdown-title">Azure Well-Architected Framework</span></a></li>
+          <li><a href="azure-cloud-adoption-framework.html"><span class="dropdown-kicker">Methodology</span><span class="dropdown-title">Cloud Adoption Framework</span></a></li>
+          <li><a href="azure-landing-zones.html"><span class="dropdown-kicker">Platform</span><span class="dropdown-title">Azure Landing Zones</span></a></li>
+        </ul>
+      </li>
+      <li><a class="nav-link" href="../contact.html">Contact</a></li>
+      <li><a class="btn btn-secondary" href="https://github.com/hendersonandrade" target="_blank" rel="noopener">GitHub ↗</a></li>
+      <li class="nav-item lang-switch">
+        <a class="lang-link is-active" href="azure-landing-zones.html">EN</a>
+        <span class="lang-sep">/</span>
+        <a class="lang-link" href="azure-landing-zones.pt-br.html">PT</a>
+      </li>
+    </ul>
+  </div>
+</header>
+
+<main class="container">
+  <div class="docs-shell">
+
+    <aside class="docs-sidebar reveal">
+      <div class="side-group">
+        <p class="side-title">On this page</p>
+        <ul class="anchor-list">
+          <li><a href="#what">What it is</a></li>
+          <li><a href="#types">Platform vs application</a></li>
+          <li><a href="#architecture">Conceptual architecture</a></li>
+          <li><a href="#mgmt-groups">Management groups</a></li>
+          <li><a href="#design-areas">The 8 design areas</a></li>
+          <li><a href="#network">Network topology</a></li>
+          <li><a href="#principles">Design principles</a></li>
+          <li><a href="#implementation">Implementation options</a></li>
+          <li><a href="#checklist">Quick checklist</a></li>
+          <li><a href="#references">Microsoft references</a></li>
+        </ul>
+      </div>
+      <div class="side-group">
+        <p class="side-title">More from the blog</p>
+        <ul>
+          <li><a href="azure-cloud-adoption-framework.html">Cloud Adoption Framework</a></li>
+          <li><a href="azure-well-architected-framework.html">Well-Architected Framework</a></li>
+          <li><a href="index.html">← All posts</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <article class="docs-content">
+      <nav class="breadcrumb">
+        <a href="../index.html">Home</a><span class="sep">/</span>
+        <a href="index.html">Blog</a><span class="sep">/</span>
+        <span>Azure Landing Zones</span>
+      </nav>
+
+      <span class="eyebrow">Platform · Architecture</span>
+      <h1>Azure Landing Zones: the platform foundation</h1>
+      <p class="docs-lede">
+        An <strong>Azure landing zone</strong> is an environment prepared in advance to host your
+        workloads — with <strong>identity, networking, governance, security and management</strong> already
+        in place — so applications land somewhere consistent, secure and ready to scale. This guide covers
+        the conceptual architecture, the management-group hierarchy, the <strong>eight design areas</strong>,
+        network topology, design principles and how to actually deploy one.
+      </p>
+
+      <div class="article-meta">
+        <span><span class="am-dot"></span> Henderson Andrade</span>
+        <span>Published 17 Jun 2026</span>
+        <span>~18 min read</span>
+        <span>Azure · Landing Zones · Platform</span>
+      </div>
+
+      <div class="badge-row">
+        <span class="badge badge-primary">Landing Zones</span>
+        <span class="badge">Management groups</span>
+        <span class="badge">8 design areas</span>
+        <span class="badge">Hub-spoke</span>
+        <span class="badge">Bicep · Terraform</span>
+      </div>
+
+      <h2 id="what">What a landing zone actually is</h2>
+      <p>
+        Picture two organizations adopting Azure. The first lets every team create subscriptions on
+        demand, wire their own networks and set their own policies. Six months in, it's a sprawl of
+        inconsistent naming, ungoverned spend, flat networks and no idea where the data lives. The second
+        deploys a <strong>landing zone</strong> first: a pre-built environment where identity, network
+        connectivity, policy guardrails, security tooling and a logging baseline already exist. Every new
+        workload "lands" into that environment and inherits all of it.
+      </p>
+      <p>
+        A landing zone is the concrete output of the Cloud Adoption Framework's <strong>Ready</strong>
+        methodology. It is <em>multi-subscription by design</em>, scales with your organization, and is
+        governed centrally while still giving application teams the autonomy they need.
+      </p>
+      <div class="note">
+        <span class="ico">ℹ</span>
+        <div>Landing zones are the "Ready" deliverable of the broader journey. For the full picture — Strategy, Plan, Adopt, Govern, Manage, Secure — read <a href="azure-cloud-adoption-framework.html">Cloud Adoption Framework for Azure: a practitioner's deep dive</a>.</div>
+      </div>
+
+      <h2 id="types">Platform vs. application landing zones</h2>
+      <p>
+        The single most important distinction. A <strong>platform landing zone</strong> provides shared
+        services that everything else depends on — identity, management and connectivity — owned by the
+        central platform team. <strong>Application landing zones</strong> are the subscriptions where
+        workloads actually run, handed to application teams with guardrails already applied.
+      </p>
+
+      <figure class="figure reveal">
+        <svg viewBox="0 0 820 320" role="img" aria-label="Platform landing zones (identity, management, connectivity) provide shared services consumed by multiple application landing zones where workloads run.">
+          <rect x="0" y="0" width="820" height="320" fill="#0c1324"/>
+          <text x="410" y="36" text-anchor="middle" fill="#3ad29f" font-family="Sora,sans-serif" font-size="15" font-weight="800">One platform, many application landing zones</text>
+          <!-- platform -->
+          <rect x="40" y="54" width="740" height="104" rx="14" fill="#0f1830" stroke="#3ad29f" stroke-dasharray="4 4"/>
+          <text x="60" y="78" fill="#3ad29f" font-family="Sora,sans-serif" font-size="13" font-weight="700">Platform landing zones · central platform team</text>
+          <g font-family="Sora,sans-serif" font-size="12" font-weight="700" text-anchor="middle">
+            <g><rect x="70" y="92" width="210" height="50" rx="10" fill="#111a30" stroke="#2f9bff"/><text x="175" y="114" fill="#2f9bff">Identity</text><text x="175" y="131" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace" font-weight="500">Entra · DCs · RBAC</text></g>
+            <g><rect x="305" y="92" width="210" height="50" rx="10" fill="#111a30" stroke="#5cb4ff"/><text x="410" y="114" fill="#5cb4ff">Management</text><text x="410" y="131" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace" font-weight="500">Log Analytics · Backup</text></g>
+            <g><rect x="540" y="92" width="210" height="50" rx="10" fill="#111a30" stroke="#38d3ff"/><text x="645" y="114" fill="#38d3ff">Connectivity</text><text x="645" y="131" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace" font-weight="500">Hub · firewall · DNS</text></g>
+          </g>
+          <!-- arrows down -->
+          <g stroke="#647495" stroke-width="2" fill="none">
+            <path d="M175 158 L175 196" marker-end="url(#lzh)"/>
+            <path d="M410 158 L410 196" marker-end="url(#lzh)"/>
+            <path d="M645 158 L645 196" marker-end="url(#lzh)"/>
+          </g>
+          <defs><marker id="lzh" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 Z" fill="#647495"/></marker></defs>
+          <text x="410" y="186" text-anchor="middle" fill="#647495" font-family="JetBrains Mono,monospace" font-size="9.5">shared services consumed by ↓</text>
+          <!-- application LZs -->
+          <rect x="40" y="200" width="740" height="104" rx="14" fill="#0f1830" stroke="#f5b942" stroke-dasharray="4 4"/>
+          <text x="60" y="224" fill="#f5b942" font-family="Sora,sans-serif" font-size="13" font-weight="700">Application landing zones · application teams</text>
+          <g font-family="Sora,sans-serif" font-size="11.5" font-weight="700" text-anchor="middle">
+            <g><rect x="70" y="238" width="160" height="52" rx="10" fill="#111a30" stroke="#f5b942"/><text x="150" y="260" fill="#e9eefc">Corp app A</text><text x="150" y="277" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace" font-weight="500">internal only</text></g>
+            <g><rect x="246" y="238" width="160" height="52" rx="10" fill="#111a30" stroke="#f5b942"/><text x="326" y="260" fill="#e9eefc">Corp app B</text><text x="326" y="277" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace" font-weight="500">internal only</text></g>
+            <g><rect x="422" y="238" width="160" height="52" rx="10" fill="#111a30" stroke="#38d3ff"/><text x="502" y="260" fill="#e9eefc">Online app C</text><text x="502" y="277" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace" font-weight="500">internet-facing</text></g>
+            <g><rect x="598" y="238" width="160" height="52" rx="10" fill="#111a30" stroke="#3ad29f"/><text x="678" y="260" fill="#e9eefc">Sandbox</text><text x="678" y="277" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace" font-weight="500">experimentation</text></g>
+          </g>
+        </svg>
+        <figcaption><b>Figure 1.</b> The platform team owns shared identity, management and connectivity; application teams get pre-governed subscriptions to run workloads in.</figcaption>
+      </figure>
+
+      <h2 id="architecture">The conceptual architecture</h2>
+      <p>
+        Microsoft publishes a <strong>conceptual architecture</strong> for Azure landing zones — an
+        opinionated, proven target you can deploy as-is and adapt. It's expressed primarily as a
+        <strong>management group hierarchy</strong> with policies assigned at each level, plus the
+        platform and application subscriptions beneath it.
+      </p>
+
+      <h2 id="mgmt-groups">The management group hierarchy</h2>
+      <p>
+        Management groups are containers above subscriptions where you assign <strong>Azure Policy and
+        RBAC once</strong> and have them inherited downward. The canonical Azure landing zone hierarchy
+        looks like this:
+      </p>
+
+      <figure class="figure reveal">
+        <svg viewBox="0 0 940 400" role="img" aria-label="The Azure landing zone management group hierarchy: tenant root, an intermediate root, then Platform (with Identity, Management, Connectivity), Landing Zones (with Corp and Online), Sandbox and Decommissioned.">
+          <rect x="0" y="0" width="940" height="400" fill="#0c1324"/>
+          <g font-family="Sora,sans-serif" text-anchor="middle">
+            <!-- tenant root -->
+            <rect x="380" y="24" width="180" height="44" rx="10" fill="#16213b" stroke="#647495"/>
+            <text x="470" y="46" fill="#97a7c6" font-size="11.5" font-weight="700">Tenant Root Group</text>
+            <text x="470" y="61" fill="#647495" font-size="9" font-family="JetBrains Mono,monospace">(do not deploy here)</text>
+            <!-- intermediate root -->
+            <rect x="380" y="92" width="180" height="44" rx="10" fill="#111a30" stroke="#2f9bff"/>
+            <text x="470" y="114" fill="#2f9bff" font-size="12" font-weight="700">Intermediate root</text>
+            <text x="470" y="129" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace">e.g. "contoso"</text>
+          </g>
+          <g stroke="#647495" stroke-width="1.5" fill="none">
+            <path d="M470 68 L470 92"/>
+            <path d="M470 136 L470 176"/>
+            <path d="M115 176 L840 176"/>
+            <path d="M115 176 L115 196"/>
+            <path d="M375 176 L375 196"/>
+            <path d="M630 176 L630 196"/>
+            <path d="M840 176 L840 196"/>
+          </g>
+          <!-- level 2 -->
+          <g font-family="Sora,sans-serif" font-size="11.5" font-weight="700" text-anchor="middle">
+            <g><rect x="40" y="196" width="150" height="44" rx="10" fill="#111a30" stroke="#3ad29f"/><text x="115" y="223" fill="#3ad29f">Platform</text></g>
+            <g><rect x="300" y="196" width="150" height="44" rx="10" fill="#111a30" stroke="#f5b942"/><text x="375" y="223" fill="#f5b942">Landing zones</text></g>
+            <g><rect x="560" y="196" width="140" height="44" rx="10" fill="#111a30" stroke="#38d3ff"/><text x="630" y="223" fill="#38d3ff">Sandbox</text></g>
+            <g><rect x="760" y="196" width="160" height="44" rx="10" fill="#111a30" stroke="#ff7a8a"/><text x="840" y="223" fill="#ff7a8a">Decommissioned</text></g>
+          </g>
+          <!-- platform children -->
+          <g stroke="#3ad29f" stroke-width="1.3" fill="none" stroke-dasharray="3 3">
+            <path d="M115 240 L115 280"/>
+            <path d="M41 280 L198 280"/>
+            <path d="M41 280 L41 300"/>
+            <path d="M114 280 L114 300"/>
+            <path d="M198 280 L198 300"/>
+          </g>
+          <g font-family="JetBrains Mono,monospace" font-size="9.5" font-weight="600" text-anchor="middle">
+            <g><rect x="6" y="300" width="70" height="40" rx="8" fill="#0f1830" stroke="#2f9bff"/><text x="41" y="324" fill="#2f9bff">Identity</text></g>
+            <g><rect x="82" y="300" width="64" height="40" rx="8" fill="#0f1830" stroke="#5cb4ff"/><text x="114" y="324" fill="#5cb4ff">Mgmt</text></g>
+            <g><rect x="152" y="300" width="92" height="40" rx="8" fill="#0f1830" stroke="#38d3ff"/><text x="198" y="324" fill="#38d3ff">Connectivity</text></g>
+          </g>
+          <!-- landing zones children -->
+          <g stroke="#f5b942" stroke-width="1.3" fill="none" stroke-dasharray="3 3">
+            <path d="M375 240 L375 280"/>
+            <path d="M330 280 L418 280"/>
+            <path d="M330 280 L330 300"/>
+            <path d="M418 280 L418 300"/>
+          </g>
+          <g font-family="JetBrains Mono,monospace" font-size="9.5" font-weight="600" text-anchor="middle">
+            <g><rect x="292" y="300" width="76" height="40" rx="8" fill="#0f1830" stroke="#f5b942"/><text x="330" y="324" fill="#f5b942">Corp</text></g>
+            <g><rect x="380" y="300" width="76" height="40" rx="8" fill="#0f1830" stroke="#38d3ff"/><text x="418" y="324" fill="#38d3ff">Online</text></g>
+          </g>
+          <text x="470" y="372" text-anchor="middle" fill="#97a7c6" font-family="Manrope,sans-serif" font-size="11.5">Policy &amp; RBAC assigned at each group are inherited by every subscription beneath it.</text>
+        </svg>
+        <figcaption><b>Figure 2.</b> The canonical hierarchy: Platform (Identity / Management / Connectivity), Landing zones (Corp / Online), plus Sandbox and Decommissioned — with policy inherited top-down.</figcaption>
+      </figure>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Management group</th><th>Holds</th><th>Why separate</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Platform</strong></td><td>Identity, Management, Connectivity subs</td><td>Shared services with their own stricter policies.</td></tr>
+            <tr><td><strong>Landing zones → Corp</strong></td><td>Internal apps (no public ingress)</td><td>Apps that connect to on-prem / are internal-only.</td></tr>
+            <tr><td><strong>Landing zones → Online</strong></td><td>Internet-facing apps</td><td>Public workloads needing edge/WAF policy.</td></tr>
+            <tr><td><strong>Sandbox</strong></td><td>Experimentation subs</td><td>Freedom to try, isolated from production policy.</td></tr>
+            <tr><td><strong>Decommissioned</strong></td><td>Subs being retired</td><td>Locked-down holding area before deletion.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="design-areas">The eight design areas</h2>
+      <p>
+        Every landing zone implementation is shaped by <strong>eight design areas</strong>. They are the
+        decisions you must make (or inherit from the accelerator) before workloads arrive. Think of them
+        as the checklist for a production-ready platform.
+      </p>
+
+      <figure class="figure reveal">
+        <svg viewBox="0 0 820 300" role="img" aria-label="The eight Azure landing zone design areas arranged in a grid: billing and tenant, identity and access, resource organization, network topology, security, management, governance, and platform automation and DevOps.">
+          <rect x="0" y="0" width="820" height="300" fill="#0c1324"/>
+          <g font-family="Sora,sans-serif" font-size="12" font-weight="700" text-anchor="middle">
+            <g><rect x="26" y="24" width="186" height="76" rx="11" fill="#111a30" stroke="#5cb4ff"/><text x="119" y="56" fill="#5cb4ff">A · Billing &amp; tenant</text><text x="119" y="78" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace" font-weight="500">EA/MCA · Entra tenant</text></g>
+            <g><rect x="222" y="24" width="186" height="76" rx="11" fill="#111a30" stroke="#2f9bff"/><text x="315" y="56" fill="#2f9bff">B · Identity &amp; access</text><text x="315" y="78" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace" font-weight="500">Entra · RBAC · PIM</text></g>
+            <g><rect x="418" y="24" width="186" height="76" rx="11" fill="#111a30" stroke="#3ad29f"/><text x="511" y="56" fill="#3ad29f">C · Resource org</text><text x="511" y="78" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace" font-weight="500">mgmt groups · subs</text></g>
+            <g><rect x="614" y="24" width="186" height="76" rx="11" fill="#111a30" stroke="#38d3ff"/><text x="707" y="56" fill="#38d3ff">D · Network topology</text><text x="707" y="78" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace" font-weight="500">hub-spoke · vWAN</text></g>
+            <g><rect x="26" y="112" width="186" height="76" rx="11" fill="#111a30" stroke="#ff7a8a"/><text x="119" y="144" fill="#ff7a8a">E · Security</text><text x="119" y="166" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace" font-weight="500">Defender · Key Vault</text></g>
+            <g><rect x="222" y="112" width="186" height="76" rx="11" fill="#111a30" stroke="#5cb4ff"/><text x="315" y="144" fill="#5cb4ff">F · Management</text><text x="315" y="166" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace" font-weight="500">Monitor · Backup · Arc</text></g>
+            <g><rect x="418" y="112" width="186" height="76" rx="11" fill="#111a30" stroke="#f5b942"/><text x="511" y="144" fill="#f5b942">G · Governance</text><text x="511" y="166" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace" font-weight="500">Azure Policy · cost</text></g>
+            <g><rect x="614" y="112" width="186" height="76" rx="11" fill="#111a30" stroke="#38d3ff"/><text x="707" y="140" fill="#38d3ff">H · Platform</text><text x="707" y="156" fill="#38d3ff">automation &amp; DevOps</text></g>
+          </g>
+          <rect x="26" y="206" width="774" height="62" rx="11" fill="#16213b" stroke="#243352"/>
+          <text x="413" y="232" text-anchor="middle" fill="#cdd9f1" font-family="Manrope,sans-serif" font-size="12.5">These eight areas turn an empty tenant into a governed, scalable platform —</text>
+          <text x="413" y="252" text-anchor="middle" fill="#97a7c6" font-family="Manrope,sans-serif" font-size="12">decide them deliberately, or inherit sensible defaults from the landing zone accelerator.</text>
+        </svg>
+        <figcaption><b>Figure 3.</b> The eight design areas — billing &amp; tenant, identity, resource organization, network, security, management, governance, and platform automation.</figcaption>
+      </figure>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Design area</th><th>Key decisions</th></tr></thead>
+          <tbody>
+            <tr><td>A</td><td><strong>Azure billing &amp; Entra tenant</strong></td><td>EA/MCA structure, tenant count, enterprise enrollment.</td></tr>
+            <tr><td>B</td><td><strong>Identity &amp; access management</strong></td><td>Entra ID, RBAC model, PIM, hybrid identity.</td></tr>
+            <tr><td>C</td><td><strong>Resource organization</strong></td><td>Management group tree, subscription strategy, naming &amp; tagging.</td></tr>
+            <tr><td>D</td><td><strong>Network topology &amp; connectivity</strong></td><td>Hub-spoke vs Virtual WAN, firewall, private DNS, hybrid links.</td></tr>
+            <tr><td>E</td><td><strong>Security</strong></td><td>Defender for Cloud, encryption, Key Vault, secrets baseline.</td></tr>
+            <tr><td>F</td><td><strong>Management</strong></td><td>Monitoring, Log Analytics, backup, DR, Azure Arc for hybrid.</td></tr>
+            <tr><td>G</td><td><strong>Governance</strong></td><td>Azure Policy guardrails, cost management, compliance.</td></tr>
+            <tr><td>H</td><td><strong>Platform automation &amp; DevOps</strong></td><td>IaC, pipelines, the platform's own GitOps lifecycle.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="network">Network topology — hub &amp; spoke</h2>
+      <p>
+        The most common landing zone network pattern is <strong>hub-and-spoke</strong> (with
+        <strong>Virtual WAN</strong> as the Microsoft-managed alternative at scale). A central
+        <strong>hub</strong> in the Connectivity subscription holds shared network services — firewall,
+        gateways, DNS — and each workload sits in its own <strong>spoke</strong> VNet, peered to the hub.
+        Traffic between spokes and to on-prem/internet is inspected centrally.
+      </p>
+
+      <figure class="figure reveal">
+        <svg viewBox="0 0 820 320" role="img" aria-label="A hub-and-spoke network: a central hub VNet with Azure Firewall, VPN/ExpressRoute gateway and DNS, peered to multiple spoke VNets that contain the workloads, with on-premises connected via gateway.">
+          <rect x="0" y="0" width="820" height="320" fill="#0c1324"/>
+          <!-- hub -->
+          <g text-anchor="middle" font-family="Sora,sans-serif">
+            <circle cx="410" cy="160" r="78" fill="#0f1830" stroke="#38d3ff"/>
+            <text x="410" y="138" fill="#38d3ff" font-size="13" font-weight="800">Hub VNet</text>
+            <text x="410" y="160" fill="#97a7c6" font-size="9.5" font-family="JetBrains Mono,monospace">Azure Firewall</text>
+            <text x="410" y="176" fill="#97a7c6" font-size="9.5" font-family="JetBrains Mono,monospace">Gateway · DNS</text>
+            <text x="410" y="196" fill="#647495" font-size="9" font-family="JetBrains Mono,monospace">Connectivity sub</text>
+          </g>
+          <!-- spokes -->
+          <g font-family="Sora,sans-serif" font-size="11" font-weight="700" text-anchor="middle">
+            <g><rect x="60" y="40" width="150" height="58" rx="11" fill="#111a30" stroke="#f5b942"/><text x="135" y="66" fill="#f5b942">Spoke · Corp A</text><text x="135" y="84" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace" font-weight="500">workload VNet</text></g>
+            <g><rect x="60" y="222" width="150" height="58" rx="11" fill="#111a30" stroke="#f5b942"/><text x="135" y="248" fill="#f5b942">Spoke · Corp B</text><text x="135" y="266" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace" font-weight="500">workload VNet</text></g>
+            <g><rect x="610" y="40" width="150" height="58" rx="11" fill="#111a30" stroke="#3ad29f"/><text x="685" y="66" fill="#3ad29f">Spoke · Online</text><text x="685" y="84" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace" font-weight="500">workload VNet</text></g>
+            <g><rect x="610" y="222" width="150" height="58" rx="11" fill="#111a30" stroke="#3ad29f"/><text x="685" y="248" fill="#3ad29f">Spoke · Data</text><text x="685" y="266" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace" font-weight="500">workload VNet</text></g>
+          </g>
+          <!-- peering lines -->
+          <g stroke="#2f9bff" stroke-width="2" fill="none">
+            <path d="M210 76 L345 135"/>
+            <path d="M210 244 L345 185"/>
+            <path d="M610 76 L475 135"/>
+            <path d="M610 244 L475 185"/>
+          </g>
+          <g font-family="JetBrains Mono,monospace" font-size="8.5" fill="#647495" text-anchor="middle">
+            <text x="270" y="98">peering</text>
+            <text x="550" y="98">peering</text>
+          </g>
+          <!-- on-prem -->
+          <g text-anchor="middle" font-family="Sora,sans-serif">
+            <rect x="335" y="266" width="150" height="44" rx="10" fill="#16213b" stroke="#647495"/>
+            <text x="410" y="286" fill="#97a7c6" font-size="11" font-weight="700">On-premises</text>
+            <text x="410" y="301" fill="#647495" font-size="8.5" font-family="JetBrains Mono,monospace">VPN / ExpressRoute</text>
+          </g>
+          <path d="M410 266 L410 238" stroke="#3ad29f" stroke-width="2" stroke-dasharray="5 4" fill="none" marker-end="url(#lzh)"/>
+        </svg>
+        <figcaption><b>Figure 4.</b> Hub-and-spoke — shared firewall, gateway and DNS live in the hub; each workload gets an isolated spoke; on-prem connects through the hub gateway.</figcaption>
+      </figure>
+
+      <h2 id="principles">Design principles</h2>
+      <p>The conceptual architecture is built on a handful of principles worth internalizing:</p>
+      <ul class="principle-list">
+        <li><strong>Subscription democratization.</strong> Use subscriptions as a unit of management and scale, handed to teams — not as a scarce resource.</li>
+        <li><strong>Policy-driven governance.</strong> Use Azure Policy to enforce and auto-remediate guardrails, instead of manual gatekeeping.</li>
+        <li><strong>Single control &amp; management plane.</strong> Govern consistently through Azure Resource Manager; avoid bypass tooling.</li>
+        <li><strong>Application-centric.</strong> Optimize for application migration and innovation, not just raw infrastructure.</li>
+        <li><strong>Align with Azure-native design &amp; roadmap.</strong> Prefer platform-native services so you ride Microsoft's roadmap.</li>
+        <li><strong>Plan for growth &amp; recovery.</strong> Build a topology that scales to many subscriptions without re-architecture.</li>
+      </ul>
+
+      <figure class="figure reveal">
+        <svg viewBox="0 0 820 200" role="img" aria-label="Policy-driven governance flow: a policy assigned at a management group is inherited by subscriptions, audits or denies non-compliant resources, and can auto-remediate via deployIfNotExists.">
+          <rect x="0" y="0" width="820" height="200" fill="#0c1324"/>
+          <g font-family="Sora,sans-serif" font-size="12" font-weight="700" text-anchor="middle">
+            <g><rect x="30" y="70" width="170" height="64" rx="11" fill="#111a30" stroke="#f5b942"/><text x="115" y="98" fill="#e9eefc">Assign policy</text><text x="115" y="116" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace" font-weight="500">at mgmt group</text></g>
+            <g><rect x="230" y="70" width="170" height="64" rx="11" fill="#111a30" stroke="#2f9bff"/><text x="315" y="98" fill="#e9eefc">Inherited</text><text x="315" y="116" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace" font-weight="500">by all subs</text></g>
+            <g><rect x="430" y="70" width="170" height="64" rx="11" fill="#111a30" stroke="#ff7a8a"/><text x="515" y="98" fill="#e9eefc">Audit / Deny</text><text x="515" y="116" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace" font-weight="500">non-compliant</text></g>
+            <g><rect x="630" y="70" width="170" height="64" rx="11" fill="#111a30" stroke="#3ad29f"/><text x="715" y="98" fill="#e9eefc">Auto-remediate</text><text x="715" y="116" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace" font-weight="500">DINE / modify</text></g>
+          </g>
+          <g stroke="#647495" stroke-width="2" fill="none">
+            <path d="M200 102 L230 102" marker-end="url(#lzh)"/>
+            <path d="M400 102 L430 102" marker-end="url(#lzh)"/>
+            <path d="M600 102 L630 102" marker-end="url(#lzh)"/>
+          </g>
+          <text x="410" y="170" text-anchor="middle" fill="#97a7c6" font-family="Manrope,sans-serif" font-size="11.5">Guardrails are code, inherited and enforced automatically — governance scales without humans in the loop.</text>
+        </svg>
+        <figcaption><b>Figure 5.</b> Policy-driven governance — assign once at a management group, inherit everywhere, and auto-remediate drift with <code>deployIfNotExists</code>.</figcaption>
+      </figure>
+
+      <h2 id="implementation">Implementation options</h2>
+      <p>
+        You don't build a landing zone from a blank page — Microsoft ships <strong>accelerators</strong>.
+        Pick the path that matches how your team works:
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Option</th><th>Best for</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Portal accelerator</strong></td><td>Getting started fast</td><td>Guided ARM-based deployment of the full conceptual architecture.</td></tr>
+            <tr><td><strong>ALZ Bicep</strong></td><td>Azure-native IaC teams</td><td>Modular Bicep; Microsoft-maintained (<code>Azure/ALZ-Bicep</code>).</td></tr>
+            <tr><td><strong>ALZ Terraform</strong></td><td>Multi-cloud / Terraform shops</td><td>Official modules via the Azure Verified Modules / <code>aka.ms/alz/tf</code>.</td></tr>
+            <tr><td><strong>Start small &amp; expand</strong></td><td>Brownfield / cautious rollout</td><td>Begin with a minimal MG + policy set, grow toward the full design.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note warn">
+        <span class="ico">⚠</span>
+        <div>Whatever you choose, manage it as <strong>code from day one</strong>. A landing zone clicked together by hand drifts the moment two people touch it — the whole point is a repeatable, version-controlled platform.</div>
+      </div>
+      <div class="note">
+        <span class="ico">ℹ</span>
+        <div>Once deployed, keep it honest: use <a href="../docs/azureutils/index.html">AzureUtils</a> and the <a href="https://trimtechbr.github.io" target="_blank" rel="noopener">Azure Estate Report</a> to spot drift, orphaned resources and tag gaps against your landing zone baseline.</div>
+      </div>
+
+      <!-- ===================== CHECKLIST ===================== -->
+      <h2 id="checklist">A quick self-review checklist</h2>
+      <ul class="principle-list">
+        <li><strong>Structure —</strong> Management group hierarchy in place (Platform / Landing zones / Sandbox / Decommissioned)?</li>
+        <li><strong>Platform —</strong> Identity, Management and Connectivity subscriptions separated and owned by the platform team?</li>
+        <li><strong>Subscriptions —</strong> Application landing zones handed out with policy already applied (democratized, not ad-hoc)?</li>
+        <li><strong>Network —</strong> Hub-and-spoke or Virtual WAN with centralized firewall, DNS and hybrid connectivity?</li>
+        <li><strong>Governance —</strong> Azure Policy guardrails assigned at the MG level with auto-remediation?</li>
+        <li><strong>Automation —</strong> Entire platform deployed and maintained as code (accelerator / Bicep / Terraform)?</li>
+        <li><strong>Design areas —</strong> All eight areas consciously decided, not left to chance?</li>
+      </ul>
+
+      <!-- ===================== REFERENCES ===================== -->
+      <h2 id="references">Official Microsoft references</h2>
+      <ul class="ref-list">
+        <li><a href="https://learn.microsoft.com/azure/cloud-adoption-framework/ready/landing-zone/" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>What is an Azure landing zone?</span></a><span class="ref-desc">The conceptual architecture and the core concepts.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/cloud-adoption-framework/ready/landing-zone/design-areas" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>The eight design areas</span></a><span class="ref-desc">Detailed guidance for each landing zone design area.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/cloud-adoption-framework/ready/landing-zone/design-principles" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Landing zone design principles</span></a><span class="ref-desc">Subscription democratization, policy-driven governance and more.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/cloud-adoption-framework/ready/landing-zone/implementation-options" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Implementation options</span></a><span class="ref-desc">Accelerator vs. start-small, and how to choose.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/cloud-adoption-framework/ready/landing-zone/design-area/resource-org-management-groups" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Management groups &amp; subscriptions</span></a><span class="ref-desc">Designing the hierarchy and subscription strategy.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/cloud-adoption-framework/ready/azure-best-practices/define-an-azure-network-topology" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Network topology &amp; connectivity</span></a><span class="ref-desc">Hub-and-spoke vs Virtual WAN design guidance.</span></li>
+        <li><a href="https://github.com/Azure/ALZ-Bicep" target="_blank" rel="noopener"><span class="ref-src">GitHub</span><span>Azure Landing Zones — Bicep</span></a><span class="ref-desc">Microsoft-maintained modular Bicep implementation.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/cloud-adoption-framework/" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Cloud Adoption Framework</span></a><span class="ref-desc">The broader journey that landing zones are the "Ready" output of.</span></li>
+      </ul>
+
+      <div class="next-prev">
+        <a class="is-prev" href="azure-cloud-adoption-framework.html">
+          <span class="np-kicker">← Related</span>
+          <span class="np-title">Cloud Adoption Framework</span>
+        </a>
+        <a class="is-next" href="index.html">
+          <span class="np-kicker">Next →</span>
+          <span class="np-title">All blog posts</span>
+        </a>
+      </div>
+    </article>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container footer-grid">
+    <p>© <span data-current-year></span> Henderson Andrade · Microsoft Azure Cloud Architect.</p>
+    <div class="footer-links">
+      <a href="index.html">Blog</a>
+      <a href="../solutions/index.html">Solutions</a>
+      <a href="https://github.com/hendersonandrade" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://br.linkedin.com/in/henderson-andrade-%E2%98%81%EF%B8%8F-22b1ba33/pt" target="_blank" rel="noopener">LinkedIn ↗</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/js/main.js"></script>
+</body>
+</html>
