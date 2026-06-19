@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Azure + Terraform + Infracost: IaC enterprise com FinOps no pipeline | Henderson Andrade</title>
-  <meta name="description" content="Um laboratório prático de IaC enterprise no Azure: estrutura modular de Terraform (storage, VM, App Service), backend de state via Bicep, pipeline GitHub Actions com OIDC sem segredos e estimativa de custo com Infracost comentada no PR.">
+  <meta name="description" content="Um laboratório prático de IaC enterprise no Azure: estrutura modular de Terraform (rede, storage, App Service), backend de state via Bicep, pipeline GitHub Actions com OIDC sem segredos e estimativa de custo com Infracost comentada no PR.">
   <meta property="og:title" content="Azure + Terraform + Infracost: IaC enterprise com FinOps no pipeline">
   <meta property="og:description" content="Da teoria de IaC e FinOps ao laboratório: módulos Terraform, bootstrap de state com Bicep, OIDC sem segredos e Infracost no Pull Request.">
   <meta property="og:type" content="article">
@@ -346,7 +346,6 @@ infra/
 modules/
   networking/          <span class="tok-com"># VNet + subnet + NSG</span>
   storage-account/     <span class="tok-com"># 1 Storage Account</span>
-  virtual-machine/     <span class="tok-com"># 1 VM Linux + NIC</span>
   app-service/         <span class="tok-com"># 1 App Service Plan + Web App</span>
 
 infracost/infracost.yml
@@ -354,7 +353,7 @@ infracost/infracost.yml
       </div>
 
       <figure class="figure reveal">
-        <svg viewBox="0 0 820 280" role="img" aria-label="Composição de módulos: a raiz infra cria o resource group e chama os quatro módulos — networking, storage-account, virtual-machine e app-service. O módulo networking fornece o subnet_id consumido pela VM.">
+        <svg viewBox="0 0 820 280" role="img" aria-label="Composição de módulos: a raiz infra cria o resource group e chama os três módulos — networking, storage-account e app-service — injetando o nome do resource group e as tags comuns em cada um.">
           <rect x="0" y="0" width="820" height="280" fill="#0c1324"/>
           <text x="410" y="32" text-anchor="middle" fill="#3ad29f" font-family="Sora,sans-serif" font-size="14" font-weight="800">Composição: a raiz orquestra os módulos</text>
           <g font-family="Sora,sans-serif" text-anchor="middle">
@@ -364,23 +363,19 @@ infracost/infracost.yml
           </g>
           <g stroke="#647495" stroke-width="1.5" fill="none">
             <path d="M410 108 L410 132"/>
-            <path d="M110 132 L710 132"/>
-            <path d="M110 132 L110 158"/>
-            <path d="M310 132 L310 158"/>
-            <path d="M510 132 L510 158"/>
-            <path d="M710 132 L710 158"/>
+            <path d="M150 132 L670 132"/>
+            <path d="M150 132 L150 158"/>
+            <path d="M410 132 L410 158"/>
+            <path d="M670 132 L670 158"/>
           </g>
           <g font-family="Sora,sans-serif" font-size="11.5" font-weight="700" text-anchor="middle">
-            <g><rect x="34" y="158" width="152" height="60" rx="11" fill="#111a30" stroke="#38d3ff"/><text x="110" y="184" fill="#38d3ff">networking</text><text x="110" y="202" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">vnet · subnet · nsg</text></g>
-            <g><rect x="234" y="158" width="152" height="60" rx="11" fill="#111a30" stroke="#3ad29f"/><text x="310" y="184" fill="#3ad29f">storage-account</text><text x="310" y="202" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">1 storage</text></g>
-            <g><rect x="434" y="158" width="152" height="60" rx="11" fill="#111a30" stroke="#f5b942"/><text x="510" y="184" fill="#f5b942">virtual-machine</text><text x="510" y="202" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">1 vm linux + nic</text></g>
-            <g><rect x="634" y="158" width="152" height="60" rx="11" fill="#111a30" stroke="#5cb4ff"/><text x="710" y="184" fill="#5cb4ff">app-service</text><text x="710" y="202" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">plan + web app</text></g>
+            <g><rect x="65" y="158" width="170" height="60" rx="11" fill="#111a30" stroke="#38d3ff"/><text x="150" y="184" fill="#38d3ff">networking</text><text x="150" y="202" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">vnet · subnet · nsg</text></g>
+            <g><rect x="325" y="158" width="170" height="60" rx="11" fill="#111a30" stroke="#3ad29f"/><text x="410" y="184" fill="#3ad29f">storage-account</text><text x="410" y="202" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">1 storage</text></g>
+            <g><rect x="585" y="158" width="170" height="60" rx="11" fill="#111a30" stroke="#5cb4ff"/><text x="670" y="184" fill="#5cb4ff">app-service</text><text x="670" y="202" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">plan + web app</text></g>
           </g>
-          <path d="M110 218 C110 248, 510 252, 510 220" stroke="#38d3ff" stroke-width="1.4" fill="none" stroke-dasharray="4 4" marker-end="url(#ara)"/>
-          <defs><marker id="ara" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 Z" fill="#38d3ff"/></marker></defs>
-          <text x="310" y="262" text-anchor="middle" fill="#97a7c6" font-family="JetBrains Mono,monospace" font-size="9">networking expõe subnet_id → consumido pela VM</text>
+          <text x="410" y="258" text-anchor="middle" fill="#97a7c6" font-family="JetBrains Mono,monospace" font-size="9">a raiz injeta resource_group_name + tags comuns em cada módulo</text>
         </svg>
-        <figcaption><b>Figura 4.</b> A raiz cria o resource group e injeta entradas em cada módulo; saídas de um módulo (ex.: <code>subnet_id</code>) alimentam outro. Cada módulo é testável e reutilizável isoladamente.</figcaption>
+        <figcaption><b>Figura 4.</b> A raiz cria o resource group e injeta entradas em cada módulo (nome do RG, tags). Cada módulo expõe saídas e é testável e reutilizável isoladamente.</figcaption>
       </figure>
 
       <p>
@@ -429,7 +424,7 @@ infracost/infracost.yml
           </defs>
           <text x="265" y="78" text-anchor="middle" fill="#97a7c6" font-family="JetBrains Mono,monospace" font-size="9">cria uma vez</text>
           <text x="555" y="78" text-anchor="middle" fill="#97a7c6" font-family="JetBrains Mono,monospace" font-size="9">usa sempre</text>
-          <text x="410" y="200" text-anchor="middle" fill="#97a7c6" font-family="Manrope,sans-serif" font-size="11.5">O Bicep vive fora do ciclo do Terraform — administrador roda o bootstrap, o pipeline cuida do resto.</text>
+          <text x="410" y="200" text-anchor="middle" fill="#97a7c6" font-family="Manrope,sans-serif" font-size="11.5">O Bicep vive fora do ciclo do Terraform — um workflow dedicado roda o bootstrap, o de infra cuida do resto.</text>
         </svg>
         <figcaption><b>Figura 5.</b> Bicep faz o bootstrap idempotente do backend (sem state próprio); a partir daí o Terraform sempre encontra um backend remoto pronto, com lock e versionamento.</figcaption>
       </figure>
@@ -459,7 +454,7 @@ resource blobService <span class="tok-str">'Microsoft.Storage/storageAccounts/bl
       </div>
       <div class="note">
         <span class="ico">ℹ</span>
-        <div>Rode o bootstrap uma vez com <code>bash bootstrap/deploy.sh</code> (que chama <code>az deployment sub create</code>). Anote os outputs <code>resourceGroupName</code> e <code>storageAccountName</code> — eles entram nas <em>Variables</em> do GitHub para o <code>terraform init</code> configurar o backend.</div>
+        <div>No repositório companion, o bootstrap roda por um <strong>workflow dedicado</strong> (<code>bootstrap-tfstate.yml</code>) com a mesma autenticação OIDC sem segredos — disparado em push na <code>main</code> ou sob demanda. O <code>az deployment sub create</code> é <strong>idempotente</strong>: rodar de novo mantém o backend existente. Os valores do backend (<code>resourceGroupName</code> e <code>storageAccountName</code>) ficam em <code>bootstrap/main.parameters.json</code>, a <strong>fonte única de verdade</strong> que o pipeline lê para configurar o <code>terraform init</code>.</div>
       </div>
 
       <!-- ===================== 6 · OIDC ===================== -->
@@ -512,6 +507,10 @@ resource blobService <span class="tok-str">'Microsoft.Storage/storageAccounts/bl
   "audiences": ["api://AzureADTokenExchange"]
 }'</span></code></pre>
       </div>
+      <div class="note">
+        <span class="ico">ℹ</span>
+        <div>Na prática você cria uma credencial federada por <strong>gatilho</strong>, porque o <code>subject</code> muda: <code>...:ref:refs/heads/main</code> (push), <code>...:pull_request</code> (PRs) e <code>...:environment:production</code> (o job de <code>apply</code> protegido pelo environment). Quando um job declara <code>environment: production</code>, o GitHub troca o subject da branch pelo do environment — por isso o apply precisa da sua própria credencial. Os três comandos estão no <a href="https://github.com/hendersonandrade/azure-iac-with-tf-infracost#readme" target="_blank" rel="noopener">README</a>.</div>
+      </div>
 
       <!-- ===================== 7 · Terraform sample ===================== -->
       <h2 id="terraform-sample">Os samples Terraform, comentados</h2>
@@ -562,9 +561,9 @@ provider <span class="tok-str">"azurerm"</span> {
       </div>
 
       <p>
-        E a raiz <strong>compõe</strong> tudo, passando saídas de um módulo como entradas de outro — repare o
-        <code>subnet_id</code> do módulo de rede indo para o da VM, e o uso de um <strong>data source</strong>
-        (<code>azurerm_subscription</code>) para ler metadados sem criar nada:
+        E a raiz <strong>compõe</strong> tudo: injeta o nome do resource group que ela mesma criou
+        (<code>azurerm_resource_group.this.name</code>) como entrada de cada módulo, e usa um
+        <strong>data source</strong> (<code>azurerm_subscription</code>) para ler metadados sem criar nada:
       </p>
       <div class="code-card reveal">
         <div class="code-head"><span class="dots"><i></i><i></i><i></i></span><span class="file">infra/main.tf · data.tf</span></div>
@@ -572,34 +571,32 @@ provider <span class="tok-str">"azurerm"</span> {
 data <span class="tok-str">"azurerm_client_config"</span> <span class="tok-str">"current"</span> {}
 data <span class="tok-str">"azurerm_subscription"</span> <span class="tok-str">"current"</span> {}
 
-<span class="tok-com"># main.tf — a VM consome o subnet_id que a rede expôs</span>
-module <span class="tok-str">"networking"</span> {
-  source        = <span class="tok-str">"../modules/networking"</span>
-  name_suffix   = local.name_suffix
-  address_space = var.address_space
-  <span class="tok-com"># ...</span>
+<span class="tok-com"># main.tf — o RG criado pela raiz vira entrada dos módulos</span>
+resource <span class="tok-str">"azurerm_resource_group"</span> <span class="tok-str">"this"</span> {
+  name     = <span class="tok-str">"rg-${local.name_suffix}"</span>
+  location = var.location
 }
 
-module <span class="tok-str">"vm"</span> {
-  source    = <span class="tok-str">"../modules/virtual-machine"</span>
-  subnet_id = module.networking.subnet_id   <span class="tok-com"># saída → entrada</span>
-  vm_size   = var.vm_size
+module <span class="tok-str">"storage"</span> {
+  source              = <span class="tok-str">"../modules/storage-account"</span>
+  resource_group_name = azurerm_resource_group.this.name   <span class="tok-com"># saída → entrada</span>
+  location            = var.location
   <span class="tok-com"># ...</span>
 }</code></pre>
       </div>
 
-      <div class="lab-shot reveal">
-        <span class="ls-ico">📷</span>
-        <span class="ls-title">Imagem do laboratório — <code>terraform plan</code> em execução</span>
-        <span class="ls-hint">substituir por &lt;img src="../assets/img/lab/tf-plan.png"&gt; quando a captura estiver pronta</span>
-      </div>
+      <figure class="figure reveal">
+        <img src="../assets/img/lab/01.tf-plan.png" alt="Saída do terraform plan no terminal, listando os recursos que serão criados no Azure.">
+        <figcaption><b>Captura 1.</b> O <code>terraform plan</code> em execução — lista o que será criado, antes de qualquer mudança no Azure.</figcaption>
+      </figure>
 
       <!-- ===================== 8 · Pipeline ===================== -->
       <h2 id="pipeline">O pipeline GitHub Actions, passo a passo</h2>
       <p>
-        O workflow tem dois jobs: <strong>plan</strong> (roda em todo PR e push, valida e estima custo) e
-        <strong>apply</strong> (só em push na <code>main</code>, atrás de um <em>environment</em> com aprovação
-        manual). Vamos pelos blocos.
+        O workflow tem três jobs: <strong>bootstrap</strong> (em push na <code>main</code>, garante que o
+        backend de state exista chamando o workflow <code>bootstrap-tfstate.yml</code> antes do <code>init</code>),
+        <strong>plan</strong> (roda em todo PR e push, valida e estima custo) e <strong>apply</strong> (só em push
+        na <code>main</code>, atrás de um <em>environment</em> com aprovação manual). Vamos pelos blocos.
       </p>
       <p>
         <strong>1 · Triggers e permissões.</strong> O bloco <code>permissions</code> é o coração do OIDC:
@@ -620,8 +617,12 @@ permissions:
 
       <p>
         <strong>2 · Login OIDC + init com backend.</strong> A action <code>azure/login</code> recebe só os
-        <em>identificadores</em> (client/tenant/subscription) — nenhuma senha — e usa o token OIDC. Em seguida o
-        <code>init</code> recebe os dados do backend Bicep via <code>-backend-config</code>.
+        <em>identificadores</em> (client/tenant/subscription) — nenhuma senha — e usa o token OIDC. Um passo
+        anterior lê <code>resourceGroupName</code> e <code>storageAccountName</code> de
+        <code>bootstrap/main.parameters.json</code> (com <code>jq</code>) e os exporta como
+        <code>TF_BACKEND_RG</code>/<code>TF_BACKEND_SA</code>; em seguida o <code>init</code> os passa ao backend
+        via <code>-backend-config</code>. Assim o <code>parameters.json</code> é a fonte única de verdade — sem
+        duplicar esses valores nas <em>Variables</em> do GitHub.
       </p>
       <div class="code-card reveal">
         <div class="code-head"><span class="dots"><i></i><i></i><i></i></span><span class="file">.github/workflows/terraform.yml — login &amp; init</span></div>
@@ -631,6 +632,12 @@ permissions:
     client-id:       ${{ vars.AZURE_CLIENT_ID }}
     tenant-id:       ${{ vars.AZURE_TENANT_ID }}
     subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+<span class="tok-flag">- name:</span> Load backend configuration   <span class="tok-com"># lê o parameters.json com jq</span>
+  <span class="tok-flag">run:</span> |
+    p=../bootstrap/main.parameters.json
+    echo "TF_BACKEND_RG=$(jq -er '.parameters.resourceGroupName.value' $p)" &gt;&gt; $GITHUB_ENV
+    echo "TF_BACKEND_SA=$(jq -er '.parameters.storageAccountName.value' $p)" &gt;&gt; $GITHUB_ENV
 
 <span class="tok-flag">- name:</span> Terraform init
   <span class="tok-flag">run:</span> |
@@ -700,24 +707,29 @@ permissions:
       </div>
       <p>
         O <code>--behavior=update</code> mantém <strong>um único comentário</strong> que é atualizado a cada push
-        no PR — em vez de poluir a conversa com um novo a cada commit. O <code>infracost/infracost.yml</code>
-        define quais projetos/var-files custar (dev e prod), de modo que o revisor vê o impacto nos dois
-        ambientes.
+        no PR — em vez de poluir a conversa com um novo a cada commit. No repositório companion o pipeline vai um
+        pouco além: gera um <strong>baseline</strong> a partir do código da <code>main</code> e usa
+        <code>--compare-to</code> para um <strong>diff</strong> preciso, publica a tabela detalhada também no
+        <strong>Summary do run</strong> (<code>GITHUB_STEP_SUMMARY</code>) e custa tanto <code>dev</code> quanto
+        <code>prod</code> via <code>infracost/infracost.yml</code>.
       </p>
+      <div class="note">
+        <span class="ico">ℹ</span>
+        <div><strong>Moeda e outras customizações.</strong> Por padrão os custos saem em <strong>USD</strong> (as nuvens publicam em dólar; a CLI converte pela cotação atual). Para exibir em <strong>BRL</strong> ou qualquer código ISO 4217, defina <code>INFRACOST_CURRENCY: BRL</code> no bloco <code>env:</code> do workflow (ou <code>infracost configure set currency BRL</code> localmente). Premissas de uso por consumo vão num <code>infracost-usage.yml</code>. O <a href="https://github.com/hendersonandrade/azure-iac-with-tf-infracost#como-customizar" target="_blank" rel="noopener">README</a> detalha essas e outras opções.</div>
+      </div>
       <div class="note">
         <span class="ico">ℹ</span>
         <div><strong>Guardrails.</strong> No <strong>Infracost Cloud</strong> (camada gratuita) você liga políticas que marcam ou bloqueiam PRs acima de um limite — ex.: "aumento &gt; US$ 100/mês exige aprovação do FinOps". É a fase <em>Operate</em> do FinOps virando portão automático na esteira.</div>
       </div>
 
-      <div class="lab-shot reveal">
-        <span class="ls-ico">📷</span>
-        <span class="ls-title">Imagem do laboratório — comentário de custo do Infracost no Pull Request</span>
-        <span class="ls-hint">e, opcionalmente, o dashboard do Infracost Cloud</span>
-      </div>
+      <figure class="figure reveal">
+        <img src="../assets/img/lab/03.tf-pr.png" alt="Comentário do Infracost no Pull Request mostrando a estimativa de custo mensal detalhada.">
+        <figcaption><b>Captura 2.</b> O comentário do Infracost no Pull Request — a estimativa de custo mensal detalhada do diff, direto na revisão.</figcaption>
+      </figure>
 
       <div class="note warn">
         <span class="ico">⚠</span>
-        <div>É um laboratório que <strong>gera custo real</strong> (VM + App Service ≈ US$ 45–55/mês em dev). Ao terminar, rode <code>terraform destroy -var-file=dev.tfvars</code> e, se não for reutilizar, apague o RG do state com <code>az group delete</code>. O próprio Infracost te lembra de quanto está em jogo.</div>
+        <div>É um laboratório que <strong>gera custo real</strong> (App Service ≈ US$ 13–15/mês em dev). Ao terminar, rode <code>terraform destroy -var-file=dev.tfvars</code> e, se não for reutilizar, apague o RG do state com <code>az group delete</code>. O próprio Infracost te lembra de quanto está em jogo.</div>
       </div>
 
       <div class="note">
