@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://hendersonandrade.github.io/sitemap.xml
