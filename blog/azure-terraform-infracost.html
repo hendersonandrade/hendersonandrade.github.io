@@ -1,0 +1,783 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Azure + Terraform + Infracost: enterprise IaC with FinOps in the pipeline | Henderson Andrade</title>
+  <meta name="description" content="A hands-on enterprise IaC lab on Azure: a modular Terraform structure (storage, VM, App Service), a Bicep-bootstrapped state backend, a secretless OIDC GitHub Actions pipeline and Infracost cost estimates commented on every PR.">
+  <meta property="og:title" content="Azure + Terraform + Infracost: enterprise IaC with FinOps in the pipeline">
+  <meta property="og:description" content="From IaC and FinOps theory to a running lab: Terraform modules, Bicep state bootstrap, secretless OIDC and Infracost on the Pull Request.">
+  <meta property="og:type" content="article">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container navbar">
+    <a class="brand" href="../index.html" aria-label="Henderson Andrade — home">
+      <img class="brand-mark" src="../assets/img/ha-monogram.svg" alt="">
+      <span>Henderson Andrade<span class="brand-sub">Azure Cloud Architect</span></span>
+    </a>
+    <button class="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-menu">
+      <li><a class="nav-link" href="../index.html">Home</a></li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Solutions <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="../solutions/index.html"><span class="dropdown-kicker">Portfolio</span><span class="dropdown-title">All solutions</span></a></li>
+          <li><a href="../docs/azureutils/index.html"><span class="dropdown-kicker">Personal · PowerShell</span><span class="dropdown-title">AzureUtils module</span></a></li>
+          <li><a href="https://trimtechbr.github.io" target="_blank" rel="noopener"><span class="dropdown-kicker">TrimTechBR ↗</span><span class="dropdown-title">AER — Azure Estate Report</span></a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Docs <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="../docs/azureutils/index.html"><span class="dropdown-kicker">Start here</span><span class="dropdown-title">Overview &amp; install</span></a></li>
+          <li><a href="../docs/azureutils/tag-inventory.html"><span class="dropdown-kicker">Reference</span><span class="dropdown-title">Tag inventory</span></a></li>
+          <li><a href="../docs/azureutils/find-commands.html"><span class="dropdown-kicker">Reference</span><span class="dropdown-title">Find commands</span></a></li>
+          <li><a href="../docs/azureutils/release-publishing.html"><span class="dropdown-kicker">Internals</span><span class="dropdown-title">Release &amp; publishing</span></a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Blog <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="index.html"><span class="dropdown-kicker">All posts</span><span class="dropdown-title">Technical blog</span></a></li>
+          <li><a href="azure-terraform-infracost.html"><span class="dropdown-kicker">DevOps · FinOps</span><span class="dropdown-title">Terraform + Infracost</span></a></li>
+          <li><a href="azure-well-architected-framework.html"><span class="dropdown-kicker">Architecture</span><span class="dropdown-title">Azure Well-Architected Framework</span></a></li>
+          <li><a href="azure-cloud-adoption-framework.html"><span class="dropdown-kicker">Methodology</span><span class="dropdown-title">Cloud Adoption Framework</span></a></li>
+          <li><a href="azure-landing-zones.html"><span class="dropdown-kicker">Platform</span><span class="dropdown-title">Azure Landing Zones</span></a></li>
+          <li><a href="microsoft-certifications.html"><span class="dropdown-kicker">Careers</span><span class="dropdown-title">Microsoft Certifications</span></a></li>
+        </ul>
+      </li>
+      <li><a class="nav-link" href="../contact.html">Contact</a></li>
+      <li><a class="btn btn-secondary" href="https://github.com/hendersonandrade" target="_blank" rel="noopener">GitHub ↗</a></li>
+      <li class="nav-item lang-switch">
+        <a class="lang-link is-active" href="azure-terraform-infracost.html">EN</a>
+        <span class="lang-sep">/</span>
+        <a class="lang-link" href="azure-terraform-infracost.pt-br.html">PT</a>
+      </li>
+    </ul>
+  </div>
+</header>
+
+<main class="container">
+  <div class="docs-shell">
+
+    <aside class="docs-sidebar reveal">
+      <div class="side-group">
+        <p class="side-title">On this page</p>
+        <ul class="anchor-list">
+          <li><a href="#iac">What IaC really is</a></li>
+          <li><a href="#finops">FinOps &amp; invisible cost</a></li>
+          <li><a href="#infracost">Infracost in depth</a></li>
+          <li><a href="#arquitetura">The enterprise structure</a></li>
+          <li><a href="#backend-bicep">tfstate via Bicep</a></li>
+          <li><a href="#oidc">Secretless OIDC</a></li>
+          <li><a href="#terraform-sample">The Terraform samples</a></li>
+          <li><a href="#pipeline">The pipeline, step by step</a></li>
+          <li><a href="#infracost-pipeline">Infracost in the pipeline</a></li>
+          <li><a href="#checklist">Production checklist</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </div>
+      <div class="side-group">
+        <p class="side-title">Lab repository</p>
+        <ul>
+          <li><a href="https://github.com/hendersonandrade/azure-iac-with-tf-infracost" target="_blank" rel="noopener">azure-iac-with-tf-infracost ↗</a></li>
+        </ul>
+      </div>
+      <div class="side-group">
+        <p class="side-title">More from the blog</p>
+        <ul>
+          <li><a href="azure-landing-zones.html">Azure Landing Zones</a></li>
+          <li><a href="azure-cloud-adoption-framework.html">Cloud Adoption Framework</a></li>
+          <li><a href="index.html">← All posts</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <article class="docs-content">
+      <nav class="breadcrumb">
+        <a href="../index.html">Home</a><span class="sep">/</span>
+        <a href="index.html">Blog</a><span class="sep">/</span>
+        <span>Terraform + Infracost</span>
+      </nav>
+
+      <span class="eyebrow">DevOps · FinOps · Hands-on</span>
+      <h1>Azure + Terraform + Infracost: enterprise IaC with FinOps in the pipeline</h1>
+      <p class="docs-lede">
+        An <strong>end-to-end</strong> lab: from the concepts of Infrastructure as Code and FinOps to a
+        <strong>modular, professional Terraform structure</strong> on Azure — with a state backend bootstrapped
+        by <strong>Bicep</strong>, a <strong>GitHub Actions</strong> pipeline authenticated through
+        <strong>secretless OIDC</strong> and <strong>Infracost</strong> cost estimates automatically commented on
+        every Pull Request. All the code lives in a
+        <a href="https://github.com/hendersonandrade/azure-iac-with-tf-infracost" target="_blank" rel="noopener">companion repository</a>
+        you can clone and run.
+      </p>
+
+      <div class="article-meta">
+        <span><span class="am-dot"></span> Henderson Andrade</span>
+        <span>Published Jun 18, 2026</span>
+        <span>~24 min read</span>
+        <span>Terraform · Azure · Infracost · GitHub Actions</span>
+      </div>
+
+      <div class="badge-row">
+        <span class="badge badge-primary">Terraform</span>
+        <span class="badge">FinOps · Infracost</span>
+        <span class="badge">Bicep backend</span>
+        <span class="badge">OIDC / WIF</span>
+        <span class="badge">GitHub Actions</span>
+        <span class="badge">6 diagrams</span>
+      </div>
+
+      <div class="note">
+        <span class="ico">ℹ</span>
+        <div><strong>Prerequisites:</strong> an Azure subscription (Owner/Contributor), Azure CLI, Terraform CLI ≥ 1.7, a GitHub repository and a free Infracost account. <strong>This article focuses on the concepts and architecture decisions</strong>; the <strong>full step-by-step guide</strong> to stand the pipeline up — bootstrap, OIDC, Variables/Secrets, opening a PR, applying and destroying — lives in the <a href="https://github.com/hendersonandrade/azure-iac-with-tf-infracost#readme" target="_blank" rel="noopener"><strong><code>azure-iac-with-tf-infracost</code> repository README</strong></a>, complete with a prerequisites checklist and troubleshooting.</div>
+      </div>
+
+      <!-- ===================== 1 · IaC ===================== -->
+      <h2 id="iac">What Infrastructure as Code really is</h2>
+      <p>
+        <strong>Infrastructure as Code (IaC)</strong> is the practice of describing your infrastructure —
+        networks, machines, databases, permissions — in <strong>versioned text files</strong>, and letting a tool
+        provision it for you. Instead of clicking through the portal and hoping you remember what you did, you
+        declare the <em>desired state</em> and the tool reconciles reality with that target.
+      </p>
+      <p>Four concepts hold up everything that follows:</p>
+      <ul class="principle-list">
+        <li><strong>Declarative &gt; imperative.</strong> You describe <em>what</em> you want (a
+          <code>Standard_B2s</code> VM in this subnet), not <em>the steps</em> to get there. Terraform figures out
+          the how — create, update or destroy — by comparing desired with actual.</li>
+        <li><strong>Idempotency.</strong> Running the same code ten times yields the same result. If nothing
+          changed in the code, <code>apply</code> does nothing. That makes automation safe to repeat.</li>
+        <li><strong>State.</strong> Terraform keeps a <strong>state</strong> file that maps each resource in code to
+          the real resource in Azure. It is the tool's source of truth — which is why it must be stored remotely,
+          securely and with locking (more on that soon).</li>
+        <li><strong>Drift &amp; immutability.</strong> <em>Drift</em> is when someone changes something by hand and
+          reality diverges from code. <code>plan</code> detects drift; <code>apply</code> corrects it. The
+          <em>immutable</em> mindset prefers to recreate over patch — servers are cattle, not pets.</li>
+      </ul>
+
+      <figure class="figure reveal">
+        <svg viewBox="0 0 820 250" role="img" aria-label="The Terraform cycle: write HCL code, run plan to compare desired vs actual by reading the state, apply the changes and update the state, in a loop.">
+          <rect x="0" y="0" width="820" height="250" fill="#0c1324"/>
+          <text x="410" y="34" text-anchor="middle" fill="#3ad29f" font-family="Sora,sans-serif" font-size="15" font-weight="800">The Terraform lifecycle</text>
+          <g font-family="Sora,sans-serif" font-size="12.5" font-weight="700" text-anchor="middle">
+            <g><rect x="40" y="74" width="160" height="64" rx="11" fill="#111a30" stroke="#2f9bff"/><text x="120" y="102" fill="#2f9bff">1 · Write</text><text x="120" y="122" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace" font-weight="500">.tf (HCL)</text></g>
+            <g><rect x="250" y="74" width="160" height="64" rx="11" fill="#111a30" stroke="#38d3ff"/><text x="330" y="102" fill="#38d3ff">2 · Plan</text><text x="330" y="122" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace" font-weight="500">desired vs actual</text></g>
+            <g><rect x="460" y="74" width="160" height="64" rx="11" fill="#111a30" stroke="#3ad29f"/><text x="540" y="102" fill="#3ad29f">3 · Apply</text><text x="540" y="122" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace" font-weight="500">create/update/destroy</text></g>
+            <g><rect x="660" y="74" width="120" height="64" rx="11" fill="#16213b" stroke="#f5b942"/><text x="720" y="102" fill="#f5b942">State</text><text x="720" y="122" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace" font-weight="500">remote</text></g>
+          </g>
+          <g stroke="#647495" stroke-width="2" fill="none">
+            <path d="M200 106 L250 106" marker-end="url(#tfa)"/>
+            <path d="M410 106 L460 106" marker-end="url(#tfa)"/>
+            <path d="M620 106 L660 106" marker-end="url(#tfa)"/>
+          </g>
+          <defs><marker id="tfa" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 Z" fill="#647495"/></marker></defs>
+          <path d="M720 138 C720 188, 330 188, 330 142" stroke="#f5b942" stroke-width="1.6" fill="none" stroke-dasharray="4 4" marker-end="url(#tfa)"/>
+          <text x="525" y="182" text-anchor="middle" fill="#97a7c6" font-family="JetBrains Mono,monospace" font-size="9.5">plan reads the state to know what already exists</text>
+          <text x="410" y="226" text-anchor="middle" fill="#97a7c6" font-family="Manrope,sans-serif" font-size="11.5">Versioned in Git, reviewed in a PR, applied by a pipeline — infrastructure treated as software.</text>
+        </svg>
+        <figcaption><b>Figure 1.</b> The <code>write → plan → apply → state</code> loop: code is the intent, state is the memory, plan is the diff between the two.</figcaption>
+      </figure>
+
+      <p>
+        <strong>Why it matters.</strong> IaC brings <strong>repeatability</strong> (dev is identical to prod),
+        <strong>versioning</strong> (every change is a commit with an author and a reason),
+        <strong>review</strong> (infra changes via Pull Request, with peer review), <strong>speed</strong>
+        (standing up a new environment is running a pipeline) and <strong>governance</strong> (policies and
+        standards become code, not tribal knowledge). It is the eighth design area of
+        <a href="azure-landing-zones.html">Azure Landing Zones</a> — platform automation — taken down to the
+        workload level.
+      </p>
+
+      <!-- ===================== 2 · FinOps ===================== -->
+      <h2 id="finops">FinOps and the invisible-cost problem</h2>
+      <p>
+        In the cloud, every line of IaC carries a <strong>price</strong>. Swapping <code>Standard_B2s</code> for
+        <code>Standard_D8s_v5</code> is a one-word diff that multiplies the bill tenfold. The trouble is that, in
+        the traditional flow, nobody sees that cost until the <strong>invoice arrives</strong> — by which point the
+        resource has already run for a whole month.
+      </p>
+      <p>
+        <strong>FinOps</strong> is the discipline that brings financial accountability to cloud speed: engineering,
+        finance and the business collaborating so each team sees and owns its own cost. The FinOps Foundation
+        organizes it into three iterative phases:
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Phase</th><th>Question it answers</th><th>In our lab</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Inform</strong></td><td>How much does it cost and whose is it?</td><td>Infracost shows the diff's cost on the PR; tags identify the owner.</td></tr>
+            <tr><td><strong>Optimize</strong></td><td>Where can we save?</td><td>Compare SKUs in the <code>plan</code> before applying; right-sizing.</td></tr>
+            <tr><td><strong>Operate</strong></td><td>How do we keep it in check?</td><td>Infracost guardrails/policies that fail expensive PRs.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        The big idea is <strong>shift-left of cost</strong>: pushing financial visibility to the <em>left</em> of
+        the pipeline — into the Pull Request, where the change is still cheap to adjust — instead of discovering it
+        on the invoice, where it is already too late.
+      </p>
+
+      <figure class="figure reveal">
+        <svg viewBox="0 0 820 250" role="img" aria-label="Comparison: without Infracost, cost only shows up on the end-of-month invoice; with Infracost, cost shows up on the Pull Request, before merge, while it is still cheap to adjust.">
+          <rect x="0" y="0" width="820" height="250" fill="#0c1324"/>
+          <text x="410" y="32" text-anchor="middle" fill="#3ad29f" font-family="Sora,sans-serif" font-size="14" font-weight="800">Where do you discover the cost?</text>
+          <g font-family="Sora,sans-serif" font-size="11" font-weight="700" text-anchor="middle">
+            <text x="210" y="62" fill="#ff7a8a" font-size="12">WITHOUT shift-left</text>
+            <g><rect x="40" y="74" width="100" height="44" rx="9" fill="#111a30" stroke="#647495"/><text x="90" y="100" fill="#cdd9f1">Code</text></g>
+            <g><rect x="160" y="74" width="100" height="44" rx="9" fill="#111a30" stroke="#647495"/><text x="210" y="100" fill="#cdd9f1">Merge</text></g>
+            <g><rect x="280" y="74" width="100" height="44" rx="9" fill="#111a30" stroke="#ff7a8a"/><text x="330" y="94" fill="#ff7a8a">Invoice</text><text x="330" y="110" fill="#97a7c6" font-size="8" font-family="JetBrains Mono,monospace">too late</text></g>
+          </g>
+          <g stroke="#647495" stroke-width="2" fill="none">
+            <path d="M140 96 L160 96" marker-end="url(#fca)"/>
+            <path d="M260 96 L280 96" marker-end="url(#fca)"/>
+          </g>
+          <defs><marker id="fca" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 Z" fill="#647495"/></marker></defs>
+          <g font-family="Sora,sans-serif" font-size="11" font-weight="700" text-anchor="middle">
+            <text x="210" y="160" fill="#3ad29f" font-size="12">WITH shift-left (Infracost)</text>
+            <g><rect x="40" y="172" width="100" height="44" rx="9" fill="#111a30" stroke="#647495"/><text x="90" y="198" fill="#cdd9f1">Code</text></g>
+            <g><rect x="160" y="172" width="130" height="44" rx="9" fill="#111a30" stroke="#3ad29f"/><text x="225" y="192" fill="#3ad29f">PR + cost</text><text x="225" y="208" fill="#97a7c6" font-size="8" font-family="JetBrains Mono,monospace">adjust here ✓</text></g>
+            <g><rect x="310" y="172" width="100" height="44" rx="9" fill="#111a30" stroke="#647495"/><text x="360" y="198" fill="#cdd9f1">Merge</text></g>
+          </g>
+          <g stroke="#3ad29f" stroke-width="2" fill="none">
+            <path d="M140 194 L160 194" marker-end="url(#fcg)"/>
+            <path d="M290 194 L310 194" marker-end="url(#fcg)"/>
+          </g>
+          <defs><marker id="fcg" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 Z" fill="#3ad29f"/></marker></defs>
+          <text x="600" y="130" text-anchor="middle" fill="#cdd9f1" font-family="Manrope,sans-serif" font-size="12" font-weight="600">The earlier cost shows up,</text>
+          <text x="600" y="150" text-anchor="middle" fill="#cdd9f1" font-family="Manrope,sans-serif" font-size="12" font-weight="600">the cheaper it is to</text>
+          <text x="600" y="170" text-anchor="middle" fill="#97a7c6" font-family="Manrope,sans-serif" font-size="12" font-weight="600">change course.</text>
+          <line x1="470" y1="70" x2="470" y2="220" stroke="#243352" stroke-width="1"/>
+        </svg>
+        <figcaption><b>Figure 2.</b> Without visibility on the PR, cost only appears on the invoice. Infracost brings it to the Pull Request, where changing your mind still costs one commit.</figcaption>
+      </figure>
+
+      <!-- ===================== 3 · Infracost ===================== -->
+      <h2 id="infracost">Infracost in depth</h2>
+      <p>
+        The <strong>Infracost CLI</strong> is <strong>open source (Apache 2.0)</strong> and estimates the
+        <strong>monthly cost</strong> of your Terraform infrastructure <em>before</em> you apply it. It reads your
+        code (or the generated plan), identifies each billable resource, queries the cloud pricing database and
+        returns a <strong>breakdown</strong> (total cost) or a <strong>diff</strong> (how much this PR adds or
+        removes). Worth the distinction: the CLI is open source, but it is part of a <strong>commercial
+        product</strong> — pricing uses the hosted <strong>Cloud Pricing API</strong> (free, requires an API
+        key/sign-up) and <strong>Infracost Cloud</strong> is a commercial SaaS (with a free tier).
+      </p>
+      <p><strong>How it works, under the hood:</strong></p>
+      <ol class="principle-list">
+        <li><strong>Parse.</strong> Infracost reads the Terraform project (HCL) or a <code>terraform plan</code> in
+          JSON and extracts the resources and their price-relevant parameters (SKU, tier, region, disk size).</li>
+        <li><strong>Pricing.</strong> For each resource, it queries Infracost's <strong>Cloud Pricing API</strong> —
+          a catalog of the public prices for AWS, Azure and GCP — and computes the projected monthly cost.</li>
+        <li><strong>Output.</strong> It emits a table (<code>breakdown</code>) or a comparison (<code>diff</code>)
+          as text, JSON, HTML or a <strong>Pull Request comment</strong>.</li>
+      </ol>
+
+      <figure class="figure reveal">
+        <svg viewBox="0 0 820 240" role="img" aria-label="Infracost flow: the Terraform project or plan JSON goes into Infracost, which queries the Cloud Pricing API and produces a breakdown or diff, posted as a comment on the Pull Request.">
+          <rect x="0" y="0" width="820" height="240" fill="#0c1324"/>
+          <text x="410" y="32" text-anchor="middle" fill="#3ad29f" font-family="Sora,sans-serif" font-size="14" font-weight="800">How Infracost computes cost</text>
+          <g font-family="Sora,sans-serif" font-size="11.5" font-weight="700" text-anchor="middle">
+            <g><rect x="34" y="86" width="150" height="64" rx="11" fill="#111a30" stroke="#2f9bff"/><text x="109" y="112" fill="#2f9bff">Terraform</text><text x="109" y="132" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace" font-weight="500">HCL or plan.json</text></g>
+            <g><rect x="244" y="86" width="150" height="64" rx="11" fill="#111a30" stroke="#38d3ff"/><text x="319" y="112" fill="#38d3ff">Infracost</text><text x="319" y="132" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace" font-weight="500">parse + match</text></g>
+            <g><rect x="454" y="86" width="150" height="64" rx="11" fill="#16213b" stroke="#f5b942"/><text x="529" y="106" fill="#f5b942">Cloud Pricing</text><text x="529" y="122" fill="#f5b942">API</text><text x="529" y="140" fill="#97a7c6" font-size="8" font-family="JetBrains Mono,monospace" font-weight="500">public prices</text></g>
+            <g><rect x="664" y="86" width="124" height="64" rx="11" fill="#111a30" stroke="#3ad29f"/><text x="726" y="106" fill="#3ad29f">PR comment</text><text x="726" y="122" fill="#3ad29f">on GitHub</text><text x="726" y="140" fill="#97a7c6" font-size="8" font-family="JetBrains Mono,monospace" font-weight="500">breakdown/diff</text></g>
+          </g>
+          <g stroke="#647495" stroke-width="2" fill="none">
+            <path d="M184 118 L244 118" marker-end="url(#ica)"/>
+            <path d="M604 118 L664 118" marker-end="url(#ica)"/>
+          </g>
+          <path d="M319 86 C319 56, 529 56, 529 84" stroke="#f5b942" stroke-width="1.6" fill="none" stroke-dasharray="4 4" marker-end="url(#icg)"/>
+          <text x="424" y="52" text-anchor="middle" fill="#97a7c6" font-family="JetBrains Mono,monospace" font-size="9">look up price ↑</text>
+          <defs>
+            <marker id="ica" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 Z" fill="#647495"/></marker>
+            <marker id="icg" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 Z" fill="#f5b942"/></marker>
+          </defs>
+          <text x="410" y="206" text-anchor="middle" fill="#97a7c6" font-family="Manrope,sans-serif" font-size="11.5">Infracost never touches your infra — it only reads the intent and computes the price. Zero risk on the PR.</text>
+        </svg>
+        <figcaption><b>Figure 3.</b> Infracost parses the plan, matches each resource against the Cloud Pricing API and returns the cost as a comment — without ever provisioning anything.</figcaption>
+      </figure>
+
+      <p>
+        <strong>Infracost Cloud</strong> is the SaaS dashboard (with a free tier) that aggregates these numbers
+        across repositories, shows trends and, crucially, lets you define <strong>guardrails/policies</strong> —
+        for example, "flag for review any PR that increases cost by more than US$ 100/mo." The
+        <strong>advantages</strong> are clear: cost visible on the PR, informed SKU decisions, prevention of
+        invoice surprises and a FinOps culture baked into the pipeline. The <strong>limitations</strong> to keep in
+        mind: it is a <em>list-price estimate</em> (it does not account for Reserved Instance/Savings Plan
+        discounts or actual hourly usage), and consumption-based resources (egress, requests) depend on usage
+        assumptions you can tune in <code>infracost-usage.yml</code>.
+      </p>
+
+      <!-- ===================== 4 · Architecture ===================== -->
+      <h2 id="arquitetura">The enterprise IaC structure</h2>
+      <p>
+        An 800-line <code>main.tf</code> works until the day two teams need to touch it. The enterprise approach is
+        <strong>modular</strong>: small, reusable modules, a root that composes them, and per-environment
+        variables. This is the companion repo's tree:
+      </p>
+
+      <div class="code-card reveal">
+        <div class="code-head"><span class="dots"><i></i><i></i><i></i></span><span class="file">azure-iac-with-tf-infracost/</span></div>
+<pre><code><span class="tok-com"># state backend bootstrap — Bicep (one-time run)</span>
+bootstrap/
+  main.bicep            <span class="tok-com"># RG + Storage Account + "tfstate" container</span>
+  modules/state-storage.bicep
+  deploy.sh
+
+<span class="tok-com"># Terraform root applied by the pipeline</span>
+infra/
+  providers.tf         <span class="tok-com"># versions + remote "azurerm" backend (OIDC)</span>
+  main.tf              <span class="tok-com"># composes the modules</span>
+  variables.tf  outputs.tf  data.tf
+  dev.tfvars    prod.tfvars
+
+<span class="tok-com"># reusable modules (1 responsibility each)</span>
+modules/
+  networking/          <span class="tok-com"># VNet + subnet + NSG</span>
+  storage-account/     <span class="tok-com"># 1 Storage Account</span>
+  virtual-machine/     <span class="tok-com"># 1 Linux VM + NIC</span>
+  app-service/         <span class="tok-com"># 1 App Service Plan + Web App</span>
+
+infracost/infracost.yml
+.github/workflows/terraform.yml</code></pre>
+      </div>
+
+      <figure class="figure reveal">
+        <svg viewBox="0 0 820 280" role="img" aria-label="Module composition: the infra root creates the resource group and calls the four modules — networking, storage-account, virtual-machine and app-service. The networking module provides the subnet_id consumed by the VM.">
+          <rect x="0" y="0" width="820" height="280" fill="#0c1324"/>
+          <text x="410" y="32" text-anchor="middle" fill="#3ad29f" font-family="Sora,sans-serif" font-size="14" font-weight="800">Composition: the root orchestrates the modules</text>
+          <g font-family="Sora,sans-serif" text-anchor="middle">
+            <rect x="310" y="52" width="200" height="56" rx="12" fill="#16213b" stroke="#2f9bff"/>
+            <text x="410" y="78" fill="#2f9bff" font-size="13" font-weight="800">infra/ (root)</text>
+            <text x="410" y="96" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace">resource group + var-files</text>
+          </g>
+          <g stroke="#647495" stroke-width="1.5" fill="none">
+            <path d="M410 108 L410 132"/>
+            <path d="M110 132 L710 132"/>
+            <path d="M110 132 L110 158"/>
+            <path d="M310 132 L310 158"/>
+            <path d="M510 132 L510 158"/>
+            <path d="M710 132 L710 158"/>
+          </g>
+          <g font-family="Sora,sans-serif" font-size="11.5" font-weight="700" text-anchor="middle">
+            <g><rect x="34" y="158" width="152" height="60" rx="11" fill="#111a30" stroke="#38d3ff"/><text x="110" y="184" fill="#38d3ff">networking</text><text x="110" y="202" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">vnet · subnet · nsg</text></g>
+            <g><rect x="234" y="158" width="152" height="60" rx="11" fill="#111a30" stroke="#3ad29f"/><text x="310" y="184" fill="#3ad29f">storage-account</text><text x="310" y="202" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">1 storage</text></g>
+            <g><rect x="434" y="158" width="152" height="60" rx="11" fill="#111a30" stroke="#f5b942"/><text x="510" y="184" fill="#f5b942">virtual-machine</text><text x="510" y="202" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">1 linux vm + nic</text></g>
+            <g><rect x="634" y="158" width="152" height="60" rx="11" fill="#111a30" stroke="#5cb4ff"/><text x="710" y="184" fill="#5cb4ff">app-service</text><text x="710" y="202" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">plan + web app</text></g>
+          </g>
+          <path d="M110 218 C110 248, 510 252, 510 220" stroke="#38d3ff" stroke-width="1.4" fill="none" stroke-dasharray="4 4" marker-end="url(#ara)"/>
+          <defs><marker id="ara" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 Z" fill="#38d3ff"/></marker></defs>
+          <text x="310" y="262" text-anchor="middle" fill="#97a7c6" font-family="JetBrains Mono,monospace" font-size="9">networking exposes subnet_id → consumed by the VM</text>
+        </svg>
+        <figcaption><b>Figure 4.</b> The root creates the resource group and injects inputs into each module; one module's outputs (e.g. <code>subnet_id</code>) feed another. Each module is testable and reusable in isolation.</figcaption>
+      </figure>
+
+      <p>
+        Each module exposes a clear contract — <code>variables.tf</code> (inputs), <code>main.tf</code> (resources)
+        and <code>outputs.tf</code> (outputs) — and nothing else. The naming convention is
+        <code>&lt;resource&gt;-&lt;workload&gt;-&lt;environment&gt;</code> (e.g. <code>vnet-iacdemo-dev</code>), and
+        common tags (<code>environment</code>, <code>managedBy</code>, <code>costCenter</code>) are merged into
+        every resource — essential for FinOps to attribute cost to the right owner.
+      </p>
+
+      <!-- ===================== 5 · Bicep backend ===================== -->
+      <h2 id="backend-bicep">Why the tfstate is provisioned with Bicep</h2>
+      <p>
+        Terraform stores its <strong>state</strong> in a backend. In production that backend is
+        <strong>remote</strong> — on Azure, a <strong>Storage Account + container</strong> — so the state is shared
+        by the team and the pipeline, encrypted at rest and <strong>locked</strong> (preventing two concurrent
+        <code>apply</code> runs from corrupting everything).
+      </p>
+      <p>
+        But here comes the <strong>chicken-and-egg problem</strong>: Terraform needs the backend to run, but the
+        backend is... infrastructure. If you create the Storage Account <em>with</em> Terraform, where does the
+        state that describes that Storage Account live? In a throwaway local state nobody else has? In a state that
+        references itself? Every path is fragile.
+      </p>
+      <div class="note">
+        <span class="ico">ℹ</span>
+        <div>The clean solution is to <strong>bootstrap the backend with Bicep</strong>. Bicep is native to Azure (it compiles to ARM), it is <strong>idempotent</strong> and — crucially — it keeps <strong>no local state</strong>: its "state" is Resource Manager itself. You run Bicep <em>once</em> to create the backend, and from then on all Terraform uses it. The bootstrap sits outside the Terraform lifecycle, exactly where it belongs.</div>
+      </div>
+
+      <figure class="figure reveal">
+        <svg viewBox="0 0 820 240" role="img" aria-label="Bootstrap: Bicep creates the state Storage Account and container once; then Terraform uses that remote backend to store state on every pipeline run.">
+          <rect x="0" y="0" width="820" height="240" fill="#0c1324"/>
+          <text x="410" y="32" text-anchor="middle" fill="#3ad29f" font-family="Sora,sans-serif" font-size="14" font-weight="800">The bootstrap breaks the chicken-and-egg</text>
+          <g font-family="Sora,sans-serif" font-size="11.5" font-weight="700" text-anchor="middle">
+            <g><rect x="40" y="84" width="170" height="70" rx="12" fill="#16213b" stroke="#5cb4ff"/><text x="125" y="110" fill="#5cb4ff">Bicep</text><text x="125" y="128" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">bootstrap (1x)</text><text x="125" y="142" fill="#647495" font-size="8" font-family="JetBrains Mono,monospace" font-weight="500">no local state</text></g>
+            <g><rect x="320" y="84" width="180" height="70" rx="12" fill="#111a30" stroke="#f5b942"/><text x="410" y="106" fill="#f5b942">Storage backend</text><text x="410" y="124" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">"tfstate" container</text><text x="410" y="140" fill="#647495" font-size="8" font-family="JetBrains Mono,monospace" font-weight="500">versioned + lock</text></g>
+            <g><rect x="610" y="84" width="170" height="70" rx="12" fill="#111a30" stroke="#3ad29f"/><text x="695" y="110" fill="#3ad29f">Terraform</text><text x="695" y="128" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">apply (always)</text><text x="695" y="142" fill="#647495" font-size="8" font-family="JetBrains Mono,monospace" font-weight="500">reads/writes state</text></g>
+          </g>
+          <g stroke="#647495" stroke-width="2" fill="none">
+            <path d="M210 119 L320 119" marker-end="url(#bca)"/>
+          </g>
+          <path d="M610 119 L500 119" stroke="#3ad29f" stroke-width="2" fill="none" marker-end="url(#bcg)"/>
+          <defs>
+            <marker id="bca" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 Z" fill="#647495"/></marker>
+            <marker id="bcg" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 Z" fill="#3ad29f"/></marker>
+          </defs>
+          <text x="265" y="78" text-anchor="middle" fill="#97a7c6" font-family="JetBrains Mono,monospace" font-size="9">create once</text>
+          <text x="555" y="78" text-anchor="middle" fill="#97a7c6" font-family="JetBrains Mono,monospace" font-size="9">use always</text>
+          <text x="410" y="200" text-anchor="middle" fill="#97a7c6" font-family="Manrope,sans-serif" font-size="11.5">Bicep lives outside the Terraform cycle — an admin runs the bootstrap, the pipeline does the rest.</text>
+        </svg>
+        <figcaption><b>Figure 5.</b> Bicep idempotently bootstraps the backend (with no state of its own); from then on Terraform always finds a ready remote backend, with locking and versioning.</figcaption>
+      </figure>
+
+      <div class="code-card reveal">
+        <div class="code-head"><span class="dots"><i></i><i></i><i></i></span><span class="file">bootstrap/modules/state-storage.bicep</span></div>
+<pre><code>resource sa <span class="tok-str">'Microsoft.Storage/storageAccounts@2023-05-01'</span> = {
+  name: storageAccountName
+  location: location
+  sku: { name: <span class="tok-str">'Standard_LRS'</span> }
+  kind: <span class="tok-str">'StorageV2'</span>
+  properties: {
+    minimumTlsVersion: <span class="tok-str">'TLS1_2'</span>
+    allowBlobPublicAccess: <span class="tok-num">false</span>
+    supportsHttpsTrafficOnly: <span class="tok-num">true</span>
+  }
+}
+
+resource blobService <span class="tok-str">'Microsoft.Storage/storageAccounts/blobServices@2023-05-01'</span> = {
+  parent: sa
+  name: <span class="tok-str">'default'</span>
+  properties: {
+    isVersioningEnabled: <span class="tok-num">true</span>          <span class="tok-com">// recover overwritten state</span>
+    deleteRetentionPolicy: { enabled: <span class="tok-num">true</span>, days: <span class="tok-num">30</span> }
+  }
+}</code></pre>
+      </div>
+      <div class="note">
+        <span class="ico">ℹ</span>
+        <div>Run the bootstrap once with <code>bash bootstrap/deploy.sh</code> (which calls <code>az deployment sub create</code>). Note the <code>resourceGroupName</code> and <code>storageAccountName</code> outputs — they go into the GitHub <em>Variables</em> so <code>terraform init</code> can configure the backend.</div>
+      </div>
+
+      <!-- ===================== 6 · OIDC ===================== -->
+      <h2 id="oidc">Workload Identity Federation: a secretless pipeline</h2>
+      <p>
+        The old way to authenticate a pipeline to Azure was to create a <strong>service principal with a client
+        secret</strong> and store that password as a GitHub secret. The problem: it is a long-lived credential that
+        <strong>leaks, expires and needs rotation</strong>. The modern way is <strong>OpenID Connect (OIDC)</strong>,
+        also called <strong>Workload Identity Federation</strong>.
+      </p>
+      <p>
+        The idea: GitHub Actions <strong>issues a short-lived OIDC token</strong> for each run, proving "I am
+        repository X, on branch Y." In Entra ID you configure a <strong>Federated Credential</strong> that
+        <em>trusts</em> that token for a specific <code>subject</code>
+        (<code>repo:org/repo:ref:refs/heads/main</code>). Azure exchanges the GitHub token for an access token —
+        <strong>no password is stored anywhere</strong>.
+      </p>
+
+      <figure class="figure reveal">
+        <svg viewBox="0 0 820 260" role="img" aria-label="OIDC token exchange: GitHub Actions requests an OIDC token from the GitHub provider, presents it to Entra ID, which validates it against the federated credential and returns a short-lived access token to reach Azure.">
+          <rect x="0" y="0" width="820" height="260" fill="#0c1324"/>
+          <text x="410" y="32" text-anchor="middle" fill="#3ad29f" font-family="Sora,sans-serif" font-size="14" font-weight="800">Secretless login via OIDC</text>
+          <g font-family="Sora,sans-serif" font-size="11" font-weight="700" text-anchor="middle">
+            <g><rect x="30" y="92" width="160" height="76" rx="12" fill="#111a30" stroke="#2f9bff"/><text x="110" y="124" fill="#2f9bff">GitHub Actions</text><text x="110" y="144" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">id-token: write</text></g>
+            <g><rect x="330" y="92" width="160" height="76" rx="12" fill="#16213b" stroke="#5cb4ff"/><text x="410" y="118" fill="#5cb4ff">Entra ID</text><text x="410" y="138" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">federated credential</text><text x="410" y="152" fill="#647495" font-size="8" font-family="JetBrains Mono,monospace" font-weight="500">trusts the subject</text></g>
+            <g><rect x="630" y="92" width="160" height="76" rx="12" fill="#111a30" stroke="#3ad29f"/><text x="710" y="124" fill="#3ad29f">Azure RM</text><text x="710" y="144" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">creates resources</text></g>
+          </g>
+          <g stroke="#647495" stroke-width="2" fill="none">
+            <path d="M190 120 L330 120" marker-end="url(#oca)"/>
+            <path d="M490 140 L630 140" marker-end="url(#ocg)"/>
+          </g>
+          <defs>
+            <marker id="oca" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 Z" fill="#647495"/></marker>
+            <marker id="ocg" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 Z" fill="#3ad29f"/></marker>
+          </defs>
+          <text x="260" y="112" text-anchor="middle" fill="#97a7c6" font-family="JetBrains Mono,monospace" font-size="8.5">OIDC token →</text>
+          <text x="560" y="132" text-anchor="middle" fill="#97a7c6" font-family="JetBrains Mono,monospace" font-size="8.5">access token →</text>
+          <text x="410" y="208" text-anchor="middle" fill="#cdd9f1" font-family="Manrope,sans-serif" font-size="11.5" font-weight="600">A token that lasts minutes, scoped to one repo/branch, zero stored secret.</text>
+          <text x="410" y="228" text-anchor="middle" fill="#97a7c6" font-family="Manrope,sans-serif" font-size="11">If the token leaks, it has already expired. Nothing to rotate.</text>
+        </svg>
+        <figcaption><b>Figure 6.</b> GitHub issues an ephemeral OIDC token; Entra ID validates it against a federated credential bound to the repo's <code>subject</code>; Azure returns a short-lived access token. No passwords.</figcaption>
+      </figure>
+
+      <div class="code-card reveal">
+        <div class="code-head"><span class="dots"><i></i><i></i><i></i></span><span class="file">create the federated credential (Azure CLI)</span></div>
+<pre><code><span class="tok-cmd">az</span> ad app federated-credential create <span class="tok-flag">--id</span> <span class="tok-str">"$appId"</span> <span class="tok-flag">--parameters</span> <span class="tok-str">'{
+  "name": "gh-main",
+  "issuer": "https://token.actions.githubusercontent.com",
+  "subject": "repo:hendersonandrade/azure-iac-with-tf-infracost:ref:refs/heads/main",
+  "audiences": ["api://AzureADTokenExchange"]
+}'</span></code></pre>
+      </div>
+
+      <!-- ===================== 7 · Terraform sample ===================== -->
+      <h2 id="terraform-sample">The Terraform samples, annotated</h2>
+      <p>
+        <code>providers.tf</code> pins versions and declares the remote backend. Note <code>use_oidc = true</code> —
+        that is what wires everything to the secretless login from the previous section. The backend values that
+        vary (resource group, storage account) <strong>cannot use variables</strong>, so they are passed at
+        <code>init</code> time via <code>-backend-config</code>:
+      </p>
+      <div class="code-card reveal">
+        <div class="code-head"><span class="dots"><i></i><i></i><i></i></span><span class="file">infra/providers.tf</span></div>
+<pre><code><span class="tok-cmd">terraform</span> {
+  required_version = <span class="tok-str">"&gt;= 1.7.0"</span>
+  required_providers {
+    azurerm = { source = <span class="tok-str">"hashicorp/azurerm"</span>, version = <span class="tok-str">"~&gt; 4.0"</span> }
+  }
+  backend <span class="tok-str">"azurerm"</span> {
+    container_name = <span class="tok-str">"tfstate"</span>
+    key            = <span class="tok-str">"azure-iac-with-tf-infracost.tfstate"</span>
+    use_oidc       = <span class="tok-num">true</span>   <span class="tok-com"># backend authenticates with the OIDC token</span>
+  }
+}
+
+provider <span class="tok-str">"azurerm"</span> {
+  features {}
+  use_oidc = <span class="tok-num">true</span>           <span class="tok-com"># no secret: login via WIF</span>
+}</code></pre>
+      </div>
+
+      <p>A module always follows the same contract. The storage one uses a random suffix to guarantee a globally unique name:</p>
+      <div class="code-card reveal">
+        <div class="code-head"><span class="dots"><i></i><i></i><i></i></span><span class="file">modules/storage-account/main.tf</span></div>
+<pre><code>resource <span class="tok-str">"azurerm_storage_account"</span> <span class="tok-str">"this"</span> {
+  name                            = local.sa_name
+  resource_group_name             = var.resource_group_name
+  location                        = var.location
+  account_tier                    = var.account_tier      <span class="tok-com"># Standard</span>
+  account_replication_type        = var.replication_type  <span class="tok-com"># LRS</span>
+  min_tls_version                 = <span class="tok-str">"TLS1_2"</span>
+  allow_nested_items_to_be_public = <span class="tok-num">false</span>
+  https_traffic_only_enabled      = <span class="tok-num">true</span>
+  tags                            = var.tags
+
+  blob_properties {
+    versioning_enabled = <span class="tok-num">true</span>
+  }
+}</code></pre>
+      </div>
+
+      <p>
+        And the root <strong>composes</strong> everything, passing one module's outputs as another's inputs — note
+        the <code>subnet_id</code> from the networking module flowing into the VM, and the use of a
+        <strong>data source</strong> (<code>azurerm_subscription</code>) to read metadata without creating anything:
+      </p>
+      <div class="code-card reveal">
+        <div class="code-head"><span class="dots"><i></i><i></i><i></i></span><span class="file">infra/main.tf · data.tf</span></div>
+<pre><code><span class="tok-com"># data.tf — reads what already exists, creates nothing</span>
+data <span class="tok-str">"azurerm_client_config"</span> <span class="tok-str">"current"</span> {}
+data <span class="tok-str">"azurerm_subscription"</span> <span class="tok-str">"current"</span> {}
+
+<span class="tok-com"># main.tf — the VM consumes the subnet_id the network exposed</span>
+module <span class="tok-str">"networking"</span> {
+  source        = <span class="tok-str">"../modules/networking"</span>
+  name_suffix   = local.name_suffix
+  address_space = var.address_space
+  <span class="tok-com"># ...</span>
+}
+
+module <span class="tok-str">"vm"</span> {
+  source    = <span class="tok-str">"../modules/virtual-machine"</span>
+  subnet_id = module.networking.subnet_id   <span class="tok-com"># output → input</span>
+  vm_size   = var.vm_size
+  <span class="tok-com"># ...</span>
+}</code></pre>
+      </div>
+
+      <div class="lab-shot reveal">
+        <span class="ls-ico">📷</span>
+        <span class="ls-title">Lab screenshot — <code>terraform plan</code> running</span>
+        <span class="ls-hint">replace with &lt;img src="../assets/img/lab/tf-plan.png"&gt; once the capture is ready</span>
+      </div>
+
+      <!-- ===================== 8 · Pipeline ===================== -->
+      <h2 id="pipeline">The GitHub Actions pipeline, step by step</h2>
+      <p>
+        The workflow has two jobs: <strong>plan</strong> (runs on every PR and push, validates and estimates cost)
+        and <strong>apply</strong> (only on push to <code>main</code>, behind an environment with manual approval).
+        Let's walk through the blocks.
+      </p>
+      <p>
+        <strong>1 · Triggers and permissions.</strong> The <code>permissions</code> block is the heart of OIDC:
+        <code>id-token: write</code> authorizes the job to request the token. <code>pull-requests: write</code>
+        lets Infracost comment on the PR.
+      </p>
+      <div class="code-card reveal">
+        <div class="code-head"><span class="dots"><i></i><i></i><i></i></span><span class="file">.github/workflows/terraform.yml — trigger &amp; permissions</span></div>
+<pre><code>on:
+  pull_request: { branches: [main] }
+  push:         { branches: [main] }
+
+permissions:
+  id-token: write        <span class="tok-com"># request the OIDC token</span>
+  contents: read         <span class="tok-com"># checkout the code</span>
+  pull-requests: write   <span class="tok-com"># comment cost on the PR</span></code></pre>
+      </div>
+
+      <p>
+        <strong>2 · OIDC login + init with backend.</strong> The <code>azure/login</code> action receives only the
+        <em>identifiers</em> (client/tenant/subscription) — no password — and uses the OIDC token. Then
+        <code>init</code> receives the Bicep backend details via <code>-backend-config</code>.
+      </p>
+      <div class="code-card reveal">
+        <div class="code-head"><span class="dots"><i></i><i></i><i></i></span><span class="file">.github/workflows/terraform.yml — login &amp; init</span></div>
+<pre><code><span class="tok-flag">- name:</span> Azure login (OIDC)
+  <span class="tok-flag">uses:</span> azure/login@v2
+  <span class="tok-flag">with:</span>
+    client-id:       ${{ vars.AZURE_CLIENT_ID }}
+    tenant-id:       ${{ vars.AZURE_TENANT_ID }}
+    subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+<span class="tok-flag">- name:</span> Terraform init
+  <span class="tok-flag">run:</span> |
+    terraform init \
+      -backend-config=<span class="tok-str">"resource_group_name=${TF_BACKEND_RG}"</span> \
+      -backend-config=<span class="tok-str">"storage_account_name=${TF_BACKEND_SA}"</span></code></pre>
+      </div>
+
+      <p>
+        <strong>3 · fmt → validate → plan.</strong> Three gates in increasing order of cost: formatting (style),
+        validation (syntax and references) and <code>plan</code>, which becomes an artifact reused by
+        <code>apply</code> — guaranteeing that <em>what was reviewed is what gets applied</em>.
+      </p>
+      <div class="code-card reveal">
+        <div class="code-head"><span class="dots"><i></i><i></i><i></i></span><span class="file">.github/workflows/terraform.yml — validation &amp; plan</span></div>
+<pre><code><span class="tok-flag">- run:</span> terraform fmt -check -recursive
+<span class="tok-flag">- run:</span> terraform validate
+<span class="tok-flag">- run:</span> terraform plan -input=false -var-file=<span class="tok-str">"dev.tfvars"</span> -out=tfplan
+
+<span class="tok-flag">- name:</span> Upload plan artifact
+  <span class="tok-flag">uses:</span> actions/upload-artifact@v4
+  <span class="tok-flag">with:</span> { name: tfplan, path: infra/tfplan }</code></pre>
+      </div>
+
+      <p>
+        <strong>4 · Protected apply.</strong> The <code>apply</code> job only fires on <code>push</code> to
+        <code>main</code> and declares <code>environment: production</code> — which, under
+        <em>Settings → Environments</em> on GitHub, enables the requirement that <strong>reviewers approve</strong>
+        before the deploy. It is your human gate over the automation.
+      </p>
+
+      <div class="lab-shot reveal">
+        <span class="ls-ico">📷</span>
+        <span class="ls-title">Lab screenshot — the workflow run on GitHub Actions</span>
+        <span class="ls-hint">plan/apply jobs, the "production" environment approval gate</span>
+      </div>
+
+      <!-- ===================== 9 · Infracost pipeline ===================== -->
+      <h2 id="infracost-pipeline">Integrating Infracost into the pipeline</h2>
+      <p>
+        With the pipeline in place, wiring in Infracost is three steps, only in the <strong>Pull Request</strong>
+        context: install the CLI, generate the cost <code>diff</code> and post/update the PR comment.
+      </p>
+      <div class="code-card reveal">
+        <div class="code-head"><span class="dots"><i></i><i></i><i></i></span><span class="file">.github/workflows/terraform.yml — Infracost on the PR</span></div>
+<pre><code><span class="tok-flag">- name:</span> Setup Infracost
+  <span class="tok-flag">if:</span> github.event_name == <span class="tok-str">'pull_request'</span>
+  <span class="tok-flag">uses:</span> infracost/actions/setup@v3
+  <span class="tok-flag">with:</span> { api-key: ${{ secrets.INFRACOST_API_KEY }} }
+
+<span class="tok-flag">- name:</span> Infracost diff
+  <span class="tok-flag">if:</span> github.event_name == <span class="tok-str">'pull_request'</span>
+  <span class="tok-flag">run:</span> |
+    infracost diff \
+      --config-file=../infracost/infracost.yml \
+      --format=json --out-file=/tmp/infracost.json
+
+<span class="tok-flag">- name:</span> Comment on PR
+  <span class="tok-flag">if:</span> github.event_name == <span class="tok-str">'pull_request'</span>
+  <span class="tok-flag">run:</span> |
+    infracost comment github \
+      --path=/tmp/infracost.json \
+      --repo=$GITHUB_REPOSITORY \
+      --github-token=${{ secrets.GITHUB_TOKEN }} \
+      --pull-request=${{ github.event.pull_request.number }} \
+      --behavior=update</code></pre>
+      </div>
+      <p>
+        <code>--behavior=update</code> keeps <strong>a single comment</strong> that is updated on every push to the
+        PR — instead of cluttering the thread with a new one per commit. The <code>infracost/infracost.yml</code>
+        file defines which projects/var-files to cost (dev and prod), so the reviewer sees the impact across both
+        environments.
+      </p>
+      <div class="note">
+        <span class="ico">ℹ</span>
+        <div><strong>Guardrails.</strong> In <strong>Infracost Cloud</strong> (free tier) you enable policies that flag or block PRs above a threshold — e.g. "an increase &gt; US$ 100/mo requires FinOps approval." It is the FinOps <em>Operate</em> phase turning into an automatic gate on the pipeline.</div>
+      </div>
+
+      <div class="lab-shot reveal">
+        <span class="ls-ico">📷</span>
+        <span class="ls-title">Lab screenshot — the Infracost cost comment on the Pull Request</span>
+        <span class="ls-hint">and, optionally, the Infracost Cloud dashboard</span>
+      </div>
+
+      <div class="note warn">
+        <span class="ico">⚠</span>
+        <div>This is a lab that <strong>incurs real cost</strong> (VM + App Service ≈ US$ 45–55/mo in dev). When you are done, run <code>terraform destroy -var-file=dev.tfvars</code> and, if you won't reuse it, delete the state RG with <code>az group delete</code>. Infracost itself reminds you how much is at stake.</div>
+      </div>
+
+      <div class="note">
+        <span class="ico">ℹ</span>
+        <div><strong>Get hands-on.</strong> The <a href="https://github.com/hendersonandrade/azure-iac-with-tf-infracost#readme" target="_blank" rel="noopener">repository README</a> carries the <strong>full numbered, end-to-end walkthrough</strong> — clone, bootstrap the state, create the OIDC identity, configure Variables/Secrets, open your first PR and see the cost, approve the <code>apply</code> and destroy the lab. Use <em>this article</em> to understand the <strong>why</strong>; use the <em>README</em> for the <strong>how</strong>.</div>
+      </div>
+
+      <!-- ===================== CHECKLIST ===================== -->
+      <h2 id="checklist">Production checklist</h2>
+      <ul class="principle-list">
+        <li><strong>State —</strong> Remote backend on Azure Storage, with versioning and locking, created by a separate Bicep bootstrap?</li>
+        <li><strong>Authentication —</strong> Pipeline via OIDC/Workload Identity Federation, with no client secret stored anywhere?</li>
+        <li><strong>Modularity —</strong> Resources in reusable modules with a clear contract (variables/outputs), not a monolith?</li>
+        <li><strong>Environments —</strong> Per-environment config isolated in <code>*.tfvars</code> (dev/prod), same code?</li>
+        <li><strong>CI quality —</strong> <code>fmt -check</code>, <code>validate</code> and <code>plan</code> running on every PR, with the plan becoming an artifact?</li>
+        <li><strong>Human gate —</strong> <code>apply</code> only on main, behind an environment with mandatory approval?</li>
+        <li><strong>FinOps —</strong> Infracost commenting the cost diff on the PR, with a threshold guardrail in Infracost Cloud?</li>
+        <li><strong>Tags —</strong> <code>environment</code>, <code>managedBy</code> and <code>costCenter</code> on every resource for cost attribution?</li>
+        <li><strong>Lifecycle —</strong> A documented <code>destroy</code> path so ephemeral environments don't become forgotten cost?</li>
+      </ul>
+
+      <!-- ===================== REFERENCES ===================== -->
+      <h2 id="references">Official references</h2>
+      <ul class="ref-list">
+        <li><a href="https://developer.hashicorp.com/terraform/language/settings/backends/azurerm" target="_blank" rel="noopener"><span class="ref-src">HashiCorp</span><span>Terraform azurerm backend</span></a><span class="ref-desc">Configuring the remote backend on Azure Storage, including OIDC.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/developer/github/connect-from-azure-openid-connect" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Connect from GitHub to Azure with OpenID Connect</span></a><span class="ref-desc">Workload Identity Federation step by step with federated credentials.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/azure-resource-manager/bicep/overview" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>What is Bicep</span></a><span class="ref-desc">Azure's native IaC language used for the backend bootstrap.</span></li>
+        <li><a href="https://www.infracost.io/docs/" target="_blank" rel="noopener"><span class="ref-src">Infracost</span><span>Infracost documentation</span></a><span class="ref-desc">Breakdown, diff, config-file, PR comments and Infracost Cloud.</span></li>
+        <li><a href="https://github.com/infracost/actions" target="_blank" rel="noopener"><span class="ref-src">GitHub</span><span>Infracost GitHub Actions</span></a><span class="ref-desc">The official setup and comment actions used in the pipeline.</span></li>
+        <li><a href="https://www.finops.org/framework/" target="_blank" rel="noopener"><span class="ref-src">FinOps</span><span>FinOps Framework</span></a><span class="ref-desc">The Inform / Optimize / Operate phases and the discipline's principles.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/developer/terraform/" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Terraform on Azure</span></a><span class="ref-desc">Microsoft's guides for provisioning Azure with Terraform.</span></li>
+        <li><a href="https://github.com/hendersonandrade/azure-iac-with-tf-infracost" target="_blank" rel="noopener"><span class="ref-src">GitHub</span><span>azure-iac-with-tf-infracost</span></a><span class="ref-desc">The complete companion repository for this article.</span></li>
+      </ul>
+
+      <div class="next-prev">
+        <a class="is-prev" href="azure-landing-zones.html">
+          <span class="np-kicker">← Related</span>
+          <span class="np-title">Azure Landing Zones</span>
+        </a>
+        <a class="is-next" href="index.html">
+          <span class="np-kicker">Next →</span>
+          <span class="np-title">All posts</span>
+        </a>
+      </div>
+    </article>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container footer-grid">
+    <p>© <span data-current-year></span> Henderson Andrade · Microsoft Azure Cloud Architect.</p>
+    <div class="footer-links">
+      <a href="index.html">Blog</a>
+      <a href="../solutions/index.html">Solutions</a>
+      <a href="https://github.com/hendersonandrade" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://br.linkedin.com/in/henderson-andrade-%E2%98%81%EF%B8%8F-22b1ba33/pt" target="_blank" rel="noopener">LinkedIn ↗</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

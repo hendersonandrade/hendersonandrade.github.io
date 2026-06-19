@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Certificações Microsoft: O Guia Completo de Paths, Níveis &amp; Provas | Henderson Andrade</title>
+  <meta name="description" content="Um guia completo e cheio de diagramas sobre as certificações Microsoft: o modelo role-based, os níveis (Fundamentals, Associate, Expert, Specialty), os learning paths do Azure e as titulações que entregam, badges, a importância de certificar, preços, como agendar e fazer a prova (online de casa ou em centro de provas) e a renovação.">
+  <meta property="og:title" content="Certificações Microsoft: O Guia Completo">
+  <meta property="og:description" content="Níveis, learning paths do Azure, badges, preços e como agendar a prova — online proctored ou em centro de provas.">
+  <meta property="og:type" content="article">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container navbar">
+    <a class="brand" href="../index.pt-br.html" aria-label="Henderson Andrade — início">
+      <img class="brand-mark" src="../assets/img/ha-monogram.svg" alt="">
+      <span>Henderson Andrade<span class="brand-sub">Azure Cloud Architect</span></span>
+    </a>
+    <button class="nav-toggle" aria-label="Alternar menu de navegação" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-menu">
+      <li><a class="nav-link" href="../index.pt-br.html">Início</a></li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Soluções <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="../solutions/index.pt-br.html"><span class="dropdown-kicker">Portfólio</span><span class="dropdown-title">Todas as soluções</span></a></li>
+          <li><a href="../docs/azureutils/index.pt-br.html"><span class="dropdown-kicker">Pessoal · PowerShell</span><span class="dropdown-title">Módulo AzureUtils</span></a></li>
+          <li><a href="https://trimtechbr.github.io" target="_blank" rel="noopener"><span class="dropdown-kicker">TrimTechBR ↗</span><span class="dropdown-title">AER — Azure Estate Report</span></a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Docs <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="../docs/azureutils/index.pt-br.html"><span class="dropdown-kicker">Comece aqui</span><span class="dropdown-title">Visão geral &amp; instalação</span></a></li>
+          <li><a href="../docs/azureutils/tag-inventory.pt-br.html"><span class="dropdown-kicker">Referência</span><span class="dropdown-title">Inventário de tags</span></a></li>
+          <li><a href="../docs/azureutils/find-commands.pt-br.html"><span class="dropdown-kicker">Referência</span><span class="dropdown-title">Comandos Find</span></a></li>
+          <li><a href="../docs/azureutils/release-publishing.pt-br.html"><span class="dropdown-kicker">Internals</span><span class="dropdown-title">Release &amp; publicação</span></a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Blog <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="index.pt-br.html"><span class="dropdown-kicker">Todos os posts</span><span class="dropdown-title">Blog técnico</span></a></li>
+          <li><a href="azure-terraform-infracost.pt-br.html"><span class="dropdown-kicker">DevOps · FinOps</span><span class="dropdown-title">Terraform + Infracost</span></a></li>
+          <li><a href="azure-well-architected-framework.pt-br.html"><span class="dropdown-kicker">Arquitetura</span><span class="dropdown-title">Azure Well-Architected Framework</span></a></li>
+          <li><a href="azure-cloud-adoption-framework.pt-br.html"><span class="dropdown-kicker">Metodologia</span><span class="dropdown-title">Cloud Adoption Framework</span></a></li>
+          <li><a href="azure-landing-zones.pt-br.html"><span class="dropdown-kicker">Plataforma</span><span class="dropdown-title">Azure Landing Zones</span></a></li>
+          <li><a href="microsoft-certifications.pt-br.html"><span class="dropdown-kicker">Carreira</span><span class="dropdown-title">Certificações Microsoft</span></a></li>
+        </ul>
+      </li>
+      <li><a class="nav-link" href="../contact.pt-br.html">Contato</a></li>
+      <li><a class="btn btn-secondary" href="https://github.com/hendersonandrade" target="_blank" rel="noopener">GitHub ↗</a></li>
+      <li class="nav-item lang-switch">
+        <a class="lang-link" href="microsoft-certifications.html">EN</a>
+        <span class="lang-sep">/</span>
+        <a class="lang-link is-active" href="microsoft-certifications.pt-br.html">PT</a>
+      </li>
+    </ul>
+  </div>
+</header>
+
+<main class="container">
+  <div class="docs-shell">
+
+    <aside class="docs-sidebar reveal">
+      <div class="side-group">
+        <p class="side-title">Nesta página</p>
+        <ul class="anchor-list">
+          <li><a href="#what">O que são</a></li>
+          <li><a href="#why">Por que importam</a></li>
+          <li><a href="#levels">Os quatro níveis</a></li>
+          <li><a href="#badges">Badges &amp; titulações</a></li>
+          <li><a href="#azure-paths">Learning paths do Azure</a></li>
+          <li><a href="#families">Outras famílias</a></li>
+          <li><a href="#prep">Como se preparar</a></li>
+          <li><a href="#scheduling">Agendando a prova</a></li>
+          <li><a href="#pricing">Preços</a></li>
+          <li><a href="#renewal">Renovação</a></li>
+          <li><a href="#checklist">Checklist rápido</a></li>
+          <li><a href="#references">Referências Microsoft</a></li>
+        </ul>
+      </div>
+      <div class="side-group">
+        <p class="side-title">Mais do blog</p>
+        <ul>
+          <li><a href="azure-well-architected-framework.pt-br.html">Well-Architected Framework</a></li>
+          <li><a href="azure-cloud-adoption-framework.pt-br.html">Cloud Adoption Framework</a></li>
+          <li><a href="azure-landing-zones.pt-br.html">Azure Landing Zones</a></li>
+          <li><a href="index.pt-br.html">← Todos os posts</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <article class="docs-content">
+      <nav class="breadcrumb">
+        <a href="../index.pt-br.html">Início</a><span class="sep">/</span>
+        <a href="index.pt-br.html">Blog</a><span class="sep">/</span>
+        <span>Certificações Microsoft</span>
+      </nav>
+
+      <span class="eyebrow">Carreira · Certificação</span>
+      <h1>Certificações Microsoft: o guia completo de paths, níveis &amp; provas</h1>
+      <p class="docs-lede">
+        As certificações Microsoft são <strong>role-based</strong> (baseadas em papel): validam que você
+        sabe fazer um trabalho, não apenas que decorou um produto. Este guia mapeia todo o cenário — os
+        quatro <strong>níveis</strong>, os <strong>badges</strong> e titulações que cada path entrega, os
+        <strong>learning paths</strong> do Azure, por que certificar importa, quanto custa e exatamente
+        como <strong>agendar e fazer a prova</strong> — online de casa ou em um centro de provas.
+      </p>
+
+      <div class="article-meta">
+        <span><span class="am-dot"></span> Henderson Andrade</span>
+        <span>Publicado em 22 jun 2026</span>
+        <span>~19 min de leitura</span>
+        <span>Microsoft · Certificações · Carreira</span>
+      </div>
+
+      <div class="badge-row">
+        <span class="badge badge-primary">Role-based</span>
+        <span class="badge">Fundamentals</span>
+        <span class="badge">Associate</span>
+        <span class="badge">Expert</span>
+        <span class="badge">Specialty</span>
+      </div>
+
+      <h2 id="what">O que são as certificações Microsoft</h2>
+      <p>
+        Desde 2018, a Microsoft abandonou as certificações por versão de produto (o antigo mundo "MCSA /
+        MCSE") rumo a um modelo <strong>role-based</strong>. Em vez de "certificado em Server 2016", você
+        agora se certifica como <em>Azure Administrator</em>, <em>Security Engineer</em>, <em>Solutions
+        Architect</em> e assim por diante. Cada certificação mapeia um papel real e as tarefas que ele
+        executa no dia a dia, e é conquistada passando em uma ou mais <strong>provas</strong>.
+      </p>
+      <p>
+        As certificações se organizam em dois eixos: uma <strong>família de produto</strong> (Azure,
+        Microsoft 365, Security, Power Platform, Dynamics 365, Data &amp; IA) e um <strong>nível</strong>
+        (Fundamentals, Associate, Expert, Specialty). Escolha o papel que você quer, siga o learning path,
+        passe na prova, e você ganha um <strong>badge</strong> digital e uma titulação para colocar no
+        currículo e no LinkedIn.
+      </p>
+
+      <h2 id="why">Por que as certificações importam</h2>
+      <p>
+        "Certificação importa mesmo?" — sim, por várias razões concretas, mesmo que nunca substituam a
+        experiência prática:
+      </p>
+      <ul class="principle-list">
+        <li><strong>Estruturam o aprendizado.</strong> Um path transforma um vago "preciso aprender Azure" em um programa concreto com objetivo final.</li>
+        <li><strong>São um sinal para contratação.</strong> Recrutadores filtram por elas; muitas vagas as listam como requisito ou diferencial.</li>
+        <li><strong>Destravam status de parceiro.</strong> As designações de parceiro Microsoft exigem um número de profissionais certificados — então gente certificada tem valor comercial para o empregador.</li>
+        <li><strong>Podem mexer no salário.</strong> Papéis de nuvem certificados reportam, de forma consistente, remuneração maior em pesquisas do setor.</li>
+        <li><strong>Mantêm você atualizado.</strong> A nuvem muda todo mês; a renovação anual gratuita força você a se manter em dia.</li>
+        <li><strong>Constroem credibilidade.</strong> Um badge verificável é prova de terceiro sobre sua habilidade, para clientes e colegas.</li>
+      </ul>
+      <div class="takeaway">
+        <span class="tk-label">Ponto-chave</span>
+        <p><strong>Certificações abrem portas; experiência mantém você na sala.</strong> Use-as para estruturar o aprendizado e provar um baseline — depois sustente com projetos reais.</p>
+      </div>
+
+      <h2 id="levels">Os quatro níveis</h2>
+      <p>
+        Toda certificação Microsoft fica em um de quatro níveis. Eles formam uma progressão natural —
+        Fundamentals para construir vocabulário, Associate para certificar um papel, Expert para certificar
+        senioridade — com Specialty ao lado, para temas estreitos e profundos.
+      </p>
+
+      <figure class="figure reveal">
+        <svg viewBox="0 0 820 380" role="img" aria-label="Uma pirâmide dos níveis de certificação Microsoft: Fundamentals na base, Associate no meio, Expert no topo, com Specialty como um bloco separado ao lado.">
+          <rect x="0" y="0" width="820" height="380" fill="#0c1324"/>
+          <polygon points="300,60 360,140 240,140" fill="#16213b" stroke="#f5b942" stroke-width="1.5"/>
+          <polygon points="240,140 360,140 410,230 190,230" fill="#16213b" stroke="#2f9bff" stroke-width="1.5"/>
+          <polygon points="190,230 410,230 470,320 130,320" fill="#16213b" stroke="#38d3ff" stroke-width="1.5"/>
+          <g font-family="Sora,sans-serif" text-anchor="middle" font-weight="800">
+            <text x="300" y="118" fill="#f5b942" font-size="14">Expert</text>
+            <text x="300" y="195" fill="#2f9bff" font-size="15">Associate</text>
+            <text x="300" y="285" fill="#38d3ff" font-size="15">Fundamentals</text>
+          </g>
+          <rect x="560" y="150" width="220" height="100" rx="14" fill="#16213b" stroke="#3ad29f" stroke-width="1.5"/>
+          <text x="670" y="190" text-anchor="middle" fill="#3ad29f" font-family="Sora,sans-serif" font-size="15" font-weight="800">Specialty</text>
+          <text x="670" y="216" text-anchor="middle" fill="#97a7c6" font-family="JetBrains Mono,monospace" font-size="10">temas estreitos e profundos</text>
+          <text x="670" y="234" text-anchor="middle" fill="#97a7c6" font-family="JetBrains Mono,monospace" font-size="10">(ex.: Azure Virtual Desktop)</text>
+          <g font-family="JetBrains Mono,monospace" font-size="10" fill="#97a7c6" text-anchor="start">
+            <text x="500" y="100">↑ senioridade &amp; profundidade</text>
+            <text x="500" y="290">↓ porta de entrada · sem pré-requisitos</text>
+          </g>
+          <text x="300" y="352" text-anchor="middle" fill="#647495" font-family="Manrope,sans-serif" font-size="11">Comece no Fundamentals (opcional), certifique seu papel no Associate, prove senioridade no Expert.</text>
+        </svg>
+        <figcaption><b>Figura 1.</b> A pirâmide de níveis — Fundamentals (base), Associate (papel), Expert (senioridade), com Specialty como trilha de aprofundamento à parte.</figcaption>
+      </figure>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Nível</th><th>Propósito</th><th>Pré-requisito</th><th>Exemplo</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Fundamentals</strong></td><td>Conceitos centrais &amp; vocabulário de um domínio</td><td>Nenhum</td><td>AZ-900 · AI-900 · SC-900</td></tr>
+            <tr><td><strong>Associate</strong></td><td>Certificar que você executa um papel</td><td>Experiência prática recomendada</td><td>AZ-104 · AZ-204 · AZ-500</td></tr>
+            <tr><td><strong>Expert</strong></td><td>Certificar capacidade avançada/sênior</td><td>Experiência (pré-requisitos de exame hoje flexibilizados)</td><td>AZ-305 · AZ-400</td></tr>
+            <tr><td><strong>Specialty</strong></td><td>Habilidade profunda em área estreita</td><td>Experiência no domínio</td><td>AZ-140 (Azure Virtual Desktop)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="badges">Badges &amp; as titulações que você ganha</h2>
+      <p>
+        Ao passar, a Microsoft emite um <strong>badge digital</strong> verificável (via Credly) e uma
+        <strong>titulação</strong>. O badge tem cor e formato por nível, aponta para uma página de
+        verificação e pode ser embutido no LinkedIn, no currículo ou em um site. A titulação segue o padrão
+        <em>"Microsoft Certified: &lt;Papel&gt; &lt;Nível&gt;"</em>.
+      </p>
+
+      <figure class="figure reveal">
+        <div class="badge-gallery">
+          <div class="badge-item">
+            <img src="../assets/img/badges/azure-fundamentals.png" alt="Badge oficial Microsoft Certified: Azure Fundamentals" width="124" height="124" loading="lazy">
+            <span class="bi-level">Fundamentals</span>
+            <span class="bi-title">Azure Fundamentals</span>
+            <span class="bi-exam">AZ-900</span>
+          </div>
+          <div class="badge-item">
+            <img src="../assets/img/badges/azure-administrator.png" alt="Badge oficial Microsoft Certified: Azure Administrator Associate" width="124" height="124" loading="lazy">
+            <span class="bi-level">Associate</span>
+            <span class="bi-title">Azure Administrator</span>
+            <span class="bi-exam">AZ-104</span>
+          </div>
+          <div class="badge-item">
+            <img src="../assets/img/badges/azure-solutions-architect-expert.png" alt="Badge oficial Microsoft Certified: Azure Solutions Architect Expert" width="124" height="124" loading="lazy">
+            <span class="bi-level">Expert</span>
+            <span class="bi-title">Solutions Architect</span>
+            <span class="bi-exam">AZ-305</span>
+          </div>
+          <div class="badge-item">
+            <img src="../assets/img/badges/azure-virtual-desktop-specialty.png" alt="Badge oficial Microsoft Certified: Azure Virtual Desktop Specialty" width="124" height="124" loading="lazy">
+            <span class="bi-level">Specialty</span>
+            <span class="bi-title">Azure Virtual Desktop</span>
+            <span class="bi-exam">AZ-140</span>
+          </div>
+        </div>
+        <figcaption><b>Figura 2.</b> Badges oficiais de certificação Microsoft, um por nível — cada um é verificável no Credly e aponta para uma página pública de verificação que você pode compartilhar. (As imagens dos badges são marcas registradas da Microsoft, exibidas aqui para representar as certificações.)</figcaption>
+      </figure>
+
+      <h2 id="azure-paths">Learning paths do Azure &amp; as titulações que entregam</h2>
+      <p>
+        Para um profissional de nuvem, a família Azure é o centro de gravidade. A maioria das jornadas
+        começa no <strong>AZ-900 Fundamentals</strong>, ramifica em um papel <strong>Associate</strong> e,
+        para alguns, culmina em uma certificação <strong>Expert</strong>. Veja como as principais provas
+        mapeiam a titulação que você ganha.
+      </p>
+
+      <figure class="figure reveal">
+        <svg viewBox="0 0 840 360" role="img" aria-label="Paths de certificação Azure: AZ-900 Fundamentals ramifica em certificações associate (Administrator AZ-104, Developer AZ-204, Security AZ-500, Network AZ-700, Data Engineer DP-203, AI Engineer AI-102), que levam às certificações expert (Solutions Architect AZ-305 e DevOps Engineer AZ-400).">
+          <rect x="0" y="0" width="840" height="360" fill="#0c1324"/>
+          <rect x="330" y="24" width="180" height="46" rx="11" fill="#111a30" stroke="#38d3ff"/>
+          <text x="420" y="44" text-anchor="middle" fill="#38d3ff" font-family="Sora,sans-serif" font-size="13" font-weight="700">AZ-900</text>
+          <text x="420" y="60" text-anchor="middle" fill="#97a7c6" font-family="JetBrains Mono,monospace" font-size="9">Azure Fundamentals</text>
+          <g font-family="Sora,sans-serif" font-size="11" font-weight="700" text-anchor="middle">
+            <g><rect x="20" y="150" width="124" height="56" rx="10" fill="#111a30" stroke="#2f9bff"/><text x="82" y="174" fill="#e9eefc">AZ-104</text><text x="82" y="192" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">Administrator</text></g>
+            <g><rect x="156" y="150" width="124" height="56" rx="10" fill="#111a30" stroke="#2f9bff"/><text x="218" y="174" fill="#e9eefc">AZ-204</text><text x="218" y="192" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">Developer</text></g>
+            <g><rect x="292" y="150" width="124" height="56" rx="10" fill="#111a30" stroke="#2f9bff"/><text x="354" y="174" fill="#e9eefc">AZ-500</text><text x="354" y="192" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">Security Engineer</text></g>
+            <g><rect x="428" y="150" width="124" height="56" rx="10" fill="#111a30" stroke="#2f9bff"/><text x="490" y="174" fill="#e9eefc">AZ-700</text><text x="490" y="192" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">Network Engineer</text></g>
+            <g><rect x="564" y="150" width="124" height="56" rx="10" fill="#111a30" stroke="#2f9bff"/><text x="626" y="174" fill="#e9eefc">DP-203</text><text x="626" y="192" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">Data Engineer</text></g>
+            <g><rect x="700" y="150" width="124" height="56" rx="10" fill="#111a30" stroke="#2f9bff"/><text x="762" y="174" fill="#e9eefc">AI-102</text><text x="762" y="192" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">AI Engineer</text></g>
+          </g>
+          <text x="420" y="128" text-anchor="middle" fill="#2f9bff" font-family="JetBrains Mono,monospace" font-size="10" letter-spacing="1">ASSOCIATE · certifica um papel</text>
+          <g font-family="Sora,sans-serif" font-size="11" font-weight="700" text-anchor="middle">
+            <g><rect x="180" y="280" width="200" height="56" rx="10" fill="#111a30" stroke="#f5b942"/><text x="280" y="304" fill="#e9eefc">AZ-305</text><text x="280" y="322" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">Solutions Architect Expert</text></g>
+            <g><rect x="460" y="280" width="200" height="56" rx="10" fill="#111a30" stroke="#f5b942"/><text x="560" y="304" fill="#e9eefc">AZ-400</text><text x="560" y="322" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">DevOps Engineer Expert</text></g>
+          </g>
+          <text x="420" y="262" text-anchor="middle" fill="#f5b942" font-family="JetBrains Mono,monospace" font-size="10" letter-spacing="1">EXPERT · prova senioridade</text>
+          <g stroke="#647495" stroke-width="1.6" fill="none" opacity="0.8">
+            <path d="M420 70 L420 92 M82 92 L762 92 M82 92 L82 150 M218 92 L218 150 M354 92 L354 150 M490 92 L490 150 M626 92 L626 150 M762 92 L762 150"/>
+          </g>
+          <g stroke="#f5b942" stroke-width="1.6" fill="none" stroke-dasharray="4 3" opacity="0.85">
+            <path d="M82 206 L82 230 L280 230 L280 280"/>
+            <path d="M218 206 L218 244 L280 244"/>
+            <path d="M490 206 L490 230 L560 230 L560 280"/>
+          </g>
+          <text x="420" y="352" text-anchor="middle" fill="#647495" font-family="Manrope,sans-serif" font-size="10.5">Papéis Associate alimentam as certificações Expert (ex.: experiência de Administrator + Developer → Solutions Architect / DevOps).</text>
+        </svg>
+        <figcaption><b>Figura 3.</b> O path Azure — AZ-900 constrói a base; provas Associate certificam um papel; AZ-305 e AZ-400 são os capstones Expert.</figcaption>
+      </figure>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Prova</th><th>Titulação conquistada</th><th>Nível</th></tr></thead>
+          <tbody>
+            <tr><td><strong>AZ-900</strong></td><td>Microsoft Certified: Azure Fundamentals</td><td>Fundamentals</td></tr>
+            <tr><td><strong>AZ-104</strong></td><td>Azure Administrator Associate</td><td>Associate</td></tr>
+            <tr><td><strong>AZ-204</strong></td><td>Azure Developer Associate</td><td>Associate</td></tr>
+            <tr><td><strong>AZ-500</strong></td><td>Azure Security Engineer Associate</td><td>Associate</td></tr>
+            <tr><td><strong>AZ-700</strong></td><td>Azure Network Engineer Associate</td><td>Associate</td></tr>
+            <tr><td><strong>DP-203</strong></td><td>Azure Data Engineer Associate</td><td>Associate</td></tr>
+            <tr><td><strong>AI-102</strong></td><td>Azure AI Engineer Associate</td><td>Associate</td></tr>
+            <tr><td><strong>AZ-305</strong></td><td>Azure Solutions Architect Expert</td><td>Expert</td></tr>
+            <tr><td><strong>AZ-400</strong></td><td>DevOps Engineer Expert</td><td>Expert</td></tr>
+            <tr><td><strong>AZ-140</strong></td><td>Azure Virtual Desktop Specialty</td><td>Specialty</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note">
+        <span class="ico">ℹ</span>
+        <div>O <strong>AZ-305</strong> (Solutions Architect Expert) é o capstone natural para os temas dos meus outros artigos — <a href="azure-well-architected-framework.pt-br.html">Well-Architected</a>, <a href="azure-cloud-adoption-framework.pt-br.html">Cloud Adoption Framework</a> e <a href="azure-landing-zones.pt-br.html">Landing Zones</a> estão todos exatamente no seu domínio de objetivos.</div>
+      </div>
+
+      <h2 id="families">Além do Azure — as outras famílias</h2>
+      <p>
+        O Azure é uma de várias famílias de certificação. Se o seu papel atravessa o Microsoft Cloud mais
+        amplo, estas são as outras trilhas que vale conhecer.
+      </p>
+
+      <figure class="figure reveal">
+        <svg viewBox="0 0 820 250" role="img" aria-label="Famílias de certificação Microsoft: Azure, Microsoft 365, Security, Power Platform, Data e IA, e Dynamics 365, cada uma com exemplos de códigos de prova fundamentals.">
+          <rect x="0" y="0" width="820" height="250" fill="#0c1324"/>
+          <g font-family="Sora,sans-serif" font-size="12.5" font-weight="700" text-anchor="middle">
+            <g><rect x="26" y="30" width="240" height="84" rx="12" fill="#111a30" stroke="#2f9bff"/><text x="146" y="62" fill="#2f9bff">Azure</text><text x="146" y="86" fill="#97a7c6" font-size="9.5" font-family="JetBrains Mono,monospace" font-weight="500">AZ-900 · AZ-104 · AZ-305</text></g>
+            <g><rect x="290" y="30" width="240" height="84" rx="12" fill="#111a30" stroke="#38d3ff"/><text x="410" y="62" fill="#38d3ff">Microsoft 365</text><text x="410" y="86" fill="#97a7c6" font-size="9.5" font-family="JetBrains Mono,monospace" font-weight="500">MS-900 · MD-102 · MS-102</text></g>
+            <g><rect x="554" y="30" width="240" height="84" rx="12" fill="#111a30" stroke="#ff7a8a"/><text x="674" y="62" fill="#ff7a8a">Security</text><text x="674" y="86" fill="#97a7c6" font-size="9.5" font-family="JetBrains Mono,monospace" font-weight="500">SC-900 · SC-200 · SC-100</text></g>
+            <g><rect x="26" y="128" width="240" height="84" rx="12" fill="#111a30" stroke="#f5b942"/><text x="146" y="160" fill="#f5b942">Power Platform</text><text x="146" y="184" fill="#97a7c6" font-size="9.5" font-family="JetBrains Mono,monospace" font-weight="500">PL-900 · PL-200 · PL-600</text></g>
+            <g><rect x="290" y="128" width="240" height="84" rx="12" fill="#111a30" stroke="#3ad29f"/><text x="410" y="160" fill="#3ad29f">Data &amp; IA</text><text x="410" y="184" fill="#97a7c6" font-size="9.5" font-family="JetBrains Mono,monospace" font-weight="500">DP-900 · AI-900 · DP-700</text></g>
+            <g><rect x="554" y="128" width="240" height="84" rx="12" fill="#111a30" stroke="#5cb4ff"/><text x="674" y="160" fill="#5cb4ff">Dynamics 365</text><text x="674" y="184" fill="#97a7c6" font-size="9.5" font-family="JetBrains Mono,monospace" font-weight="500">MB-910 · MB-280 · MB-700</text></g>
+          </g>
+          <text x="410" y="236" text-anchor="middle" fill="#647495" font-family="Manrope,sans-serif" font-size="10.5">Cada família segue a mesma estrutura Fundamentals → Associate → Expert.</text>
+        </svg>
+        <figcaption><b>Figura 4.</b> As seis principais famílias de certificação — cada uma espelha a mesma estrutura de níveis, então o roteiro deste guia se transfere para todas elas.</figcaption>
+      </figure>
+
+      <h2 id="prep">Como se preparar</h2>
+      <p>Toda prova tem um <strong>study guide</strong> publicado listando as habilidades medidas. Monte sua preparação em torno dele:</p>
+      <ul class="principle-list">
+        <li><strong>Microsoft Learn (grátis).</strong> Cada certificação tem learning paths oficiais e gratuitos — a fonte primária e autoritativa.</li>
+        <li><strong>Prática hands-on.</strong> Uma conta Azure gratuita ou um sandbox. Nada supera realmente fazer as tarefas que a prova testa.</li>
+        <li><strong>Practice assessment oficial (grátis).</strong> A Microsoft oferece uma avaliação prática gratuita para a maioria das provas, para medir seu preparo.</li>
+        <li><strong>Treinamento com instrutor (pago).</strong> Cursos oficiais Microsoft via Learning Partners, geralmente com ambiente de laboratório.</li>
+        <li><strong>Demo da prova.</strong> Experimente o demo de tipos de questão para que a interface (estudos de caso, labs) não traga surpresas.</li>
+      </ul>
+
+      <h2 id="scheduling">Agendando &amp; fazendo a prova</h2>
+      <p>
+        As provas Microsoft são entregues pela <strong>Pearson VUE</strong>. Você agenda a partir da página
+        da certificação no Microsoft Learn, logado com a conta Microsoft que guarda seu perfil de
+        certificação. A grande escolha é <strong>onde</strong> fazer: <strong>online proctored</strong> de
+        casa/escritório, ou em um <strong>centro de provas Pearson VUE</strong>.
+      </p>
+
+      <figure class="figure reveal">
+        <svg viewBox="0 0 820 220" role="img" aria-label="Fluxo de agendamento: escolha a prova no Microsoft Learn, faça login, vá à Pearson VUE, escolha online proctored ou centro de provas, escolha data e hora, faça a prova e receba um resultado provisório na hora.">
+          <rect x="0" y="0" width="820" height="220" fill="#0c1324"/>
+          <g font-family="Sora,sans-serif" font-size="11" font-weight="700" text-anchor="middle">
+            <g><rect x="20" y="44" width="150" height="64" rx="11" fill="#111a30" stroke="#38d3ff"/><text x="95" y="72" fill="#e9eefc">1 · Escolher</text><text x="95" y="90" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">no MS Learn</text></g>
+            <g><rect x="190" y="44" width="150" height="64" rx="11" fill="#111a30" stroke="#2f9bff"/><text x="265" y="72" fill="#e9eefc">2 · Login</text><text x="265" y="90" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">conta Microsoft</text></g>
+            <g><rect x="360" y="44" width="150" height="64" rx="11" fill="#111a30" stroke="#5cb4ff"/><text x="435" y="72" fill="#e9eefc">3 · Pearson VUE</text><text x="435" y="90" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">agendar</text></g>
+            <g><rect x="530" y="44" width="150" height="64" rx="11" fill="#111a30" stroke="#f5b942"/><text x="605" y="72" fill="#e9eefc">4 · Entrega</text><text x="605" y="90" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">online / centro</text></g>
+            <g><rect x="700" y="44" width="100" height="64" rx="11" fill="#111a30" stroke="#3ad29f"/><text x="750" y="72" fill="#e9eefc">5 · Fazer</text><text x="750" y="90" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">prova</text></g>
+          </g>
+          <g stroke="#647495" stroke-width="2" fill="none">
+            <path d="M170 76 L190 76" marker-end="url(#cx)"/>
+            <path d="M340 76 L360 76" marker-end="url(#cx)"/>
+            <path d="M510 76 L530 76" marker-end="url(#cx)"/>
+            <path d="M680 76 L700 76" marker-end="url(#cx)"/>
+          </g>
+          <defs><marker id="cx" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 Z" fill="#647495"/></marker></defs>
+          <text x="410" y="150" text-anchor="middle" fill="#3ad29f" font-family="JetBrains Mono,monospace" font-size="11">Aprovado/reprovado provisório aparece na tela ao final · relatório completo vem em seguida</text>
+          <text x="410" y="186" text-anchor="middle" fill="#97a7c6" font-family="Manrope,sans-serif" font-size="11.5">A nota de aprovação é 700 de 1000 (escalada) na maioria das provas.</text>
+        </svg>
+        <figcaption><b>Figura 5.</b> O fluxo de agendamento — escolher, logar, agendar pela Pearson VUE, escolher a forma de entrega e fazer a prova.</figcaption>
+      </figure>
+
+      <h3>Online proctored vs. centro de provas</h3>
+      <figure class="figure reveal">
+        <svg viewBox="0 0 820 250" role="img" aria-label="Comparação entre provas online proctored e provas em centro de provas, listando os requisitos e tradeoffs de cada opção.">
+          <rect x="0" y="0" width="820" height="250" fill="#0c1324"/>
+          <rect x="30" y="24" width="370" height="200" rx="14" fill="#0f1830" stroke="#2f9bff" stroke-dasharray="4 4"/>
+          <text x="215" y="52" text-anchor="middle" fill="#2f9bff" font-family="Sora,sans-serif" font-size="14" font-weight="800">Online proctored (de casa)</text>
+          <g font-family="JetBrains Mono,monospace" font-size="10.5" fill="#97a7c6">
+            <text x="52" y="84">✓ Faça de qualquer lugar, sem deslocamento</text>
+            <text x="52" y="108">✓ Mais disponibilidade de data/hora</text>
+            <text x="52" y="132">• Sala privada, silenciosa e fechada</text>
+            <text x="52" y="156">• Webcam + internet estável + documento</text>
+            <text x="52" y="180">• Teste de sistema &amp; scan da sala antes</text>
+            <text x="52" y="204">• Mesa limpa · sem segundo monitor</text>
+          </g>
+          <rect x="420" y="24" width="370" height="200" rx="14" fill="#0f1830" stroke="#3ad29f" stroke-dasharray="4 4"/>
+          <text x="605" y="52" text-anchor="middle" fill="#3ad29f" font-family="Sora,sans-serif" font-size="14" font-weight="800">Centro de provas Pearson VUE</text>
+          <g font-family="JetBrains Mono,monospace" font-size="10.5" fill="#97a7c6">
+            <text x="442" y="84">✓ Sala controlada, sem distrações</text>
+            <text x="442" y="108">✓ Sem setup em casa ou risco técnico</text>
+            <text x="442" y="132">• Deslocamento até um centro físico</text>
+            <text x="442" y="156">• Chegar cedo · documento oficial com foto</text>
+            <text x="442" y="180">• Armários · materiais fornecidos</text>
+            <text x="442" y="204">• Menos horários em cidades menores</text>
+          </g>
+        </svg>
+        <figcaption><b>Figura 6.</b> As duas opções são igualmente válidas e têm o mesmo preço — online proctored troca conveniência por checagens de ambiente mais rígidas; o centro de provas troca deslocamento por uma sala controlada.</figcaption>
+      </figure>
+      <div class="note warn">
+        <span class="ico">⚠</span>
+        <div>Para provas online proctored, faça o <strong>teste de sistema com antecedência</strong> e limpe a sala: sem celulares, anotações, segundo monitor ou pessoas. Uma checagem de ambiente reprovada no dia pode custar a sua vaga.</div>
+      </div>
+
+      <h2 id="pricing">Preços</h2>
+      <p>
+        O preço da prova depende do nível e do seu país. Como referência (preços de lista dos EUA; os
+        preços locais variam e aparecem no checkout na sua moeda):
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Nível</th><th>Preço típico (EUA)</th><th>Notas</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Fundamentals</strong></td><td>~US$99</td><td>Menor custo; ótima primeira prova de baixo risco.</td></tr>
+            <tr><td><strong>Associate</strong></td><td>~US$165</td><td>A maior parte das provas role-based.</td></tr>
+            <tr><td><strong>Expert</strong></td><td>~US$165</td><td>Uma prova cada (AZ-305, AZ-400).</td></tr>
+            <tr><td><strong>Specialty</strong></td><td>~US$165</td><td>Igual às provas role-based.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <ul class="principle-list">
+        <li><strong>Preço local varia.</strong> Brasil e outras regiões têm preço em moeda local — sempre confirme na página oficial da prova, no checkout.</li>
+        <li><strong>Existem descontos.</strong> Estudantes têm taxas reduzidas; a Microsoft frequentemente oferece vouchers gratuitos/com desconto em eventos como o Cloud Skills Challenge do Ignite.</li>
+        <li><strong>Recuperação custa de novo.</strong> Reprovou? A retentativa é uma nova tentativa paga — e há períodos de espera entre tentativas.</li>
+        <li><strong>Renovações são gratuitas.</strong> Veja abaixo — renovar nunca custa um centavo.</li>
+      </ul>
+
+      <h2 id="renewal">Renovação — gratuita, todo ano</h2>
+      <p>
+        Certificações role-based e specialty <strong>expiram em um ano</strong> após conquistadas — mas
+        renovar é <strong>gratuito</strong> e feito inteiramente no Microsoft Learn. Nos seis meses antes do
+        vencimento, você faz uma <strong>avaliação de renovação curta, sem proctor e com consulta</strong>,
+        online; passou, sua certificação estende por mais um ano. As certificações Fundamentals
+        <em>não</em> expiram. Esse modelo mantém as habilidades certificadas atualizadas conforme o Azure
+        evolui, sem custo recorrente.
+      </p>
+
+      <h2 id="checklist">Um checklist rápido para escolher o path</h2>
+      <ul class="principle-list">
+        <li><strong>Escolha o papel, não a prova.</strong> Decida o trabalho que você quer (Administrator? Architect?), depois siga aquele path.</li>
+        <li><strong>Comece pelo Fundamentals só se for novo.</strong> Tem experiência? Pode pular direto para a prova Associate.</li>
+        <li><strong>Leia o study guide primeiro.</strong> Ele lista exatamente as habilidades medidas — seu escopo já vem definido.</li>
+        <li><strong>Pratique hands-on.</strong> Suba recursos reais; as provas premiam quem de fato fez as tarefas.</li>
+        <li><strong>Faça o practice assessment gratuito.</strong> Use-o para decidir se está pronto para agendar.</li>
+        <li><strong>Escolha a entrega de propósito.</strong> Sala silenciosa e confiável → online; caso contrário, um centro de provas.</li>
+        <li><strong>Anote a renovação.</strong> Crie um lembrete para ~10 meses depois, para a renovação gratuita nunca vencer.</li>
+      </ul>
+
+      <h2 id="references">Referências oficiais da Microsoft</h2>
+      <ul class="ref-list">
+        <li><a href="https://learn.microsoft.com/credentials/" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Microsoft Credentials — início</span></a><span class="ref-desc">O hub de todas as certificações, provas e learning paths.</span></li>
+        <li><a href="https://learn.microsoft.com/credentials/browse/" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Navegar todas as certificações &amp; provas</span></a><span class="ref-desc">Filtre por produto, papel e nível para achar o seu path.</span></li>
+        <li><a href="https://learn.microsoft.com/credentials/certifications/azure-solutions-architect/" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Azure Solutions Architect Expert (AZ-305)</span></a><span class="ref-desc">Exemplo de página de certificação com study guide e o botão de agendar.</span></li>
+        <li><a href="https://learn.microsoft.com/credentials/support/exam-duration-exam-experience" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Duração &amp; experiência da prova</span></a><span class="ref-desc">Tipos de questão, tempo e como é a interface da prova.</span></li>
+        <li><a href="https://learn.microsoft.com/credentials/support/schedule-with-pearson-vue" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Agendar uma prova com a Pearson VUE</span></a><span class="ref-desc">Passo a passo, online proctored vs. centro de provas.</span></li>
+        <li><a href="https://learn.microsoft.com/credentials/support/online-exam-environment-requirements" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Requisitos de ambiente da prova online</span></a><span class="ref-desc">O que você precisa para uma prova online proctored em casa.</span></li>
+        <li><a href="https://learn.microsoft.com/credentials/support/renew-your-microsoft-certification" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Renovar sua certificação (gratuito)</span></a><span class="ref-desc">Como funciona a avaliação de renovação anual gratuita.</span></li>
+        <li><a href="https://learn.microsoft.com/credentials/support/credentials-faq" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>FAQ de certificações &amp; provas</span></a><span class="ref-desc">Preços, políticas, retentativas e dúvidas sobre badges.</span></li>
+      </ul>
+
+      <div class="next-prev">
+        <a class="is-prev" href="azure-landing-zones.pt-br.html">
+          <span class="np-kicker">← Relacionado</span>
+          <span class="np-title">Azure Landing Zones</span>
+        </a>
+        <a class="is-next" href="index.pt-br.html">
+          <span class="np-kicker">Próximo →</span>
+          <span class="np-title">Todos os posts</span>
+        </a>
+      </div>
+    </article>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container footer-grid">
+    <p>© <span data-current-year></span> Henderson Andrade · Microsoft Azure Cloud Architect.</p>
+    <div class="footer-links">
+      <a href="index.pt-br.html">Blog</a>
+      <a href="../solutions/index.pt-br.html">Soluções</a>
+      <a href="https://github.com/hendersonandrade" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://br.linkedin.com/in/henderson-andrade-%E2%98%81%EF%B8%8F-22b1ba33/pt" target="_blank" rel="noopener">LinkedIn ↗</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

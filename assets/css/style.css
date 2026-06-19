@@ -55,6 +55,7 @@
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -896,6 +897,35 @@ tbody td code { white-space: nowrap; }
 }
 .figure figcaption b { color: var(--accent); font-weight: 600; }
 
+/* ---- lab screenshot placeholder ----------------------------------------- */
+/* Caixa tracejada onde entram os prints do laboratório em funcionamento.
+   Troque o conteúdo por <img src="..."> quando a captura estiver pronta. */
+.lab-shot {
+  margin: 1.8rem 0;
+  padding: 2.4rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: center;
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius);
+  background:
+    repeating-linear-gradient(-45deg, rgba(56, 211, 255, 0.03) 0 10px, transparent 10px 20px),
+    var(--bg-2);
+  color: var(--muted-2);
+}
+.lab-shot .ls-ico { font-size: 1.6rem; line-height: 1; }
+.lab-shot .ls-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+.lab-shot .ls-hint { font-family: var(--font-mono); font-size: 0.74rem; color: var(--muted-2); }
+.lab-shot img { width: 100%; height: auto; border-radius: calc(var(--radius) - 4px); display: block; }
+.lab-shot.has-img { padding: 0; border-style: solid; background: var(--bg-2); }
+
 /* ---- pillars ------------------------------------------------------------- */
 .pillar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.1rem; margin: 1.6rem 0; }
 .pillar-card {
@@ -1009,3 +1039,28 @@ tbody td code { white-space: nowrap; }
 }
 .takeaway p { margin: 0; color: var(--muted); }
 .takeaway strong { color: var(--text); }
+
+/* ---- certification badge gallery ----------------------------------------- */
+.badge-gallery {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  padding: 1.8rem 1.2rem 1rem;
+}
+.badge-item { margin: 0; text-align: center; }
+.badge-item img {
+  width: 124px;
+  height: 124px;
+  max-width: 100%;
+  object-fit: contain;
+  margin: 0 auto 0.8rem;
+  display: block;
+  filter: drop-shadow(0 10px 22px rgba(2, 8, 23, 0.6));
+}
+.badge-item .bi-level { font-family: var(--font-display); font-weight: 700; color: var(--text); font-size: 1rem; }
+.badge-item .bi-title { display: block; font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); margin-top: 0.3rem; }
+.badge-item .bi-exam { display: block; font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted-2); margin-top: 0.1rem; }
+
+@media (max-width: 620px) {
+  .badge-gallery { grid-template-columns: repeat(2, 1fr); gap: 1.4rem; }
+}
