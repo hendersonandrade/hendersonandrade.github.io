@@ -668,11 +668,10 @@ permissions:
         before the deploy. It is your human gate over the automation.
       </p>
 
-      <div class="lab-shot reveal">
-        <span class="ls-ico">📷</span>
-        <span class="ls-title">Lab screenshot — the workflow run on GitHub Actions</span>
-        <span class="ls-hint">plan/apply jobs, the "production" environment approval gate</span>
-      </div>
+      <figure class="figure reveal">
+        <img src="../assets/img/lab/02.tf-apply-approval.png" alt="The workflow run on GitHub Actions with the apply job waiting for the production environment approval.">
+        <figcaption><b>Capture 2.</b> The workflow run on GitHub Actions — the <code>apply</code> job paused, waiting for the <code>production</code> environment approval before touching Azure.</figcaption>
+      </figure>
 
       <!-- ===================== 9 · Infracost pipeline ===================== -->
       <h2 id="infracost-pipeline">Integrating Infracost into the pipeline</h2>
@@ -723,7 +722,7 @@ permissions:
 
       <figure class="figure reveal">
         <img src="../assets/img/lab/03.tf-pr.png" alt="Infracost comment on the Pull Request showing the detailed monthly cost estimate.">
-        <figcaption><b>Capture 2.</b> The Infracost comment on the Pull Request — the detailed monthly cost estimate of the diff, right in the review.</figcaption>
+        <figcaption><b>Capture 3.</b> The Infracost comment on the Pull Request — the detailed monthly cost estimate of the diff, right in the review.</figcaption>
       </figure>
 
       <div class="note warn">

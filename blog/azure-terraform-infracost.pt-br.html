@@ -669,11 +669,10 @@ permissions:
         deploy. É o seu portão humano sobre a automação.
       </p>
 
-      <div class="lab-shot reveal">
-        <span class="ls-ico">📷</span>
-        <span class="ls-title">Imagem do laboratório — execução do workflow no GitHub Actions</span>
-        <span class="ls-hint">jobs plan/apply, gate de aprovação do environment "production"</span>
-      </div>
+      <figure class="figure reveal">
+        <img src="../assets/img/lab/02.tf-apply-approval.png" alt="Execução do workflow no GitHub Actions com o job de apply aguardando aprovação do environment production.">
+        <figcaption><b>Captura 2.</b> A execução do workflow no GitHub Actions — o job de <code>apply</code> pausado, aguardando a aprovação do environment <code>production</code> antes de tocar no Azure.</figcaption>
+      </figure>
 
       <!-- ===================== 9 · Infracost pipeline ===================== -->
       <h2 id="infracost-pipeline">Integrando o Infracost no pipeline</h2>
@@ -724,7 +723,7 @@ permissions:
 
       <figure class="figure reveal">
         <img src="../assets/img/lab/03.tf-pr.png" alt="Comentário do Infracost no Pull Request mostrando a estimativa de custo mensal detalhada.">
-        <figcaption><b>Captura 2.</b> O comentário do Infracost no Pull Request — a estimativa de custo mensal detalhada do diff, direto na revisão.</figcaption>
+        <figcaption><b>Captura 3.</b> O comentário do Infracost no Pull Request — a estimativa de custo mensal detalhada do diff, direto na revisão.</figcaption>
       </figure>
 
       <div class="note warn">
