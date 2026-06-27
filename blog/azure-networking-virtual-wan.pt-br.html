@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Azure Virtual WAN: rede gerenciada em escala | Henderson Andrade</title>
+  <meta name="description" content="Azure Virtual WAN: hubs virtuais gerenciados, routing intent, Secured Virtual Hub, conexão de VNets, VPN, ExpressRoute e P2S — e quando ele supera o Hub-Spoke tradicional.">
+  <meta property="og:title" content="Azure Virtual WAN: rede gerenciada em escala">
+  <meta property="og:description" content="Virtual Hub, routing intent, Secured Hub e conectividade global gerenciada — e quando o Virtual WAN faz mais sentido que o Hub-Spoke tradicional.">
+  <meta property="og:type" content="article">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="canonical" href="https://hendersonandrade.github.io/blog/azure-networking-virtual-wan.pt-br.html">
+  <link rel="alternate" hreflang="en" href="https://hendersonandrade.github.io/blog/azure-networking-virtual-wan.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://hendersonandrade.github.io/blog/azure-networking-virtual-wan.pt-br.html">
+  <link rel="alternate" hreflang="x-default" href="https://hendersonandrade.github.io/blog/azure-networking-virtual-wan.html">
+  <meta property="og:url" content="https://hendersonandrade.github.io/blog/azure-networking-virtual-wan.pt-br.html">
+  <meta property="og:image" content="https://hendersonandrade.github.io/assets/img/avatar.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://hendersonandrade.github.io/assets/img/avatar.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Azure Virtual WAN: rede gerenciada em escala",
+    "description": "Azure Virtual WAN: hubs virtuais gerenciados, routing intent, Secured Virtual Hub, conexão de VNets, VPN, ExpressRoute e P2S — e quando ele supera o Hub-Spoke tradicional.",
+    "inLanguage": "pt-BR",
+    "datePublished": "2026-06-19",
+    "dateModified": "2026-06-19",
+    "url": "https://hendersonandrade.github.io/blog/azure-networking-virtual-wan.pt-br.html",
+    "mainEntityOfPage": { "@type": "WebPage", "@id": "https://hendersonandrade.github.io/blog/azure-networking-virtual-wan.pt-br.html" },
+    "image": "https://hendersonandrade.github.io/assets/img/avatar.png",
+    "keywords": "Azure, Virtual WAN, vWAN, Virtual Hub, routing intent, Secured Virtual Hub, ExpressRoute, VPN, networking",
+    "articleSection": "Azure · Networking",
+    "author": { "@type": "Person", "name": "Henderson Andrade", "url": "https://hendersonandrade.github.io/" },
+    "publisher": { "@type": "Person", "name": "Henderson Andrade", "url": "https://hendersonandrade.github.io/" }
+  }
+  </script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container navbar">
+    <a class="brand" href="../index.pt-br.html" aria-label="Henderson Andrade — início">
+      <img class="brand-mark" src="../assets/img/ha-monogram.svg" alt="">
+      <span>Henderson Andrade<span class="brand-sub">Azure Cloud Architect</span></span>
+    </a>
+    <button class="nav-toggle" aria-label="Alternar menu de navegação" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-menu">
+      <li><a class="nav-link" href="../index.pt-br.html">Início</a></li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Soluções <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="../solutions/index.pt-br.html"><span class="dropdown-kicker">Portfólio</span><span class="dropdown-title">Todas as soluções</span></a></li>
+          <li><a href="../docs/azureutils/index.pt-br.html"><span class="dropdown-kicker">Pessoal · PowerShell</span><span class="dropdown-title">Módulo AzureUtils</span></a></li>
+          <li><a href="https://trimtechbr.github.io" target="_blank" rel="noopener"><span class="dropdown-kicker">TrimTechBR ↗</span><span class="dropdown-title">AER — Azure Estate Report</span></a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Docs <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="../docs/azureutils/index.pt-br.html"><span class="dropdown-kicker">Comece aqui</span><span class="dropdown-title">Visão geral &amp; instalação</span></a></li>
+          <li><a href="../docs/azureutils/tag-inventory.pt-br.html"><span class="dropdown-kicker">Referência</span><span class="dropdown-title">Inventário de tags</span></a></li>
+          <li><a href="../docs/azureutils/find-commands.pt-br.html"><span class="dropdown-kicker">Referência</span><span class="dropdown-title">Comandos Find</span></a></li>
+          <li><a href="../docs/azureutils/release-publishing.pt-br.html"><span class="dropdown-kicker">Internals</span><span class="dropdown-title">Release &amp; publicação</span></a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Blog <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="index.pt-br.html"><span class="dropdown-kicker">Todos</span><span class="dropdown-title">Todos os posts</span></a></li>
+          <li><a href="category-networking.pt-br.html"><span class="dropdown-kicker">Categoria</span><span class="dropdown-title">Redes</span></a></li>
+          <li><a href="category-architecture.pt-br.html"><span class="dropdown-kicker">Categoria</span><span class="dropdown-title">Arquitetura</span></a></li>
+          <li><a href="category-iac.pt-br.html"><span class="dropdown-kicker">Categoria</span><span class="dropdown-title">IaC</span></a></li>
+          <li><a href="category-finops.pt-br.html"><span class="dropdown-kicker">Categoria</span><span class="dropdown-title">FinOps</span></a></li>
+          <li><a href="category-careers.pt-br.html"><span class="dropdown-kicker">Categoria</span><span class="dropdown-title">Carreira</span></a></li>
+        </ul>
+      </li>
+      <li><a class="nav-link" href="../contact.pt-br.html">Contato</a></li>
+      <li><a class="btn btn-secondary" href="https://github.com/hendersonandrade" target="_blank" rel="noopener">GitHub ↗</a></li>
+      <li class="nav-item lang-switch">
+        <a class="lang-link" href="azure-networking-virtual-wan.html">EN</a>
+        <span class="lang-sep">/</span>
+        <a class="lang-link is-active" href="azure-networking-virtual-wan.pt-br.html">PT</a>
+      </li>
+    </ul>
+  </div>
+</header>
+
+<main class="container">
+  <div class="docs-shell">
+
+    <aside class="docs-sidebar reveal">
+      <div class="side-group">
+        <p class="side-title">Nesta página</p>
+        <ul class="anchor-list">
+          <li><a href="#resumo">Resumo executivo</a></li>
+          <li><a href="#conceito">Conceito</a></li>
+          <li><a href="#componentes">Componentes</a></li>
+          <li><a href="#routing">Routing intent &amp; Secured Hub</a></li>
+          <li><a href="#vs">Virtual WAN vs Hub-Spoke</a></li>
+          <li><a href="#quando">Quando usar / evitar</a></li>
+          <li><a href="#checklist">Checklist</a></li>
+          <li><a href="#references">Referências</a></li>
+        </ul>
+      </div>
+      <div class="side-group">
+        <p class="side-title">Série Azure Networking</p>
+        <ul>
+          <li><a href="azure-networking-fundamentals.pt-br.html">1 · Fundamentos</a></li>
+          <li><a href="azure-networking-hub-spoke.pt-br.html">2 · Hub-and-Spoke</a></li>
+          <li><strong>3 · Virtual WAN</strong> (você está aqui)</li>
+          <li><a href="azure-networking-vpn-expressroute.pt-br.html">4 · VPN &amp; ExpressRoute</a></li>
+          <li><a href="azure-networking-dns-private-link-security.pt-br.html">5 · DNS, Private Link &amp; Segurança</a></li>
+          <li><a href="azure-networking-operations-governance-finops.pt-br.html">6 · Operação, Governança &amp; FinOps</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <article class="docs-content">
+      <nav class="breadcrumb">
+        <a href="../index.pt-br.html">Início</a><span class="sep">/</span>
+        <a href="index.pt-br.html">Blog</a><span class="sep">/</span>
+        <span>Virtual WAN</span>
+      </nav>
+
+      <span class="eyebrow">Redes · Série · Parte 3 de 6</span>
+      <h1>Azure Virtual WAN: rede gerenciada em escala</h1>
+      <p class="docs-lede">
+        O <strong>Azure Virtual WAN</strong> é a resposta gerenciada da Microsoft para conectividade em
+        <strong>escala global</strong>: hubs virtuais que conectam VNets, filiais (VPN/SD-WAN), ExpressRoute e
+        usuários remotos, com transitividade e roteamento centralizados. É um Hub-and-Spoke <em>gerenciado</em>.
+        Esta é a <strong>Parte 3</strong> da série — compare com o <a href="azure-networking-hub-spoke.pt-br.html">Hub-Spoke
+        tradicional</a> da Parte 2.
+      </p>
+
+      <div class="article-meta">
+        <span><span class="am-dot"></span> Henderson Andrade</span>
+        <span>Publicado em 19 jun 2026</span>
+        <span>~14 min de leitura</span>
+        <span>Azure · Virtual WAN · Escala global</span>
+      </div>
+
+      <div class="badge-row">
+        <span class="badge badge-primary">Virtual WAN</span>
+        <span class="badge">Virtual Hub</span>
+        <span class="badge">Routing intent</span>
+        <span class="badge">Série · 3/6</span>
+      </div>
+
+      <h2 id="resumo">Resumo executivo</h2>
+      <div class="note">
+        <span class="ico">ℹ</span>
+        <div>O Virtual WAN troca <strong>controle granular por abstração gerenciada</strong>. Em vez de você construir hub, peerings, gateways e route tables à mão, a Microsoft entrega um <strong>Virtual Hub</strong> gerenciado onde VNets, VPN, ExpressRoute e P2S se conectam com <strong>transitividade nativa</strong>. É um caso forte para <strong>muitas filiais</strong>, <strong>múltiplas regiões</strong> e <strong>conectividade global</strong>. O preço: um <strong>modelo de roteamento próprio</strong> (route tables do hub, labels, routing intent) com sua curva de aprendizado, e menos liberdade para padrões de NVA muito específicos. Para ambientes pequenos e regionais, costuma ser overengineering.</div>
+      </div>
+      <div class="note warn">
+        <span class="ico">⚠</span>
+        <div>O comportamento de roteamento, a integração de NVAs e as capacidades de cada SKU do Virtual WAN <strong>evoluem</strong> — valide na documentação oficial antes de adotar.</div>
+      </div>
+
+      <h2 id="conceito">Conceito</h2>
+      <p>
+        O <strong>Virtual WAN</strong> é um recurso que agrega <strong>Virtual Hubs</strong> — hubs gerenciados
+        pela Microsoft, um por região — aos quais você conecta VNets (VNet connections), sites VPN/SD-WAN,
+        circuitos ExpressRoute e usuários P2S. Os hubs se interligam pelo backbone, dando
+        <strong>transitividade global</strong> sem você desenhar peerings em malha. É a mesma ideia de
+        hub-and-spoke, mas com o hub e boa parte do roteamento <strong>como serviço</strong>.
+      </p>
+
+      <figure class="figure reveal">
+        <svg viewBox="0 0 820 300" role="img" aria-label="Um Virtual WAN com dois Virtual Hubs em regiões diferentes, interligados pelo backbone; cada hub conecta VNets, sites VPN, circuitos ExpressRoute e usuários P2S; um hub é um Secured Hub com Azure Firewall.">
+          <rect x="0" y="0" width="820" height="300" fill="#0c1324"/>
+          <text x="410" y="30" text-anchor="middle" fill="#3ad29f" font-family="Sora,sans-serif" font-size="14" font-weight="800">Virtual WAN — hubs gerenciados, transitividade global</text>
+          <g text-anchor="middle" font-family="Sora,sans-serif">
+            <rect x="150" y="120" width="170" height="60" rx="12" fill="#0f1830" stroke="#38d3ff"/>
+            <text x="235" y="146" fill="#38d3ff" font-size="12" font-weight="800">Virtual Hub · R1</text>
+            <text x="235" y="164" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace">Secured (Firewall)</text>
+            <rect x="500" y="120" width="170" height="60" rx="12" fill="#0f1830" stroke="#5cb4ff"/>
+            <text x="585" y="146" fill="#5cb4ff" font-size="12" font-weight="800">Virtual Hub · R2</text>
+            <text x="585" y="164" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace">routing intent</text>
+          </g>
+          <path d="M320 150 L500 150" stroke="#3ad29f" stroke-width="2.5" fill="none"/>
+          <text x="410" y="142" text-anchor="middle" fill="#647495" font-family="JetBrains Mono,monospace" font-size="8.5">backbone (transitivo)</text>
+          <g font-family="Sora,sans-serif" font-size="9.5" font-weight="700" text-anchor="middle">
+            <g><rect x="40" y="40" width="120" height="40" rx="9" fill="#111a30" stroke="#f5b942"/><text x="100" y="64" fill="#f5b942">VNets</text></g>
+            <g><rect x="40" y="220" width="120" height="40" rx="9" fill="#111a30" stroke="#f5b942"/><text x="100" y="244" fill="#f5b942">Sites VPN/SD-WAN</text></g>
+            <g><rect x="310" y="220" width="120" height="40" rx="9" fill="#111a30" stroke="#38d3ff"/><text x="370" y="244" fill="#38d3ff">ExpressRoute</text></g>
+            <g><rect x="660" y="40" width="120" height="40" rx="9" fill="#111a30" stroke="#3ad29f"/><text x="720" y="64" fill="#3ad29f">VNets</text></g>
+            <g><rect x="660" y="220" width="120" height="40" rx="9" fill="#111a30" stroke="#3ad29f"/><text x="720" y="244" fill="#3ad29f">Usuários P2S</text></g>
+          </g>
+          <g stroke="#647495" stroke-width="1.6" fill="none">
+            <path d="M150 70 L210 120"/><path d="M150 230 L210 180"/><path d="M320 225 L300 180"/>
+            <path d="M670 70 L610 120"/><path d="M670 230 L610 180"/>
+          </g>
+        </svg>
+        <figcaption><b>Figura 1.</b> Dois Virtual Hubs em regiões distintas, interligados pelo backbone (transitivo). Cada hub conecta VNets, VPN/SD-WAN, ExpressRoute e P2S; um deles é um <strong>Secured Hub</strong> com Azure Firewall.</figcaption>
+      </figure>
+
+      <h2 id="componentes">Componentes</h2>
+      <ul class="principle-list">
+        <li><strong>Virtual WAN —</strong> o recurso "guarda-chuva" que agrega os hubs.</li>
+        <li><strong>Virtual Hub —</strong> o hub gerenciado por região; hospeda gateways e o roteamento.</li>
+        <li><strong>VNet connections —</strong> conectam suas VNets ao hub (substituem o peering manual).</li>
+        <li><strong>VPN Gateway / ExpressRoute Gateway / P2S Gateway —</strong> dentro do hub, para sites, circuitos e usuários.</li>
+        <li><strong>Route tables &amp; labels —</strong> o modelo de roteamento do hub (associação e propagação).</li>
+        <li><strong>Routing intent &amp; Secured Hub —</strong> políticas que enviam tráfego (Internet e/ou privado) ao Azure Firewall no hub.</li>
+      </ul>
+
+      <h2 id="routing">Routing intent e Secured Virtual Hub</h2>
+      <p>
+        O <strong>Secured Virtual Hub</strong> é um Virtual Hub com <strong>Azure Firewall</strong> integrado.
+        Com <strong>routing intent</strong>, você declara a <em>intenção</em> de inspecionar o tráfego de
+        <strong>Internet</strong> e/ou o tráfego <strong>privado</strong> (entre VNets, branches e on-premises),
+        e o Virtual WAN programa as rotas para passar pelo firewall — sem você montar UDRs manualmente em cada
+        spoke. É o equivalente gerenciado ao "UDR <code>0.0.0.0/0</code> para o firewall" do Hub-Spoke
+        tradicional (Parte 2), porém com o modelo de rotas do vWAN.
+      </p>
+      <div class="note">
+        <span class="ico">ℹ</span>
+        <div>Nem todo padrão de NVA/inspeção do Hub-Spoke tradicional se comporta igual no Virtual WAN. Se a sua organização depende de uma NVA específica com um modelo de roteamento muito particular, valide a compatibilidade com o vWAN <strong>antes</strong> de decidir.</div>
+      </div>
+
+      <h2 id="vs">Virtual WAN vs. Hub-Spoke tradicional</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Critério</th><th>Hub-Spoke tradicional</th><th>Azure Virtual WAN</th></tr></thead>
+          <tbody>
+            <tr><td>Controle</td><td>Maior controle manual</td><td>Mais gerenciado</td></tr>
+            <tr><td>Operação</td><td>Mais responsabilidade do cliente</td><td>Mais abstração e automação</td></tr>
+            <tr><td>Escala global</td><td>Exige desenho próprio (múltiplos hubs)</td><td>Mais natural (transitividade entre hubs)</td></tr>
+            <tr><td>Filiais</td><td>Possível, mas aumenta a complexidade</td><td>Caso de uso forte</td></tr>
+            <tr><td>Roteamento</td><td>UDRs, peerings, gateways</td><td>Route tables do hub, labels, routing intent</td></tr>
+            <tr><td>Firewall</td><td>Azure Firewall/NVA na VNet do hub</td><td>Secured Hub / Azure Firewall</td></tr>
+            <tr><td>Curva de aprendizado</td><td>Conhecida por times Azure</td><td>Requer entender o modelo vWAN</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Os dois <strong>não são excludentes</strong>: é comum um hub tradicional em uma região e Virtual WAN para conectividade global, ou vWAN com ExpressRoute e VPN backup (Parte 4).</p>
+
+      <h2 id="quando">Quando usar e quando evitar</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Use Virtual WAN quando…</th><th>Reavalie quando…</th></tr></thead>
+          <tbody>
+            <tr><td>Há muitas filiais e sites VPN/SD-WAN</td><td>O ambiente é pequeno e regional</td></tr>
+            <tr><td>Há múltiplas regiões e conectividade global</td><td>Você precisa de controle extremo sobre cada rota</td></tr>
+            <tr><td>Quer simplificar a operação de conectividade</td><td>Depende de NVAs/modelos de inspeção muito específicos</td></tr>
+            <tr><td>Quer transitividade global padronizada</td><td>Ainda não há maturidade para operar o modelo de rotas do vWAN</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="checklist">Checklist</h2>
+      <ul class="principle-list">
+        <li><strong>Justificativa —</strong> A escala (filiais/regiões) realmente justifica o vWAN sobre o Hub-Spoke?</li>
+        <li><strong>Roteamento —</strong> Route tables, labels e routing intent desenhados e entendidos pelo time?</li>
+        <li><strong>Segurança —</strong> Secured Hub com Azure Firewall e routing intent para Internet/privado?</li>
+        <li><strong>Híbrido —</strong> ExpressRoute e VPN conectados aos hubs com redundância (Parte 4)?</li>
+        <li><strong>Compatibilidade —</strong> NVAs e padrões de inspeção validados no modelo do vWAN?</li>
+      </ul>
+
+      <h2 id="references">Referências oficiais</h2>
+      <ul class="ref-list">
+        <li><a href="https://learn.microsoft.com/azure/virtual-wan/virtual-wan-about" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>O que é o Azure Virtual WAN</span></a><span class="ref-desc">Conceitos, hubs, conexões.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/virtual-wan/virtual-wan-global-transit-network-architecture" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Global transit network architecture</span></a><span class="ref-desc">Transitividade global com Virtual WAN.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/virtual-wan/how-to-routing-policies" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Routing intent &amp; routing policies</span></a><span class="ref-desc">Inspeção de Internet e tráfego privado.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/firewall-manager/secured-virtual-hub" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Secured Virtual Hub</span></a><span class="ref-desc">Azure Firewall no contexto do Virtual WAN.</span></li>
+      </ul>
+
+      <div class="next-prev">
+        <a class="is-prev" href="azure-networking-hub-spoke.pt-br.html">
+          <span class="np-kicker">← Parte 2</span>
+          <span class="np-title">Hub-and-Spoke</span>
+        </a>
+        <a class="is-next" href="azure-networking-vpn-expressroute.pt-br.html">
+          <span class="np-kicker">Parte 4 →</span>
+          <span class="np-title">VPN &amp; ExpressRoute</span>
+        </a>
+      </div>
+    </article>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container footer-grid">
+    <p>© <span data-current-year></span> Henderson Andrade · Microsoft Azure Cloud Architect.</p>
+    <div class="footer-links">
+      <a href="index.pt-br.html">Blog</a>
+      <a href="../solutions/index.pt-br.html">Soluções</a>
+      <a href="https://github.com/hendersonandrade" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://br.linkedin.com/in/henderson-andrade-%E2%98%81%EF%B8%8F-22b1ba33/pt" target="_blank" rel="noopener">LinkedIn ↗</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fundamentos de Rede no Azure | Henderson Andrade</title>
+  <meta name="description" content="Os blocos fundamentais de rede no Azure — VNet, subnets, NSG, UDR, peering, gateway transit, Azure Firewall, Private Link e DNS — e por que a topologia define a sua Landing Zone.">
+  <meta property="og:title" content="Fundamentos de Rede no Azure">
+  <meta property="og:description" content="VNet, subnets, NSG, rotas, peering, gateway transit, firewall, Private Link e DNS — a base para escolher Hub-Spoke, Virtual WAN ou conectividade híbrida.">
+  <meta property="og:type" content="article">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="canonical" href="https://hendersonandrade.github.io/blog/azure-networking-fundamentals.pt-br.html">
+  <link rel="alternate" hreflang="en" href="https://hendersonandrade.github.io/blog/azure-networking-fundamentals.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://hendersonandrade.github.io/blog/azure-networking-fundamentals.pt-br.html">
+  <link rel="alternate" hreflang="x-default" href="https://hendersonandrade.github.io/blog/azure-networking-fundamentals.html">
+  <meta property="og:url" content="https://hendersonandrade.github.io/blog/azure-networking-fundamentals.pt-br.html">
+  <meta property="og:image" content="https://hendersonandrade.github.io/assets/img/avatar.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://hendersonandrade.github.io/assets/img/avatar.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Fundamentos de Rede no Azure",
+    "description": "Os blocos fundamentais de rede no Azure — VNet, subnets, NSG, UDR, peering, gateway transit, Azure Firewall, Private Link e DNS — e por que a topologia define a sua Landing Zone.",
+    "inLanguage": "pt-BR",
+    "datePublished": "2026-06-19",
+    "dateModified": "2026-06-19",
+    "url": "https://hendersonandrade.github.io/blog/azure-networking-fundamentals.pt-br.html",
+    "mainEntityOfPage": { "@type": "WebPage", "@id": "https://hendersonandrade.github.io/blog/azure-networking-fundamentals.pt-br.html" },
+    "image": "https://hendersonandrade.github.io/assets/img/avatar.png",
+    "keywords": "Azure, networking, VNet, subnet, NSG, UDR, peering, gateway transit, Azure Firewall, Private Link, DNS, Landing Zone",
+    "articleSection": "Azure · Networking",
+    "author": { "@type": "Person", "name": "Henderson Andrade", "url": "https://hendersonandrade.github.io/" },
+    "publisher": { "@type": "Person", "name": "Henderson Andrade", "url": "https://hendersonandrade.github.io/" }
+  }
+  </script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container navbar">
+    <a class="brand" href="../index.pt-br.html" aria-label="Henderson Andrade — início">
+      <img class="brand-mark" src="../assets/img/ha-monogram.svg" alt="">
+      <span>Henderson Andrade<span class="brand-sub">Azure Cloud Architect</span></span>
+    </a>
+    <button class="nav-toggle" aria-label="Alternar menu de navegação" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-menu">
+      <li><a class="nav-link" href="../index.pt-br.html">Início</a></li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Soluções <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="../solutions/index.pt-br.html"><span class="dropdown-kicker">Portfólio</span><span class="dropdown-title">Todas as soluções</span></a></li>
+          <li><a href="../docs/azureutils/index.pt-br.html"><span class="dropdown-kicker">Pessoal · PowerShell</span><span class="dropdown-title">Módulo AzureUtils</span></a></li>
+          <li><a href="https://trimtechbr.github.io" target="_blank" rel="noopener"><span class="dropdown-kicker">TrimTechBR ↗</span><span class="dropdown-title">AER — Azure Estate Report</span></a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Docs <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="../docs/azureutils/index.pt-br.html"><span class="dropdown-kicker">Comece aqui</span><span class="dropdown-title">Visão geral &amp; instalação</span></a></li>
+          <li><a href="../docs/azureutils/tag-inventory.pt-br.html"><span class="dropdown-kicker">Referência</span><span class="dropdown-title">Inventário de tags</span></a></li>
+          <li><a href="../docs/azureutils/find-commands.pt-br.html"><span class="dropdown-kicker">Referência</span><span class="dropdown-title">Comandos Find</span></a></li>
+          <li><a href="../docs/azureutils/release-publishing.pt-br.html"><span class="dropdown-kicker">Internals</span><span class="dropdown-title">Release &amp; publicação</span></a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Blog <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="index.pt-br.html"><span class="dropdown-kicker">Todos</span><span class="dropdown-title">Todos os posts</span></a></li>
+          <li><a href="category-networking.pt-br.html"><span class="dropdown-kicker">Categoria</span><span class="dropdown-title">Redes</span></a></li>
+          <li><a href="category-architecture.pt-br.html"><span class="dropdown-kicker">Categoria</span><span class="dropdown-title">Arquitetura</span></a></li>
+          <li><a href="category-iac.pt-br.html"><span class="dropdown-kicker">Categoria</span><span class="dropdown-title">IaC</span></a></li>
+          <li><a href="category-finops.pt-br.html"><span class="dropdown-kicker">Categoria</span><span class="dropdown-title">FinOps</span></a></li>
+          <li><a href="category-careers.pt-br.html"><span class="dropdown-kicker">Categoria</span><span class="dropdown-title">Carreira</span></a></li>
+        </ul>
+      </li>
+      <li><a class="nav-link" href="../contact.pt-br.html">Contato</a></li>
+      <li><a class="btn btn-secondary" href="https://github.com/hendersonandrade" target="_blank" rel="noopener">GitHub ↗</a></li>
+      <li class="nav-item lang-switch">
+        <a class="lang-link" href="azure-networking-fundamentals.html">EN</a>
+        <span class="lang-sep">/</span>
+        <a class="lang-link is-active" href="azure-networking-fundamentals.pt-br.html">PT</a>
+      </li>
+    </ul>
+  </div>
+</header>
+
+<main class="container">
+  <div class="docs-shell">
+
+    <aside class="docs-sidebar reveal">
+      <div class="side-group">
+        <p class="side-title">Nesta página</p>
+        <ul class="anchor-list">
+          <li><a href="#resumo">Resumo executivo</a></li>
+          <li><a href="#intro">Por que a topologia importa</a></li>
+          <li><a href="#vnet">VNet &amp; subnets</a></li>
+          <li><a href="#nsg">NSG &amp; ASG</a></li>
+          <li><a href="#rotas">Rotas &amp; UDR</a></li>
+          <li><a href="#peering">Peering &amp; gateway transit</a></li>
+          <li><a href="#firewall">Firewall &amp; NVA</a></li>
+          <li><a href="#privatelink">Private Link &amp; DNS</a></li>
+          <li><a href="#mais">NAT, Bastion, DDoS, Watcher</a></li>
+          <li><a href="#armadilhas">Armadilhas comuns</a></li>
+          <li><a href="#checklist">Checklist</a></li>
+          <li><a href="#references">Referências</a></li>
+        </ul>
+      </div>
+      <div class="side-group">
+        <p class="side-title">Série Azure Networking</p>
+        <ul>
+          <li><strong>1 · Fundamentos</strong> (você está aqui)</li>
+          <li><a href="azure-networking-hub-spoke.pt-br.html">2 · Hub-and-Spoke</a></li>
+          <li><a href="azure-networking-virtual-wan.pt-br.html">3 · Virtual WAN</a></li>
+          <li><a href="azure-networking-vpn-expressroute.pt-br.html">4 · VPN &amp; ExpressRoute</a></li>
+          <li><a href="azure-networking-dns-private-link-security.pt-br.html">5 · DNS, Private Link &amp; Segurança</a></li>
+          <li><a href="azure-networking-operations-governance-finops.pt-br.html">6 · Operação, Governança &amp; FinOps</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <article class="docs-content">
+      <nav class="breadcrumb">
+        <a href="../index.pt-br.html">Início</a><span class="sep">/</span>
+        <a href="index.pt-br.html">Blog</a><span class="sep">/</span>
+        <span>Fundamentos de Rede no Azure</span>
+      </nav>
+
+      <span class="eyebrow">Redes · Série · Parte 1 de 6</span>
+      <h1>Fundamentos de Rede no Azure</h1>
+      <p class="docs-lede">
+        Antes de escolher entre <strong>Hub-and-Spoke</strong>, <strong>Virtual WAN</strong> ou
+        <strong>conectividade híbrida</strong>, é preciso dominar os blocos que compõem qualquer topologia
+        no Azure: VNet, subnets, NSG, rotas, peering, gateway transit, firewall, Private Link e DNS. Esta é
+        a <strong>Parte 1</strong> de uma série sobre arquitetura de redes no Azure — a base conceitual sobre
+        a qual as decisões corporativas das próximas partes se apoiam.
+      </p>
+
+      <div class="article-meta">
+        <span><span class="am-dot"></span> Henderson Andrade</span>
+        <span>Publicado em 19 jun 2026</span>
+        <span>~16 min de leitura</span>
+        <span>Azure · Networking · Landing Zone</span>
+      </div>
+
+      <div class="badge-row">
+        <span class="badge badge-primary">Azure Networking</span>
+        <span class="badge">VNet · Subnet · NSG</span>
+        <span class="badge">UDR · Peering</span>
+        <span class="badge">Private Link · DNS</span>
+        <span class="badge">Série · 1/6</span>
+      </div>
+
+      <!-- ===================== RESUMO EXECUTIVO ===================== -->
+      <h2 id="resumo">Resumo executivo</h2>
+      <div class="note">
+        <span class="ico">ℹ</span>
+        <div>
+          A <strong>topologia de rede</strong> é uma das primeiras e mais duradouras decisões de uma Landing
+          Zone Azure — difícil de mudar depois que dezenas de assinaturas e VNets já dependem dela. Esta parte
+          estabelece os fundamentos: a <strong>VNet</strong> é o perímetro privado; <strong>subnets</strong>
+          segmentam; <strong>NSG/ASG</strong> filtram; <strong>UDR</strong> redireciona o caminho do tráfego
+          (tipicamente para um firewall); <strong>peering</strong> conecta VNets pelo backbone, mas
+          <strong>não é transitivo</strong>; <strong>gateway transit</strong> permite que spokes usem o gateway
+          híbrido do hub; <strong>Private Link</strong> traz PaaS para dentro da rede privada — e
+          <strong>exige DNS bem planejado</strong>. As partes 2 a 4 mostram como combinar esses blocos em
+          Hub-Spoke, Virtual WAN e conectividade híbrida; as partes 5 e 6 cobrem DNS/segurança e
+          operação/governança/FinOps. <strong>Nenhum modelo é universalmente correto</strong> — o que muda é o
+          trade-off entre controle, escala, custo e esforço operacional.
+        </div>
+      </div>
+      <div class="note warn">
+        <span class="ico">⚠</span>
+        <div>Capacidades, limites de SKU, disponibilidade regional e preços <strong>mudam</strong> com frequência. Toda vez que este artigo cita um comportamento específico, <strong>valide na documentação oficial da Microsoft Learn</strong> antes de desenhar para produção. Os números aqui são conceituais, não substituem a referência atual.</div>
+      </div>
+
+      <!-- ===================== INTRO ===================== -->
+      <h2 id="intro">Por que a topologia de rede é uma decisão central</h2>
+      <p>
+        Rede no Azure não é "conectar VNets". A topologia define <strong>como workloads se comunicam</strong>,
+        como aplicações acessam serviços PaaS, como o ambiente on-premises chega à nuvem, <strong>onde o
+        tráfego é inspecionado</strong>, como a governança é aplicada e como o custo de conectividade cresce.
+        É a quarta das oito áreas de design das <a href="azure-landing-zones.pt-br.html">Azure Landing
+        Zones</a> — e talvez a de maior inércia: trocar a topologia depois que a plataforma cresceu é caro e
+        arriscado.
+      </p>
+      <p>
+        Por isso, uma boa arquitetura separa <strong>plataforma</strong> de <strong>workloads</strong>: os
+        serviços compartilhados de conectividade (firewall, gateways, DNS, Bastion) vivem em uma assinatura de
+        <em>conectividade</em>, governada pelo time de plataforma; os workloads aterrissam em assinaturas
+        próprias com guardrails herdados. Essa decisão — central no <a href="azure-cloud-adoption-framework.pt-br.html">Cloud
+        Adoption Framework</a> — só faz sentido se você entender os blocos abaixo.
+      </p>
+
+      <!-- ===================== VNET / SUBNETS ===================== -->
+      <h2 id="vnet">Virtual Network e subnets</h2>
+      <p>
+        A <strong>Azure Virtual Network (VNet)</strong> é a unidade lógica de rede privada: um espaço de
+        endereçamento (um ou mais blocos CIDR) dentro do qual você cria <strong>subnets</strong>. Recursos na
+        mesma VNet se comunicam por padrão; o que cruza a fronteira da VNet depende de peering, gateways e
+        rotas. O <strong>planejamento de IP</strong> é a decisão mais difícil de reverter: escolha blocos que
+        <strong>não se sobreponham</strong> ao on-premises nem a outras VNets que um dia farão peering, e deixe
+        espaço para crescer.
+      </p>
+      <p>
+        Algumas subnets têm <strong>nomes reservados</strong> exigidos por serviços específicos — planeje-as
+        no desenho de IP desde o início:
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Subnet</th><th>Para</th><th>Observação</th></tr></thead>
+          <tbody>
+            <tr><td><code>GatewaySubnet</code></td><td>VPN / ExpressRoute Gateway</td><td>Nome obrigatório; dimensione com folga (ver doc).</td></tr>
+            <tr><td><code>AzureFirewallSubnet</code></td><td>Azure Firewall</td><td>Nome obrigatório.</td></tr>
+            <tr><td><code>AzureFirewallManagementSubnet</code></td><td>Forced tunneling do Firewall</td><td>Necessária em cenários específicos.</td></tr>
+            <tr><td><code>AzureBastionSubnet</code></td><td>Azure Bastion</td><td>Nome obrigatório.</td></tr>
+            <tr><td><code>RouteServerSubnet</code></td><td>Azure Route Server</td><td>Nome obrigatório.</td></tr>
+            <tr><td>workload / dados / PE</td><td>Aplicações, bancos, Private Endpoints</td><td>Nome livre; segmente por criticidade/ambiente.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Subnets também suportam <strong>delegação</strong> (entregar a subnet ao plano de controle de um
+        serviço, como App Service VNet Integration, AKS ou bancos gerenciados). Planeje subnets dedicadas para
+        Private Endpoints, integração de App Service e AKS — cada um tem requisitos próprios de tamanho.
+      </p>
+
+      <!-- ===================== NSG ===================== -->
+      <h2 id="nsg">Network Security Groups e ASGs</h2>
+      <p>
+        O <strong>Network Security Group (NSG)</strong> é um filtro stateful de 5-tupla aplicado a uma
+        <strong>subnet</strong> ou a uma <strong>NIC</strong>. Regras têm prioridade, direção (inbound/outbound)
+        e podem usar <strong>service tags</strong> (ex.: <code>Storage</code>, <code>AzureKeyVault</code>) em
+        vez de IPs, e <strong>Application Security Groups (ASG)</strong> para agrupar NICs por papel (ex.:
+        <code>web</code>, <code>db</code>) e escrever regras por grupo lógico, não por IP.
+      </p>
+      <div class="note">
+        <span class="ico">ℹ</span>
+        <div>NSG é <strong>necessário, mas não suficiente</strong>. Ele faz microssegmentação L3/L4, não inspeção de aplicação, FQDN, TLS ou IDS/IPS. Para isso você precisa de um <strong>firewall</strong> (próxima seções). Use NSG para o baseline de segmentação e firewall para a inspeção centralizada.</div>
+      </div>
+
+      <!-- ===================== ROTAS / UDR ===================== -->
+      <h2 id="rotas">Rotas do sistema e User Defined Routes</h2>
+      <p>
+        O Azure cria <strong>system routes</strong> automaticamente (dentro da VNet, para a Internet, para
+        prefixos de peering e de gateway). Você sobrescreve esse comportamento com <strong>User Defined Routes
+        (UDR)</strong> em uma route table associada à subnet. O caso mais comum é a rota default
+        <code>0.0.0.0/0</code> apontando para um <strong>Azure Firewall</strong> ou NVA — forçando todo o
+        egress a passar por inspeção:
+      </p>
+
+      <figure class="figure reveal">
+        <svg viewBox="0 0 820 250" role="img" aria-label="Uma subnet de workload tem uma UDR com rota default 0.0.0.0/0 apontando para o IP privado do Azure Firewall no hub; o firewall inspeciona e encaminha o tráfego para a Internet ou para o on-premises, enviando logs ao Log Analytics.">
+          <rect x="0" y="0" width="820" height="250" fill="#0c1324"/>
+          <text x="410" y="32" text-anchor="middle" fill="#3ad29f" font-family="Sora,sans-serif" font-size="14" font-weight="800">UDR força o egress pelo firewall</text>
+          <g font-family="Sora,sans-serif" font-size="11.5" font-weight="700" text-anchor="middle">
+            <g><rect x="34" y="92" width="170" height="66" rx="11" fill="#111a30" stroke="#f5b942"/><text x="119" y="120" fill="#f5b942">Subnet workload</text><text x="119" y="140" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">UDR 0.0.0.0/0 → fw</text></g>
+            <g><rect x="325" y="92" width="170" height="66" rx="11" fill="#111a30" stroke="#38d3ff"/><text x="410" y="120" fill="#38d3ff">Azure Firewall</text><text x="410" y="140" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">inspeciona · loga</text></g>
+            <g><rect x="616" y="62" width="170" height="50" rx="11" fill="#16213b" stroke="#5cb4ff"/><text x="701" y="84" fill="#5cb4ff">Internet</text><text x="701" y="101" fill="#97a7c6" font-size="8" font-family="JetBrains Mono,monospace" font-weight="500">egress inspecionado</text></g>
+            <g><rect x="616" y="138" width="170" height="50" rx="11" fill="#16213b" stroke="#3ad29f"/><text x="701" y="160" fill="#3ad29f">On-premises</text><text x="701" y="177" fill="#97a7c6" font-size="8" font-family="JetBrains Mono,monospace" font-weight="500">VPN / ExpressRoute</text></g>
+          </g>
+          <g stroke="#647495" stroke-width="2" fill="none">
+            <path d="M204 125 L325 125" marker-end="url(#nfa)"/>
+            <path d="M495 118 L616 92" marker-end="url(#nfa)"/>
+            <path d="M495 132 L616 158" marker-end="url(#nfa)"/>
+          </g>
+          <defs><marker id="nfa" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 Z" fill="#647495"/></marker></defs>
+          <path d="M410 158 L410 206" stroke="#647495" stroke-width="1.6" stroke-dasharray="4 4" fill="none" marker-end="url(#nfa)"/>
+          <text x="410" y="224" text-anchor="middle" fill="#97a7c6" font-family="JetBrains Mono,monospace" font-size="9">logs → Log Analytics / Sentinel</text>
+        </svg>
+        <figcaption><b>Figura 1.</b> A UDR redireciona o tráfego de saída da subnet para o IP privado do firewall; ele inspeciona, registra e encaminha. Cuidado com <strong>rotas assimétricas</strong> e com forçar tráfego que a plataforma espera direto.</figcaption>
+      </figure>
+      <p>
+        <strong>Forced tunneling</strong> (mandar até o egress de Internet para o firewall ou para o
+        on-premises) é poderoso, mas não deve ser aplicado indiscriminadamente: aumenta latência, custo e o
+        risco de quebrar dependências de plataforma. Use <code>propagate gateway routes</code> com consciência
+        e <strong>valide as effective routes</strong> antes de confiar no desenho.
+      </p>
+
+      <!-- ===================== PEERING / GATEWAY TRANSIT ===================== -->
+      <h2 id="peering">VNet Peering e Gateway Transit</h2>
+      <p>
+        O <strong>VNet Peering</strong> conecta duas VNets pelo backbone da Microsoft (regional ou
+        <strong>global</strong>, entre regiões), com baixa latência e sem gateway. O ponto que mais causa
+        confusão: <strong>peering não é transitivo</strong>. Se o spoke A faz peering com o hub e o spoke B
+        também, <strong>A não fala com B automaticamente</strong> — é preciso roteamento explícito (via NVA/
+        firewall no hub, ou peering direto, ou Virtual WAN). As flags que governam isso:
+        <code>allow forwarded traffic</code>, <code>allow gateway transit</code> e <code>use remote
+        gateway</code>.
+      </p>
+      <div class="note">
+        <span class="ico">ℹ</span>
+        <div><strong>Gateway transit</strong> resolve um problema clássico: o gateway híbrido (VPN/ExpressRoute) é caro e fica no hub. Com <code>allow gateway transit</code> no hub e <code>use remote gateway</code> no spoke, os spokes usam o gateway do hub <strong>sem ter um gateway próprio</strong>. Cuidados: um spoke usa <strong>um</strong> gateway remoto por vez, e a propagação de rotas precisa ser planejada para o on-premises enxergar os spokes e vice-versa.</div>
+      </div>
+
+      <!-- ===================== FIREWALL / NVA ===================== -->
+      <h2 id="firewall">Azure Firewall vs. NVA de terceiros</h2>
+      <p>
+        A inspeção centralizada — o "ponto único" por onde o tráfego norte-sul e leste-oeste passa — pode ser
+        feita com o <strong>Azure Firewall</strong> (PaaS nativo, gerenciado, escala automática, regras de
+        rede e de aplicação, FQDN tags, Threat Intelligence) ou com uma <strong>Network Virtual Appliance
+        (NVA)</strong> de mercado (Palo Alto, Fortinet, Check Point...). A escolha é menos sobre features
+        isoladas e mais sobre <strong>quem opera</strong> e o que já existe na organização:
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Critério</th><th>Azure Firewall</th><th>NVA de terceiros</th></tr></thead>
+          <tbody>
+            <tr><td>Operação</td><td>Gerenciado pela Microsoft</td><td>Você opera HA, scaling, patching</td></tr>
+            <tr><td>Integração Azure</td><td>Nativa (logs, Policy, vWAN)</td><td>Boa, mas via configuração</td></tr>
+            <tr><td>Escala</td><td>Automática</td><td>Dimensionada por você</td></tr>
+            <tr><td>Licenciamento</td><td>Incluso no serviço</td><td>BYOL / marketplace</td></tr>
+            <tr><td>Funcionalidades avançadas</td><td>IDPS/TLS em SKU específico (validar)</td><td>Recursos do fornecedor</td></tr>
+            <tr><td>Melhor quando</td><td>Quer simplicidade e integração</td><td>Já tem padrão corporativo na NVA</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note warn">
+        <span class="ico">⚠</span>
+        <div>Rede privada e firewall <strong>não são</strong> sinônimo de Zero Trust, e ExpressRoute <strong>não substitui</strong> criptografia ou controle de identidade. Segurança de rede é uma camada — não a única.</div>
+      </div>
+
+      <!-- ===================== PRIVATE LINK / DNS ===================== -->
+      <h2 id="privatelink">Private Link, Private Endpoints e DNS</h2>
+      <p>
+        O <strong>Private Endpoint (PE)</strong> traz um serviço PaaS (Storage, SQL, Key Vault...) para dentro
+        da sua rede com um <strong>IP privado</strong>, eliminando a exposição pública. O detalhe que mais
+        quebra ambientes: o <strong>FQDN do serviço continua o mesmo</strong>, mas precisa <strong>resolver
+        para o IP privado</strong> — e isso depende de <strong>DNS bem configurado</strong> (uma Azure Private
+        DNS Zone ligada à VNet, com o registro do PE). DNS mal feito resolve para o endpoint público e o PE
+        vira um IP que ninguém usa.
+      </p>
+
+      <figure class="figure reveal">
+        <svg viewBox="0 0 820 240" role="img" aria-label="Um workload em uma VNet resolve o FQDN de um serviço PaaS; a Azure Private DNS Zone ligada à VNet devolve o IP privado do Private Endpoint, e o tráfego vai pela rede privada em vez do endpoint público.">
+          <rect x="0" y="0" width="820" height="240" fill="#0c1324"/>
+          <text x="410" y="32" text-anchor="middle" fill="#3ad29f" font-family="Sora,sans-serif" font-size="14" font-weight="800">Private Endpoint só funciona com DNS correto</text>
+          <g font-family="Sora,sans-serif" font-size="11.5" font-weight="700" text-anchor="middle">
+            <g><rect x="34" y="92" width="160" height="64" rx="11" fill="#111a30" stroke="#f5b942"/><text x="114" y="118" fill="#f5b942">Workload</text><text x="114" y="138" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">resolve o FQDN</text></g>
+            <g><rect x="320" y="92" width="180" height="64" rx="11" fill="#16213b" stroke="#5cb4ff"/><text x="410" y="114" fill="#5cb4ff">Private DNS Zone</text><text x="410" y="132" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">ligada à VNet → IP privado</text></g>
+            <g><rect x="626" y="92" width="160" height="64" rx="11" fill="#111a30" stroke="#3ad29f"/><text x="706" y="114" fill="#3ad29f">Private Endpoint</text><text x="706" y="132" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">PaaS via IP privado</text></g>
+          </g>
+          <g stroke="#647495" stroke-width="2" fill="none">
+            <path d="M194 124 L320 124" marker-end="url(#pfa)"/>
+            <path d="M500 124 L626 124" marker-end="url(#pfa)"/>
+          </g>
+          <defs><marker id="pfa" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 Z" fill="#647495"/></marker></defs>
+          <text x="257" y="114" text-anchor="middle" fill="#97a7c6" font-family="JetBrains Mono,monospace" font-size="8.5">consulta DNS →</text>
+          <text x="563" y="114" text-anchor="middle" fill="#97a7c6" font-family="JetBrains Mono,monospace" font-size="8.5">IP privado →</text>
+          <text x="410" y="206" text-anchor="middle" fill="#97a7c6" font-family="Manrope,sans-serif" font-size="11.5">Sem a Private DNS Zone ligada à VNet, o mesmo FQDN resolve para o endpoint PÚBLICO — e o PE não é usado.</text>
+        </svg>
+        <figcaption><b>Figura 2.</b> O Private Endpoint reduz exposição apenas quando o DNS resolve o FQDN para o IP privado. DNS é o calcanhar de Aquiles das arquiteturas privadas — a Parte 5 da série aprofunda DNS híbrido e o DNS Private Resolver.</figcaption>
+      </figure>
+
+      <p>
+        Há ainda os <strong>Service Endpoints</strong>, mais antigos: dão à subnet uma rota otimizada para o
+        serviço PaaS pela backbone, mas <strong>sem</strong> IP privado e sem a granularidade do Private Link.
+        Em arquiteturas restritivas, o <strong>Private Endpoint costuma ser o padrão preferido</strong>:
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Critério</th><th>Private Endpoint</th><th>Service Endpoint</th></tr></thead>
+          <tbody>
+            <tr><td>Acesso</td><td>IP privado na sua VNet</td><td>IP público do serviço, via rota otimizada</td></tr>
+            <tr><td>Exposição</td><td>Remove o endpoint público (com firewall do serviço)</td><td>Mantém o endpoint público</td></tr>
+            <tr><td>DNS</td><td>Exige Private DNS Zone</td><td>Não exige</td></tr>
+            <tr><td>Híbrido (on-prem)</td><td>Acessível via DNS/rotas privadas</td><td>Não se estende ao on-premises</td></tr>
+            <tr><td>Granularidade</td><td>Por recurso</td><td>Por subnet/serviço</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ===================== MAIS COMPONENTES ===================== -->
+      <h2 id="mais">NAT Gateway, Bastion, DDoS e Network Watcher</h2>
+      <ul class="principle-list">
+        <li><strong>NAT Gateway —</strong> egress de saída com IP público <em>estável</em> e gerenciado para uma subnet, sem expor entrada. Diferente do firewall: NAT Gateway não inspeciona, só faz SNAT de saída.</li>
+        <li><strong>Azure Bastion —</strong> acesso administrativo (RDP/SSH) às VMs <em>sem</em> IP público nas VMs e sem expor essas portas à Internet. Vive na <code>AzureBastionSubnet</code>.</li>
+        <li><strong>DDoS Protection —</strong> proteção contra ataques volumétricos para VNets com recursos críticos expostos publicamente. Avalie em ambientes com superfície pública relevante.</li>
+        <li><strong>Network Watcher —</strong> o canivete de troubleshooting: <code>next hop</code>, <code>effective routes</code>, <code>effective security rules</code>, connection troubleshoot, packet capture e topologia. Sem observabilidade, a rede vira caixa-preta (a Parte 6 aprofunda).</li>
+      </ul>
+
+      <!-- ===================== ARMADILHAS ===================== -->
+      <h2 id="armadilhas">Armadilhas comuns (fundamentos)</h2>
+      <ul class="principle-list">
+        <li><strong>Sobrepor endereçamento</strong> entre Azure e on-premises (ou entre VNets que farão peering) — quebra o roteamento e é caríssimo de corrigir depois.</li>
+        <li>Assumir que <strong>peering é transitivo</strong> e esperar que spokes conversem entre si sem rota.</li>
+        <li>Criar <strong>Private Endpoint sem configurar a Private DNS Zone</strong> — o FQDN resolve para o IP público e o PE não é usado.</li>
+        <li>Aplicar <strong>forced tunneling indiscriminado</strong> e quebrar dependências de plataforma, ou criar latência/custo desnecessários.</li>
+        <li>Tratar <strong>NSG como único controle</strong> de segurança, sem inspeção de aplicação/FQDN.</li>
+        <li>Não <strong>validar as effective routes</strong> antes de confiar no desenho de roteamento.</li>
+      </ul>
+
+      <!-- ===================== CHECKLIST ===================== -->
+      <h2 id="checklist">Checklist de fundamentos</h2>
+      <ul class="principle-list">
+        <li><strong>Endereçamento —</strong> Plano de IP sem sobreposição com on-premises e com espaço para crescer?</li>
+        <li><strong>Subnets —</strong> Subnets reservadas (Gateway/Firewall/Bastion) e dedicadas (PE/AKS/App Service) planejadas?</li>
+        <li><strong>Segmentação —</strong> NSG/ASG no baseline e firewall/NVA para inspeção centralizada?</li>
+        <li><strong>Roteamento —</strong> UDRs documentadas, propagação controlada, effective routes validadas?</li>
+        <li><strong>Conectividade —</strong> Peering e gateway transit desenhados sabendo que peering não é transitivo?</li>
+        <li><strong>PaaS privado —</strong> Private Endpoints com Private DNS Zones ligadas às VNets corretas?</li>
+        <li><strong>Operação —</strong> Network Watcher e logs habilitados desde o dia 1?</li>
+      </ul>
+
+      <!-- ===================== REFERÊNCIAS ===================== -->
+      <h2 id="references">Referências oficiais</h2>
+      <ul class="ref-list">
+        <li><a href="https://learn.microsoft.com/azure/cloud-adoption-framework/ready/azure-best-practices/define-an-azure-network-topology" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Topologia de rede &amp; conectividade (CAF)</span></a><span class="ref-desc">Orientação de design de rede para Landing Zones.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/virtual-network/virtual-networks-overview" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Azure Virtual Network — visão geral</span></a><span class="ref-desc">VNet, subnets, endereçamento.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/virtual-network/network-security-groups-overview" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Network Security Groups</span></a><span class="ref-desc">Regras, prioridades, service tags, ASGs.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/virtual-network/virtual-networks-udr-overview" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Rotas &amp; UDR</span></a><span class="ref-desc">System routes, UDR, forced tunneling.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/virtual-network/virtual-network-peering-overview" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>VNet Peering</span></a><span class="ref-desc">Peering regional/global, gateway transit, transitividade.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/firewall/overview" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Azure Firewall</span></a><span class="ref-desc">Inspeção centralizada, regras, logs.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/private-link/private-endpoint-dns" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Private Endpoint &amp; integração DNS</span></a><span class="ref-desc">Como o DNS resolve o FQDN para o IP privado.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/network-watcher/network-watcher-overview" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Network Watcher</span></a><span class="ref-desc">Troubleshooting, effective routes, packet capture.</span></li>
+      </ul>
+
+      <div class="next-prev">
+        <a class="is-prev" href="index.pt-br.html">
+          <span class="np-kicker">← Blog</span>
+          <span class="np-title">Todos os posts</span>
+        </a>
+        <a class="is-next" href="azure-networking-hub-spoke.pt-br.html">
+          <span class="np-kicker">Parte 2 →</span>
+          <span class="np-title">Hub-and-Spoke</span>
+        </a>
+      </div>
+    </article>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container footer-grid">
+    <p>© <span data-current-year></span> Henderson Andrade · Microsoft Azure Cloud Architect.</p>
+    <div class="footer-links">
+      <a href="index.pt-br.html">Blog</a>
+      <a href="../solutions/index.pt-br.html">Soluções</a>
+      <a href="https://github.com/hendersonandrade" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://br.linkedin.com/in/henderson-andrade-%E2%98%81%EF%B8%8F-22b1ba33/pt" target="_blank" rel="noopener">LinkedIn ↗</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

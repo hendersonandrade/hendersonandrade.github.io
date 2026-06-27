@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Azure networking: operations, governance and FinOps | Henderson Andrade</title>
+  <meta name="description" content="Observability (Network Watcher, logs, SIEM), governance (IaC, Policy as Code, RBAC), network FinOps, antipatterns and the decision table for choosing your Azure topology.">
+  <meta property="og:title" content="Azure networking: operations, governance and FinOps">
+  <meta property="og:description" content="Observability, IaC/Policy as Code, RBAC, network FinOps, antipatterns and the decision table for choosing your topology.">
+  <meta property="og:type" content="article">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="canonical" href="https://hendersonandrade.github.io/blog/azure-networking-operations-governance-finops.html">
+  <link rel="alternate" hreflang="en" href="https://hendersonandrade.github.io/blog/azure-networking-operations-governance-finops.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://hendersonandrade.github.io/blog/azure-networking-operations-governance-finops.pt-br.html">
+  <link rel="alternate" hreflang="x-default" href="https://hendersonandrade.github.io/blog/azure-networking-operations-governance-finops.html">
+  <meta property="og:url" content="https://hendersonandrade.github.io/blog/azure-networking-operations-governance-finops.html">
+  <meta property="og:image" content="https://hendersonandrade.github.io/assets/img/avatar.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://hendersonandrade.github.io/assets/img/avatar.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Azure networking: operations, governance and FinOps",
+    "description": "Observability (Network Watcher, logs, SIEM), governance (IaC, Policy as Code, RBAC), network FinOps, antipatterns and the decision table for choosing your Azure topology.",
+    "inLanguage": "en",
+    "datePublished": "2026-06-19",
+    "dateModified": "2026-06-19",
+    "url": "https://hendersonandrade.github.io/blog/azure-networking-operations-governance-finops.html",
+    "mainEntityOfPage": { "@type": "WebPage", "@id": "https://hendersonandrade.github.io/blog/azure-networking-operations-governance-finops.html" },
+    "image": "https://hendersonandrade.github.io/assets/img/avatar.png",
+    "keywords": "Azure, Network Watcher, NSG flow logs, Azure Policy, IaC, FinOps, antipatterns, topology decision, networking",
+    "articleSection": "Azure · Networking",
+    "author": { "@type": "Person", "name": "Henderson Andrade", "url": "https://hendersonandrade.github.io/" },
+    "publisher": { "@type": "Person", "name": "Henderson Andrade", "url": "https://hendersonandrade.github.io/" }
+  }
+  </script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container navbar">
+    <a class="brand" href="../index.html" aria-label="Henderson Andrade — home">
+      <img class="brand-mark" src="../assets/img/ha-monogram.svg" alt="">
+      <span>Henderson Andrade<span class="brand-sub">Azure Cloud Architect</span></span>
+    </a>
+    <button class="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-menu">
+      <li><a class="nav-link" href="../index.html">Home</a></li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Solutions <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="../solutions/index.html"><span class="dropdown-kicker">Portfolio</span><span class="dropdown-title">All solutions</span></a></li>
+          <li><a href="../docs/azureutils/index.html"><span class="dropdown-kicker">Personal · PowerShell</span><span class="dropdown-title">AzureUtils module</span></a></li>
+          <li><a href="https://trimtechbr.github.io" target="_blank" rel="noopener"><span class="dropdown-kicker">TrimTechBR ↗</span><span class="dropdown-title">AER — Azure Estate Report</span></a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Docs <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="../docs/azureutils/index.html"><span class="dropdown-kicker">Start here</span><span class="dropdown-title">Overview &amp; install</span></a></li>
+          <li><a href="../docs/azureutils/tag-inventory.html"><span class="dropdown-kicker">Reference</span><span class="dropdown-title">Tag inventory</span></a></li>
+          <li><a href="../docs/azureutils/find-commands.html"><span class="dropdown-kicker">Reference</span><span class="dropdown-title">Find commands</span></a></li>
+          <li><a href="../docs/azureutils/release-publishing.html"><span class="dropdown-kicker">Internals</span><span class="dropdown-title">Release &amp; publishing</span></a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Blog <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="index.html"><span class="dropdown-kicker">All</span><span class="dropdown-title">All posts</span></a></li>
+          <li><a href="category-networking.html"><span class="dropdown-kicker">Category</span><span class="dropdown-title">Networking</span></a></li>
+          <li><a href="category-architecture.html"><span class="dropdown-kicker">Category</span><span class="dropdown-title">Architecture</span></a></li>
+          <li><a href="category-iac.html"><span class="dropdown-kicker">Category</span><span class="dropdown-title">IaC</span></a></li>
+          <li><a href="category-finops.html"><span class="dropdown-kicker">Category</span><span class="dropdown-title">FinOps</span></a></li>
+          <li><a href="category-careers.html"><span class="dropdown-kicker">Category</span><span class="dropdown-title">Careers</span></a></li>
+        </ul>
+      </li>
+      <li><a class="nav-link" href="../contact.html">Contact</a></li>
+      <li><a class="btn btn-secondary" href="https://github.com/hendersonandrade" target="_blank" rel="noopener">GitHub ↗</a></li>
+      <li class="nav-item lang-switch">
+        <a class="lang-link is-active" href="azure-networking-operations-governance-finops.html">EN</a>
+        <span class="lang-sep">/</span>
+        <a class="lang-link" href="azure-networking-operations-governance-finops.pt-br.html">PT</a>
+      </li>
+    </ul>
+  </div>
+</header>
+
+<main class="container">
+  <div class="docs-shell">
+
+    <aside class="docs-sidebar reveal">
+      <div class="side-group">
+        <p class="side-title">On this page</p>
+        <ul class="anchor-list">
+          <li><a href="#resumo">Executive summary</a></li>
+          <li><a href="#observabilidade">Observability</a></li>
+          <li><a href="#governanca">Governance &amp; automation</a></li>
+          <li><a href="#finops">Network FinOps</a></li>
+          <li><a href="#antipadroes">Antipatterns</a></li>
+          <li><a href="#decisao">Decision table</a></li>
+          <li><a href="#cenarios">Practical scenarios</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </div>
+      <div class="side-group">
+        <p class="side-title">Azure Networking series</p>
+        <ul>
+          <li><a href="azure-networking-fundamentals.html">1 · Fundamentals</a></li>
+          <li><a href="azure-networking-hub-spoke.html">2 · Hub-and-Spoke</a></li>
+          <li><a href="azure-networking-virtual-wan.html">3 · Virtual WAN</a></li>
+          <li><a href="azure-networking-vpn-expressroute.html">4 · VPN &amp; ExpressRoute</a></li>
+          <li><a href="azure-networking-dns-private-link-security.html">5 · DNS, Private Link &amp; Security</a></li>
+          <li><strong>6 · Operations, Governance &amp; FinOps</strong> (you are here)</li>
+        </ul>
+      </div>
+    </aside>
+
+    <article class="docs-content">
+      <nav class="breadcrumb">
+        <a href="../index.html">Home</a><span class="sep">/</span>
+        <a href="index.html">Blog</a><span class="sep">/</span>
+        <span>Operations, Governance &amp; FinOps</span>
+      </nav>
+
+      <span class="eyebrow">Networking · Series · Part 6 of 6</span>
+      <h1>Network as a platform: operations, governance and FinOps</h1>
+      <p class="docs-lede">
+        A well-designed topology that nobody observes, governs or measures becomes an expensive black box. This
+        <strong>Part 6</strong> closes the series by treating the network <strong>as a product/platform</strong>:
+        observability, governance with IaC and Policy as Code, network FinOps, the antipatterns to avoid and —
+        finally — the <strong>decision table</strong> that ties together everything from Parts 1 to 5.
+      </p>
+
+      <div class="article-meta">
+        <span><span class="am-dot"></span> Henderson Andrade</span>
+        <span>Published Jun 19, 2026</span>
+        <span>~16 min read</span>
+        <span>Azure · Operations · Governance · FinOps</span>
+      </div>
+
+      <div class="badge-row">
+        <span class="badge badge-primary">Observability</span>
+        <span class="badge">IaC · Policy as Code</span>
+        <span class="badge">Network FinOps</span>
+        <span class="badge">Series · 6/6</span>
+      </div>
+
+      <h2 id="resumo">Executive summary</h2>
+      <div class="note">
+        <span class="ico">ℹ</span>
+        <div>Treat the network as a <strong>platform</strong>: reusable patterns, automation and clear change processes. <strong>Observability</strong> (Network Watcher, logs in Log Analytics/Sentinel) takes the network out of the black box. <strong>Governance</strong> comes from <strong>IaC</strong> (Terraform/Bicep), <strong>Policy as Code</strong> (Azure Policy) and <strong>RBAC</strong> that separates platform from workloads. <strong>FinOps</strong> is crucial because networking generates often-underestimated costs — firewall, gateways, logs and traffic. And on choosing the model: <strong>none is universally correct</strong>, and they <strong>combine</strong> (Hub-Spoke with ExpressRoute, vWAN with VPN backup, etc.).</div>
+      </div>
+      <div class="note warn">
+        <span class="ico">⚠</span>
+        <div>Network costs (firewall, gateways, traffic, logs, Private Endpoints) <strong>vary by region, volume and SKU</strong> and change over time. Use Infracost and the official calculator; <strong>do not trust prices from memory</strong>. (See the <a href="azure-terraform-infracost.html">Terraform + Infracost</a> article for cost on the PR.)</div>
+      </div>
+
+      <h2 id="observabilidade">Observability and troubleshooting</h2>
+      <ul class="principle-list">
+        <li><strong>Network Watcher —</strong> <code>next hop</code>, <code>effective routes</code>, <code>effective security rules</code>, connection troubleshoot, packet capture and topology.</li>
+        <li><strong>Logs —</strong> Azure Firewall logs, NSG flow logs, VPN Gateway diagnostics, ExpressRoute metrics, Application Gateway/Front Door logs, Private Endpoint state.</li>
+        <li><strong>Metrics —</strong> throughput, latency, packet drops, tunnel/BGP status, SNAT utilization, firewall health, gateway utilization, data processed, DNS errors.</li>
+        <li><strong>SIEM —</strong> send to Log Analytics and Microsoft Sentinel to detect anomalous traffic, unauthorized egress, unexpected cross-segment communication and changes to critical routes/rules.</li>
+      </ul>
+
+      <h2 id="governanca">Governance and automation</h2>
+      <ul class="principle-list">
+        <li><strong>IaC —</strong> the whole network in Terraform/Bicep, with reusable modules, pull requests, architectural review and pre-deploy validation.</li>
+        <li><strong>Policy as Code —</strong> Azure Policy and initiatives to block public IP on sensitive resources, require Private Endpoint, restrict regions, audit NSGs/diagnostics, enforce tags and prevent creating network resources outside the connectivity subscription.</li>
+        <li><strong>RBAC —</strong> platform manages hub/connectivity; application teams manage workloads within limits; security audits. Prevent apps from creating public routes or firewall bypass.</li>
+        <li><strong>Naming &amp; tagging —</strong> the base for operations, FinOps, troubleshooting and automation.</li>
+        <li><strong>Controlled change —</strong> changes to routes, firewall, DNS and peering can cause wide outages: plan, window, tests, rollback and effective-routes validation.</li>
+      </ul>
+
+      <h2 id="finops">Network FinOps</h2>
+      <p>
+        Networking is a large and often underestimated cost. The main drivers and the decisions that impact them:
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Cost driver</th><th>Decision that impacts it</th></tr></thead>
+          <tbody>
+            <tr><td>Azure Firewall / NVA</td><td>Centralizing all traffic without weighing cost/latency</td></tr>
+            <tr><td>Gateways (VPN/ExpressRoute) / circuit</td><td>Duplicating gateways per region without analysis</td></tr>
+            <tr><td>VNet Peering &amp; data transfer</td><td>Cross-region traffic and inefficient routing</td></tr>
+            <tr><td>Private Endpoints</td><td>Massive use without governance</td></tr>
+            <tr><td>Logs (Log Analytics)</td><td>Overly verbose logs without proper retention</td></tr>
+            <tr><td>DDoS / WAF / Public IPs</td><td>Enabling where there is no surface to justify it</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><strong>FinOps recommendations:</strong> measure traffic, estimate growth, classify workloads by criticality, define per-criticality standards, review logs/retention, use tagging and track costs by subscription, resource group, application and service — <strong>avoiding overengineering</strong>.</p>
+
+      <h2 id="antipadroes">Common antipatterns</h2>
+      <ul class="principle-list">
+        <li>Isolated VNets with no connectivity strategy; mesh peerings with no governance.</li>
+        <li>Each application creating its own firewall, gateway and DNS; public IP on everything "for simplicity".</li>
+        <li>Private Endpoints without correct private DNS; centralizing everything on the firewall without weighing cost/latency.</li>
+        <li>Not documenting routes and flows; not using IaC; manual changes to critical route tables.</li>
+        <li>Not monitoring gateways, tunnels, BGP and firewall; mixing Hub-Spoke and Virtual WAN with no clear architecture.</li>
+        <li>ExpressRoute without a VPN contingency when continuity is required; VPN as a critical link without weighing latency.</li>
+        <li>Underestimating IP planning; overlapping addressing; ignoring hybrid DNS.</li>
+        <li>Not separating platform and workloads; NSG as the only control; ignoring log and traffic costs.</li>
+      </ul>
+
+      <h2 id="decisao">Decision table: which architecture to choose?</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Criterion</th><th>Hub-Spoke</th><th>Virtual WAN</th><th>VPN</th><th>ExpressRoute</th></tr></thead>
+          <tbody>
+            <tr><td>Model</td><td>Customer manages hub/peerings</td><td>Managed connectivity</td><td>Tunnel over Internet</td><td>Private connection via provider</td></tr>
+            <tr><td>Best for</td><td>Controlled regional/enterprise</td><td>Global, many branches</td><td>Smaller or backup</td><td>Critical/hybrid</td></tr>
+            <tr><td>Route control</td><td>High</td><td>Medium/high (vWAN)</td><td>Medium</td><td>High (BGP)</td></tr>
+            <tr><td>Global scale</td><td>Requires design</td><td>Strong</td><td>Limited</td><td>Strong (with design)</td></tr>
+            <tr><td>Operations</td><td>More manual</td><td>More managed</td><td>Tunnels</td><td>Provider + BGP</td></tr>
+            <tr><td>Cost</td><td>Variable</td><td>Variable</td><td>Generally lower</td><td>Generally higher</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Remember: they are <strong>not mutually exclusive</strong>. Hub-Spoke with ExpressRoute and VPN backup; vWAN with Secured Hub, ExpressRoute and VPN; Private Endpoints in spokes with centralized DNS — all coexist.</p>
+
+      <h2 id="cenarios">Practical scenarios (summary)</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Scenario</th><th>Likely recommendation</th></tr></thead>
+          <tbody>
+            <tr><td>Small company starting out</td><td>Simple Hub-Spoke (or single VNet); S2S VPN if on-prem; avoid overengineering</td></tr>
+            <tr><td>Mid-size, multiple apps</td><td>Hub-Spoke with firewall/VPN/ExpressRoute/DNS; spokes per domain; IaC and policies</td></tr>
+            <tr><td>Regulated, central security</td><td>Hub-Spoke with Firewall/NVA, forced tunneling, Private Endpoints, central DNS, SIEM</td></tr>
+            <tr><td>Many branches</td><td>Virtual WAN; VPN/SD-WAN sites; Secured Hub; ExpressRoute where critical</td></tr>
+            <tr><td>Global multi-region</td><td>Virtual WAN or multiple hubs; weigh latency/traffic/cost; Front Door for web apps</td></tr>
+            <tr><td>Datacenter migration</td><td>ExpressRoute primary + VPN backup; Hub-Spoke; hybrid DNS; intensive monitoring</td></tr>
+            <tr><td>Cloud-native (PaaS)</td><td>Private Endpoints; Private DNS Zones; egress control; less IaaS</td></tr>
+            <tr><td>Dev/lab</td><td>Cheap architecture; simple VPN or no hybrid; minimal anti-exposure policies</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note">
+        <span class="ico">ℹ</span>
+        <div><strong>End of the series.</strong> You went through the fundamentals, the three big models, hybrid connectivity, DNS/security and now operations/governance/FinOps. The goal was not to memorize "what each architecture is", but to know <strong>when to choose each model, which trade-offs to weigh and which mistakes to avoid</strong> in enterprise Azure environments.</div>
+      </div>
+
+      <h2 id="references">Official references</h2>
+      <ul class="ref-list">
+        <li><a href="https://learn.microsoft.com/azure/network-watcher/network-watcher-overview" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Network Watcher</span></a><span class="ref-desc">Network troubleshooting and observability.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/governance/policy/overview" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Azure Policy</span></a><span class="ref-desc">Policy as Code and governance initiatives.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/cloud-adoption-framework/ready/landing-zone/" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Azure Landing Zones</span></a><span class="ref-desc">Networking as a platform design area.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/well-architected/" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Well-Architected Framework</span></a><span class="ref-desc">Network cost, operations and reliability.</span></li>
+        <li><a href="https://www.finops.org/framework/" target="_blank" rel="noopener"><span class="ref-src">FinOps</span><span>FinOps Framework</span></a><span class="ref-desc">Inform / Optimize / Operate applied to network costs.</span></li>
+      </ul>
+
+      <div class="next-prev">
+        <a class="is-prev" href="azure-networking-dns-private-link-security.html">
+          <span class="np-kicker">← Part 5</span>
+          <span class="np-title">DNS, Private Link &amp; Security</span>
+        </a>
+        <a class="is-next" href="azure-networking-fundamentals.html">
+          <span class="np-kicker">Re-read the series →</span>
+          <span class="np-title">Part 1 · Fundamentals</span>
+        </a>
+      </div>
+    </article>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container footer-grid">
+    <p>© <span data-current-year></span> Henderson Andrade · Microsoft Azure Cloud Architect.</p>
+    <div class="footer-links">
+      <a href="index.html">Blog</a>
+      <a href="../solutions/index.html">Solutions</a>
+      <a href="https://github.com/hendersonandrade" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://br.linkedin.com/in/henderson-andrade-%E2%98%81%EF%B8%8F-22b1ba33/pt" target="_blank" rel="noopener">LinkedIn ↗</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

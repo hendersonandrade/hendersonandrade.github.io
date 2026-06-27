@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hybrid connectivity on Azure: VPN and ExpressRoute | Henderson Andrade</title>
+  <meta name="description" content="Azure VPN Gateway (S2S/P2S) and ExpressRoute: IPsec/IKE, BGP, private peering, high availability and the ExpressRoute-primary with VPN-backup pattern.">
+  <meta property="og:title" content="Hybrid connectivity on Azure: VPN and ExpressRoute">
+  <meta property="og:description" content="VPN Gateway and ExpressRoute: transport, privacy, BGP, HA and when to use each — including the primary + backup pattern.">
+  <meta property="og:type" content="article">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="canonical" href="https://hendersonandrade.github.io/blog/azure-networking-vpn-expressroute.html">
+  <link rel="alternate" hreflang="en" href="https://hendersonandrade.github.io/blog/azure-networking-vpn-expressroute.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://hendersonandrade.github.io/blog/azure-networking-vpn-expressroute.pt-br.html">
+  <link rel="alternate" hreflang="x-default" href="https://hendersonandrade.github.io/blog/azure-networking-vpn-expressroute.html">
+  <meta property="og:url" content="https://hendersonandrade.github.io/blog/azure-networking-vpn-expressroute.html">
+  <meta property="og:image" content="https://hendersonandrade.github.io/assets/img/avatar.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://hendersonandrade.github.io/assets/img/avatar.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Hybrid connectivity on Azure: VPN and ExpressRoute",
+    "description": "Azure VPN Gateway (S2S/P2S) and ExpressRoute: IPsec/IKE, BGP, private peering, high availability and the ExpressRoute-primary with VPN-backup pattern.",
+    "inLanguage": "en",
+    "datePublished": "2026-06-19",
+    "dateModified": "2026-06-19",
+    "url": "https://hendersonandrade.github.io/blog/azure-networking-vpn-expressroute.html",
+    "mainEntityOfPage": { "@type": "WebPage", "@id": "https://hendersonandrade.github.io/blog/azure-networking-vpn-expressroute.html" },
+    "image": "https://hendersonandrade.github.io/assets/img/avatar.png",
+    "keywords": "Azure, VPN Gateway, ExpressRoute, IPsec, BGP, Site-to-Site, Point-to-Site, hybrid connectivity, networking",
+    "articleSection": "Azure · Networking",
+    "author": { "@type": "Person", "name": "Henderson Andrade", "url": "https://hendersonandrade.github.io/" },
+    "publisher": { "@type": "Person", "name": "Henderson Andrade", "url": "https://hendersonandrade.github.io/" }
+  }
+  </script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container navbar">
+    <a class="brand" href="../index.html" aria-label="Henderson Andrade — home">
+      <img class="brand-mark" src="../assets/img/ha-monogram.svg" alt="">
+      <span>Henderson Andrade<span class="brand-sub">Azure Cloud Architect</span></span>
+    </a>
+    <button class="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-menu">
+      <li><a class="nav-link" href="../index.html">Home</a></li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Solutions <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="../solutions/index.html"><span class="dropdown-kicker">Portfolio</span><span class="dropdown-title">All solutions</span></a></li>
+          <li><a href="../docs/azureutils/index.html"><span class="dropdown-kicker">Personal · PowerShell</span><span class="dropdown-title">AzureUtils module</span></a></li>
+          <li><a href="https://trimtechbr.github.io" target="_blank" rel="noopener"><span class="dropdown-kicker">TrimTechBR ↗</span><span class="dropdown-title">AER — Azure Estate Report</span></a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Docs <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="../docs/azureutils/index.html"><span class="dropdown-kicker">Start here</span><span class="dropdown-title">Overview &amp; install</span></a></li>
+          <li><a href="../docs/azureutils/tag-inventory.html"><span class="dropdown-kicker">Reference</span><span class="dropdown-title">Tag inventory</span></a></li>
+          <li><a href="../docs/azureutils/find-commands.html"><span class="dropdown-kicker">Reference</span><span class="dropdown-title">Find commands</span></a></li>
+          <li><a href="../docs/azureutils/release-publishing.html"><span class="dropdown-kicker">Internals</span><span class="dropdown-title">Release &amp; publishing</span></a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Blog <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="index.html"><span class="dropdown-kicker">All</span><span class="dropdown-title">All posts</span></a></li>
+          <li><a href="category-networking.html"><span class="dropdown-kicker">Category</span><span class="dropdown-title">Networking</span></a></li>
+          <li><a href="category-architecture.html"><span class="dropdown-kicker">Category</span><span class="dropdown-title">Architecture</span></a></li>
+          <li><a href="category-iac.html"><span class="dropdown-kicker">Category</span><span class="dropdown-title">IaC</span></a></li>
+          <li><a href="category-finops.html"><span class="dropdown-kicker">Category</span><span class="dropdown-title">FinOps</span></a></li>
+          <li><a href="category-careers.html"><span class="dropdown-kicker">Category</span><span class="dropdown-title">Careers</span></a></li>
+        </ul>
+      </li>
+      <li><a class="nav-link" href="../contact.html">Contact</a></li>
+      <li><a class="btn btn-secondary" href="https://github.com/hendersonandrade" target="_blank" rel="noopener">GitHub ↗</a></li>
+      <li class="nav-item lang-switch">
+        <a class="lang-link is-active" href="azure-networking-vpn-expressroute.html">EN</a>
+        <span class="lang-sep">/</span>
+        <a class="lang-link" href="azure-networking-vpn-expressroute.pt-br.html">PT</a>
+      </li>
+    </ul>
+  </div>
+</header>
+
+<main class="container">
+  <div class="docs-shell">
+
+    <aside class="docs-sidebar reveal">
+      <div class="side-group">
+        <p class="side-title">On this page</p>
+        <ul class="anchor-list">
+          <li><a href="#resumo">Executive summary</a></li>
+          <li><a href="#vpn">VPN Gateway (S2S &amp; P2S)</a></li>
+          <li><a href="#expressroute">ExpressRoute</a></li>
+          <li><a href="#bgp">BGP &amp; route exchange</a></li>
+          <li><a href="#ha">High availability &amp; backup</a></li>
+          <li><a href="#vs">VPN vs ExpressRoute</a></li>
+          <li><a href="#checklist">Checklist</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </div>
+      <div class="side-group">
+        <p class="side-title">Azure Networking series</p>
+        <ul>
+          <li><a href="azure-networking-fundamentals.html">1 · Fundamentals</a></li>
+          <li><a href="azure-networking-hub-spoke.html">2 · Hub-and-Spoke</a></li>
+          <li><a href="azure-networking-virtual-wan.html">3 · Virtual WAN</a></li>
+          <li><strong>4 · VPN &amp; ExpressRoute</strong> (you are here)</li>
+          <li><a href="azure-networking-dns-private-link-security.html">5 · DNS, Private Link &amp; Security</a></li>
+          <li><a href="azure-networking-operations-governance-finops.html">6 · Operations, Governance &amp; FinOps</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <article class="docs-content">
+      <nav class="breadcrumb">
+        <a href="../index.html">Home</a><span class="sep">/</span>
+        <a href="index.html">Blog</a><span class="sep">/</span>
+        <span>VPN &amp; ExpressRoute</span>
+      </nav>
+
+      <span class="eyebrow">Networking · Series · Part 4 of 6</span>
+      <h1>Hybrid connectivity: VPN and ExpressRoute</h1>
+      <p class="docs-lede">
+        Hub-Spoke and Virtual WAN define the topology <em>inside</em> Azure; <strong>hybrid connectivity</strong>
+        defines how <strong>on-premises</strong> gets there. The two options: <strong>VPN Gateway</strong> (an
+        encrypted tunnel over the Internet) and <strong>ExpressRoute</strong> (a private connection via a
+        provider). This is <strong>Part 4</strong> of the series — they are <strong>components</strong> that plug
+        into the models from Parts 2 and 3.
+      </p>
+
+      <div class="article-meta">
+        <span><span class="am-dot"></span> Henderson Andrade</span>
+        <span>Published Jun 19, 2026</span>
+        <span>~14 min read</span>
+        <span>Azure · Hybrid · VPN · ExpressRoute</span>
+      </div>
+
+      <div class="badge-row">
+        <span class="badge badge-primary">VPN Gateway</span>
+        <span class="badge">ExpressRoute</span>
+        <span class="badge">BGP · IPsec</span>
+        <span class="badge">Series · 4/6</span>
+      </div>
+
+      <h2 id="resumo">Executive summary</h2>
+      <div class="note">
+        <span class="ico">ℹ</span>
+        <div><strong>VPN</strong> uses the public Internet with IPsec encryption — quick to deploy, cheap, ideal for smaller environments, simple branches, contingency and labs. <strong>ExpressRoute</strong> is a <strong>private</strong> connection via a provider — predictable, suited to critical traffic, high volume and datacenter migration. The most common enterprise pattern combines both: <strong>ExpressRoute as the primary path and VPN as backup</strong>. Neither replaces a firewall, application encryption or identity control — connectivity is not security.</div>
+      </div>
+      <div class="note warn">
+        <span class="ico">⚠</span>
+        <div>Gateway SKU throughput, redundancy options, SLA and ExpressRoute availability per region/provider <strong>vary and change</strong> — validate against the official documentation and with the provider before sizing.</div>
+      </div>
+
+      <h2 id="vpn">VPN Gateway: Site-to-Site and Point-to-Site</h2>
+      <p>
+        The <strong>VPN Gateway</strong> creates encrypted tunnels between Azure and external networks over the
+        Internet. Two modes:
+      </p>
+      <ul class="principle-list">
+        <li><strong>Site-to-Site (S2S) —</strong> connects an entire on-premises network to Azure over an
+          <strong>IPsec/IKE</strong> tunnel, terminating on a compatible local VPN device. Can use BGP. Serves as
+          primary connectivity for smaller environments or as an ExpressRoute backup.</li>
+        <li><strong>Point-to-Site (P2S) —</strong> connects <strong>individual users</strong> to the VNet (remote
+          access, administration). Can be complemented or replaced by modern/Zero Trust access solutions,
+          depending on the case.</li>
+      </ul>
+
+      <h2 id="expressroute">ExpressRoute</h2>
+      <p>
+        <strong>ExpressRoute</strong> establishes <strong>private</strong> connectivity between your
+        infrastructure (via a <strong>connectivity provider</strong>) and the Microsoft Cloud — traffic
+        <strong>does not traverse the public Internet</strong>. The core concepts:
+      </p>
+      <ul class="principle-list">
+        <li><strong>ExpressRoute circuit —</strong> the unit of connectivity, provisioned with a provider.</li>
+        <li><strong>Private peering —</strong> the BGP peering that connects your VNets (via the ExpressRoute Gateway).</li>
+        <li><strong>ExpressRoute Gateway —</strong> the gateway in the (hub) VNet that terminates the circuit.</li>
+        <li><strong>Global Reach —</strong> connects on-premises sites to each other <em>through</em> the Microsoft backbone.</li>
+        <li><strong>Hub-Spoke or Virtual WAN —</strong> the ExpressRoute Gateway lives in the traditional hub (Part 2) or the Virtual Hub (Part 3).</li>
+      </ul>
+
+      <figure class="figure reveal">
+        <svg viewBox="0 0 820 250" role="img" aria-label="The on-premises datacenter connects to Azure via two paths: ExpressRoute through a provider as the primary path and Site-to-Site VPN over the Internet as backup; both reach the hub VNet via gateways, with BGP exchanging routes.">
+          <rect x="0" y="0" width="820" height="250" fill="#0c1324"/>
+          <text x="410" y="30" text-anchor="middle" fill="#3ad29f" font-family="Sora,sans-serif" font-size="14" font-weight="800">ExpressRoute primary + VPN backup</text>
+          <g font-family="Sora,sans-serif" font-size="11" font-weight="700" text-anchor="middle">
+            <g><rect x="40" y="95" width="160" height="64" rx="11" fill="#16213b" stroke="#647495"/><text x="120" y="121" fill="#cdd9f1">On-premises</text><text x="120" y="139" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">CE routers · BGP</text></g>
+            <g><rect x="620" y="95" width="160" height="64" rx="11" fill="#0f1830" stroke="#38d3ff"/><text x="700" y="121" fill="#38d3ff">Hub VNet</text><text x="700" y="139" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">ER + VPN Gateway</text></g>
+            <g><rect x="320" y="50" width="180" height="46" rx="10" fill="#111a30" stroke="#3ad29f"/><text x="410" y="71" fill="#3ad29f">ExpressRoute provider</text><text x="410" y="87" fill="#97a7c6" font-size="8" font-family="JetBrains Mono,monospace" font-weight="500">private · primary</text></g>
+            <g><rect x="320" y="158" width="180" height="46" rx="10" fill="#111a30" stroke="#f5b942"/><text x="410" y="179" fill="#f5b942">Internet (IPsec)</text><text x="410" y="195" fill="#97a7c6" font-size="8" font-family="JetBrains Mono,monospace" font-weight="500">VPN S2S · backup</text></g>
+          </g>
+          <g stroke="#3ad29f" stroke-width="2.5" fill="none"><path d="M200 110 L320 78"/><path d="M500 73 L620 110"/></g>
+          <g stroke="#f5b942" stroke-width="2" fill="none" stroke-dasharray="5 4"><path d="M200 140 L320 181"/><path d="M500 181 L620 145"/></g>
+        </svg>
+        <figcaption><b>Figure 1.</b> The enterprise pattern: <strong>ExpressRoute as the primary path</strong> (private, predictable) and <strong>S2S VPN as backup</strong> (over the Internet). BGP exchanges routes and handles failover when continuity requirements demand it.</figcaption>
+      </figure>
+
+      <h2 id="bgp">BGP and route exchange</h2>
+      <p>
+        Both VPN (with BGP enabled) and ExpressRoute use <strong>BGP</strong> to advertise and learn prefixes
+        dynamically between Azure and on-premises. This simplifies routing and enables <strong>failover</strong>,
+        but it requires care: <strong>incorrect advertisements</strong> or too many prefixes can cause unexpected
+        routes or exceed limits. Practice <strong>summarization</strong> and <strong>prefix control</strong>, and
+        always validate the effective routes (Part 1).
+      </p>
+
+      <h2 id="ha">High availability and backup</h2>
+      <ul class="principle-list">
+        <li><strong>VPN as primary —</strong> use redundant tunnels and BGP for smaller environments.</li>
+        <li><strong>ExpressRoute as primary —</strong> evaluate circuit redundancy and, per continuity requirements, <strong>S2S VPN as a backup path</strong>.</li>
+        <li><strong>Failover —</strong> BGP must be designed to reconverge onto the backup path without asymmetric routing.</li>
+      </ul>
+
+      <h2 id="vs">VPN vs. ExpressRoute</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Criterion</th><th>VPN Gateway</th><th>ExpressRoute</th></tr></thead>
+          <tbody>
+            <tr><td>Transport</td><td>Public Internet (IPsec)</td><td>Private connection via provider</td></tr>
+            <tr><td>Privacy</td><td>Encrypted over the Internet</td><td>Does not use the public Internet</td></tr>
+            <tr><td>Predictability</td><td>Depends on the Internet</td><td>Higher predictability</td></tr>
+            <tr><td>Cost</td><td>Generally lower</td><td>Generally higher (circuit + provider)</td></tr>
+            <tr><td>Deployment</td><td>Relatively fast</td><td>Can take longer (provider)</td></tr>
+            <tr><td>Best for</td><td>Smaller environments, simple branches, backup, lab</td><td>Critical, high volume, DC migration</td></tr>
+            <tr><td>HA / backup</td><td>Redundant tunnels</td><td>Often with a VPN contingency</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><strong>VPN is not "always inferior"</strong>: for many scenarios it fully suffices. And ExpressRoute <strong>does not replace</strong> a firewall or application encryption — it is transport, not security.</p>
+
+      <h2 id="checklist">Checklist</h2>
+      <ul class="principle-list">
+        <li><strong>Requirement —</strong> Does the case need private/predictable connectivity (ExpressRoute) or does VPN suffice?</li>
+        <li><strong>Continuity —</strong> Is there a backup (VPN) when ExpressRoute is critical?</li>
+        <li><strong>BGP —</strong> Prefixes summarized and controlled, with no risk of incorrect advertisement?</li>
+        <li><strong>Gateway —</strong> ExpressRoute/VPN Gateway in the hub (Part 2) or Virtual Hub (Part 3), with gateway transit for spokes?</li>
+        <li><strong>Security —</strong> Connectivity not confused with security: firewall and identity in place?</li>
+      </ul>
+
+      <h2 id="references">Official references</h2>
+      <ul class="ref-list">
+        <li><a href="https://learn.microsoft.com/azure/vpn-gateway/vpn-gateway-about-vpngateways" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>About VPN Gateway</span></a><span class="ref-desc">S2S, P2S, IPsec/IKE, BGP.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/expressroute/expressroute-introduction" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Introduction to ExpressRoute</span></a><span class="ref-desc">Circuits, private peering, providers.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/expressroute/expressroute-global-reach" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>ExpressRoute Global Reach</span></a><span class="ref-desc">Connect on-premises sites over the backbone.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/vpn-gateway/vpn-gateway-highlyavailable" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>VPN Gateway — high availability</span></a><span class="ref-desc">Redundant tunnels, active-active, ExpressRoute backup.</span></li>
+      </ul>
+
+      <div class="next-prev">
+        <a class="is-prev" href="azure-networking-virtual-wan.html">
+          <span class="np-kicker">← Part 3</span>
+          <span class="np-title">Virtual WAN</span>
+        </a>
+        <a class="is-next" href="azure-networking-dns-private-link-security.html">
+          <span class="np-kicker">Part 5 →</span>
+          <span class="np-title">DNS, Private Link &amp; Security</span>
+        </a>
+      </div>
+    </article>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container footer-grid">
+    <p>© <span data-current-year></span> Henderson Andrade · Microsoft Azure Cloud Architect.</p>
+    <div class="footer-links">
+      <a href="index.html">Blog</a>
+      <a href="../solutions/index.html">Solutions</a>
+      <a href="https://github.com/hendersonandrade" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://br.linkedin.com/in/henderson-andrade-%E2%98%81%EF%B8%8F-22b1ba33/pt" target="_blank" rel="noopener">LinkedIn ↗</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hub-and-Spoke Architecture on Azure | Henderson Andrade</title>
+  <meta name="description" content="The traditional Hub-and-Spoke topology on Azure: a shared-services hub, workload spokes, traffic flows, centralized inspection, and when to use or avoid it.">
+  <meta property="og:title" content="Hub-and-Spoke Architecture on Azure">
+  <meta property="og:description" content="Connectivity hub, workload spokes, the eight traffic flows, centralized inspection and the trade-offs of the traditional Hub-Spoke model.">
+  <meta property="og:type" content="article">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="canonical" href="https://hendersonandrade.github.io/blog/azure-networking-hub-spoke.html">
+  <link rel="alternate" hreflang="en" href="https://hendersonandrade.github.io/blog/azure-networking-hub-spoke.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://hendersonandrade.github.io/blog/azure-networking-hub-spoke.pt-br.html">
+  <link rel="alternate" hreflang="x-default" href="https://hendersonandrade.github.io/blog/azure-networking-hub-spoke.html">
+  <meta property="og:url" content="https://hendersonandrade.github.io/blog/azure-networking-hub-spoke.html">
+  <meta property="og:image" content="https://hendersonandrade.github.io/assets/img/avatar.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://hendersonandrade.github.io/assets/img/avatar.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Hub-and-Spoke Architecture on Azure",
+    "description": "The traditional Hub-and-Spoke topology on Azure: a shared-services hub, workload spokes, traffic flows, centralized inspection, and when to use or avoid it.",
+    "inLanguage": "en",
+    "datePublished": "2026-06-19",
+    "dateModified": "2026-06-19",
+    "url": "https://hendersonandrade.github.io/blog/azure-networking-hub-spoke.html",
+    "mainEntityOfPage": { "@type": "WebPage", "@id": "https://hendersonandrade.github.io/blog/azure-networking-hub-spoke.html" },
+    "image": "https://hendersonandrade.github.io/assets/img/avatar.png",
+    "keywords": "Azure, Hub-Spoke, hub and spoke, VNet peering, Azure Firewall, gateway transit, Landing Zone, networking",
+    "articleSection": "Azure · Networking",
+    "author": { "@type": "Person", "name": "Henderson Andrade", "url": "https://hendersonandrade.github.io/" },
+    "publisher": { "@type": "Person", "name": "Henderson Andrade", "url": "https://hendersonandrade.github.io/" }
+  }
+  </script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container navbar">
+    <a class="brand" href="../index.html" aria-label="Henderson Andrade — home">
+      <img class="brand-mark" src="../assets/img/ha-monogram.svg" alt="">
+      <span>Henderson Andrade<span class="brand-sub">Azure Cloud Architect</span></span>
+    </a>
+    <button class="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-menu">
+      <li><a class="nav-link" href="../index.html">Home</a></li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Solutions <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="../solutions/index.html"><span class="dropdown-kicker">Portfolio</span><span class="dropdown-title">All solutions</span></a></li>
+          <li><a href="../docs/azureutils/index.html"><span class="dropdown-kicker">Personal · PowerShell</span><span class="dropdown-title">AzureUtils module</span></a></li>
+          <li><a href="https://trimtechbr.github.io" target="_blank" rel="noopener"><span class="dropdown-kicker">TrimTechBR ↗</span><span class="dropdown-title">AER — Azure Estate Report</span></a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Docs <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="../docs/azureutils/index.html"><span class="dropdown-kicker">Start here</span><span class="dropdown-title">Overview &amp; install</span></a></li>
+          <li><a href="../docs/azureutils/tag-inventory.html"><span class="dropdown-kicker">Reference</span><span class="dropdown-title">Tag inventory</span></a></li>
+          <li><a href="../docs/azureutils/find-commands.html"><span class="dropdown-kicker">Reference</span><span class="dropdown-title">Find commands</span></a></li>
+          <li><a href="../docs/azureutils/release-publishing.html"><span class="dropdown-kicker">Internals</span><span class="dropdown-title">Release &amp; publishing</span></a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Blog <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="index.html"><span class="dropdown-kicker">All</span><span class="dropdown-title">All posts</span></a></li>
+          <li><a href="category-networking.html"><span class="dropdown-kicker">Category</span><span class="dropdown-title">Networking</span></a></li>
+          <li><a href="category-architecture.html"><span class="dropdown-kicker">Category</span><span class="dropdown-title">Architecture</span></a></li>
+          <li><a href="category-iac.html"><span class="dropdown-kicker">Category</span><span class="dropdown-title">IaC</span></a></li>
+          <li><a href="category-finops.html"><span class="dropdown-kicker">Category</span><span class="dropdown-title">FinOps</span></a></li>
+          <li><a href="category-careers.html"><span class="dropdown-kicker">Category</span><span class="dropdown-title">Careers</span></a></li>
+        </ul>
+      </li>
+      <li><a class="nav-link" href="../contact.html">Contact</a></li>
+      <li><a class="btn btn-secondary" href="https://github.com/hendersonandrade" target="_blank" rel="noopener">GitHub ↗</a></li>
+      <li class="nav-item lang-switch">
+        <a class="lang-link is-active" href="azure-networking-hub-spoke.html">EN</a>
+        <span class="lang-sep">/</span>
+        <a class="lang-link" href="azure-networking-hub-spoke.pt-br.html">PT</a>
+      </li>
+    </ul>
+  </div>
+</header>
+
+<main class="container">
+  <div class="docs-shell">
+
+    <aside class="docs-sidebar reveal">
+      <div class="side-group">
+        <p class="side-title">On this page</p>
+        <ul class="anchor-list">
+          <li><a href="#resumo">Executive summary</a></li>
+          <li><a href="#conceito">Concept</a></li>
+          <li><a href="#componentes">Hub &amp; spoke components</a></li>
+          <li><a href="#fluxos">The eight traffic flows</a></li>
+          <li><a href="#spoke-spoke">Spoke-to-spoke traffic</a></li>
+          <li><a href="#vantagens">Pros &amp; cons</a></li>
+          <li><a href="#quando">When to use / avoid</a></li>
+          <li><a href="#checklist">Checklist</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </div>
+      <div class="side-group">
+        <p class="side-title">Azure Networking series</p>
+        <ul>
+          <li><a href="azure-networking-fundamentals.html">1 · Fundamentals</a></li>
+          <li><strong>2 · Hub-and-Spoke</strong> (you are here)</li>
+          <li><a href="azure-networking-virtual-wan.html">3 · Virtual WAN</a></li>
+          <li><a href="azure-networking-vpn-expressroute.html">4 · VPN &amp; ExpressRoute</a></li>
+          <li><a href="azure-networking-dns-private-link-security.html">5 · DNS, Private Link &amp; Security</a></li>
+          <li><a href="azure-networking-operations-governance-finops.html">6 · Operations, Governance &amp; FinOps</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <article class="docs-content">
+      <nav class="breadcrumb">
+        <a href="../index.html">Home</a><span class="sep">/</span>
+        <a href="index.html">Blog</a><span class="sep">/</span>
+        <span>Hub-and-Spoke</span>
+      </nav>
+
+      <span class="eyebrow">Networking · Series · Part 2 of 6</span>
+      <h1>Hub-and-Spoke Architecture on Azure</h1>
+      <p class="docs-lede">
+        The <strong>traditional Hub-and-Spoke</strong> is Azure's best-known enterprise topology: a central VNet
+        (the <strong>hub</strong>) concentrates firewall, gateways, DNS and Bastion; each workload lives in an
+        isolated <strong>spoke</strong> VNet peered to the hub. This is <strong>Part 2</strong> of the series —
+        built on the <a href="azure-networking-fundamentals.html">Fundamentals</a> from Part 1.
+      </p>
+
+      <div class="article-meta">
+        <span><span class="am-dot"></span> Henderson Andrade</span>
+        <span>Published Jun 19, 2026</span>
+        <span>~14 min read</span>
+        <span>Azure · Hub-Spoke · Landing Zone</span>
+      </div>
+
+      <div class="badge-row">
+        <span class="badge badge-primary">Hub-and-Spoke</span>
+        <span class="badge">Peering · Gateway transit</span>
+        <span class="badge">Azure Firewall</span>
+        <span class="badge">Series · 2/6</span>
+      </div>
+
+      <h2 id="resumo">Executive summary</h2>
+      <div class="note">
+        <span class="ico">ℹ</span>
+        <div>In traditional Hub-Spoke, <strong>you own the routing</strong>: the hub hosts shared services (firewall/NVA, VPN/ExpressRoute Gateway, DNS, Bastion), spokes host workloads, and peering + UDRs stitch it together. It is the model with the most <strong>granular control</strong> and the closest fit to traditional Landing Zones. The price of that control is <strong>operations</strong>: many peering relationships, route tables and inspection paths to manage as the number of VNets and regions grows. When global scale and branch count explode, <a href="azure-networking-virtual-wan.html">Virtual WAN</a> (Part 3) tends to simplify.</div>
+      </div>
+      <div class="note warn">
+        <span class="ico">⚠</span>
+        <div>Sizing, peering limits per VNet and SKU capabilities <strong>change</strong> — always validate against the official documentation before designing for production.</div>
+      </div>
+
+      <h2 id="conceito">Concept</h2>
+      <p>
+        The topology uses a central VNet — the <strong>hub</strong> — to host shared connectivity, security, DNS
+        and management services. The <strong>spoke</strong> VNets host workloads and connect to the hub via
+        <strong>VNet Peering</strong>. The hub usually lives in the <strong>connectivity subscription</strong>
+        (owned by the platform); each spoke usually lives in its workload's subscription. As we saw in Part 1,
+        <strong>peering is not transitive</strong> — so spoke-to-spoke and hybrid traffic depend on explicit
+        routing through the hub.
+      </p>
+
+      <figure class="figure reveal">
+        <svg viewBox="0 0 820 320" role="img" aria-label="A central hub with Azure Firewall, VPN/ExpressRoute gateway, DNS and Bastion, peered to four workload spokes; on-premises connects to the hub via the gateway, and egress traffic flows through the firewall.">
+          <rect x="0" y="0" width="820" height="320" fill="#0c1324"/>
+          <g text-anchor="middle" font-family="Sora,sans-serif">
+            <circle cx="410" cy="160" r="84" fill="#0f1830" stroke="#38d3ff"/>
+            <text x="410" y="140" fill="#38d3ff" font-size="13" font-weight="800">Hub VNet</text>
+            <text x="410" y="160" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace">Firewall · DNS</text>
+            <text x="410" y="176" fill="#97a7c6" font-size="9" font-family="JetBrains Mono,monospace">Gateway · Bastion</text>
+            <text x="410" y="196" fill="#647495" font-size="8.5" font-family="JetBrains Mono,monospace">Connectivity sub</text>
+          </g>
+          <g font-family="Sora,sans-serif" font-size="11" font-weight="700" text-anchor="middle">
+            <g><rect x="56" y="40" width="150" height="56" rx="11" fill="#111a30" stroke="#f5b942"/><text x="131" y="64" fill="#f5b942">Spoke · Corp A</text><text x="131" y="82" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">workload</text></g>
+            <g><rect x="56" y="224" width="150" height="56" rx="11" fill="#111a30" stroke="#f5b942"/><text x="131" y="248" fill="#f5b942">Spoke · Corp B</text><text x="131" y="266" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">workload</text></g>
+            <g><rect x="614" y="40" width="150" height="56" rx="11" fill="#111a30" stroke="#3ad29f"/><text x="689" y="64" fill="#3ad29f">Spoke · Online</text><text x="689" y="82" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">workload</text></g>
+            <g><rect x="614" y="224" width="150" height="56" rx="11" fill="#111a30" stroke="#3ad29f"/><text x="689" y="248" fill="#3ad29f">Spoke · Data</text><text x="689" y="266" fill="#97a7c6" font-size="8.5" font-family="JetBrains Mono,monospace" font-weight="500">PE + data</text></g>
+          </g>
+          <g stroke="#2f9bff" stroke-width="2" fill="none">
+            <path d="M206 72 L342 140"/>
+            <path d="M206 248 L342 180"/>
+            <path d="M614 72 L478 140"/>
+            <path d="M614 248 L478 180"/>
+          </g>
+          <g font-family="JetBrains Mono,monospace" font-size="8" fill="#647495" text-anchor="middle">
+            <text x="270" y="96">peering</text><text x="550" y="96">peering</text>
+          </g>
+          <g text-anchor="middle" font-family="Sora,sans-serif">
+            <rect x="335" y="270" width="150" height="42" rx="10" fill="#16213b" stroke="#647495"/>
+            <text x="410" y="289" fill="#97a7c6" font-size="10.5" font-weight="700">On-premises</text>
+            <text x="410" y="303" fill="#647495" font-size="8" font-family="JetBrains Mono,monospace">VPN / ExpressRoute</text>
+          </g>
+          <path d="M410 270 L410 244" stroke="#3ad29f" stroke-width="2" stroke-dasharray="5 4" fill="none" marker-end="url(#hsa)"/>
+          <defs><marker id="hsa" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 Z" fill="#3ad29f"/></marker></defs>
+        </svg>
+        <figcaption><b>Figure 1.</b> Central hub with firewall, gateway, DNS and Bastion; workload-isolated spokes; on-premises via the hub's gateway (consumed by spokes through <strong>gateway transit</strong>). Egress and spoke-to-spoke traffic flow through the hub firewall.</figcaption>
+      </figure>
+
+      <h2 id="componentes">Hub and spoke components</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>In the hub (shared)</th><th>In each spoke (workload)</th></tr></thead>
+          <tbody>
+            <tr><td>Azure Firewall or NVA (inspection)</td><td>Application and data subnets</td></tr>
+            <tr><td>VPN Gateway / ExpressRoute Gateway</td><td>Private Endpoint subnets</td></tr>
+            <tr><td>Azure Bastion</td><td>App Service VNet Integration / AKS subnets</td></tr>
+            <tr><td>DNS Private Resolver / Private DNS Zones</td><td>NSGs and UDRs pointing to the hub firewall</td></tr>
+            <tr><td>Central route tables and log collection</td><td>Workloads isolated by environment/domain</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="fluxos">The eight traffic flows</h2>
+      <p>Designing Hub-Spoke is, in practice, designing these eight paths — each with its route and firewall rule:</p>
+      <ul class="principle-list">
+        <li><strong>1 · Spoke → Internet —</strong> UDR <code>0.0.0.0/0</code> sends to the hub firewall, which inspects and egresses.</li>
+        <li><strong>2 · Spoke → on-premises —</strong> via gateway transit; the route to on-prem prefixes points to the hub gateway.</li>
+        <li><strong>3 · On-premises → spoke —</strong> on-prem must see the spoke prefixes (route/BGP propagation).</li>
+        <li><strong>4 · Spoke → spoke —</strong> not automatic; goes through the hub firewall (or direct peering). See below.</li>
+        <li><strong>5 · Spoke → PaaS via Private Endpoint —</strong> resolution via Private DNS Zone to a private IP (Parts 1 and 5).</li>
+        <li><strong>6 · Remote user → workload —</strong> P2S on the gateway, or a modern/Zero Trust access solution.</li>
+        <li><strong>7 · Admin traffic → VM —</strong> Azure Bastion in the hub, no public IP on the VMs.</li>
+        <li><strong>8 · Published application —</strong> ingress via Application Gateway (regional WAF) or Azure Front Door (global edge WAF).</li>
+      </ul>
+
+      <h2 id="spoke-spoke">Spoke-to-spoke traffic: the options</h2>
+      <p>The path between two spokes is the decision that sparks the most debate. The options, with trade-offs:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Option</th><th>Pros</th><th>Cons</th></tr></thead>
+          <tbody>
+            <tr><td>Via firewall/NVA in the hub</td><td>Centralized east-west inspection</td><td>Extra latency and cost; firewall becomes a bottleneck</td></tr>
+            <tr><td>Direct spoke-to-spoke peering</td><td>Lower latency</td><td>No inspection; the peering mesh grows</td></tr>
+            <tr><td>Private Link between services</td><td>Granular, no exposing the whole VNet</td><td>Applies to services that support it</td></tr>
+            <tr><td>Avoid by design</td><td>Less coupling between workloads</td><td>Not always possible</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="vantagens">Pros and cons</h2>
+      <ul class="principle-list">
+        <li><strong>+ Granular control —</strong> you decide every route, peering and inspection path.</li>
+        <li><strong>+ Firewall flexibility —</strong> Azure Firewall or the corporate NVA the team already runs.</li>
+        <li><strong>+ Alignment —</strong> fits traditional Landing Zones and platform/workload separation.</li>
+        <li><strong>− Operations grow —</strong> many peerings, routes and paths to maintain by hand.</li>
+        <li><strong>− Multi-region —</strong> requires multiple hubs and inter-hub connectivity you design yourself.</li>
+        <li><strong>− Branch scale —</strong> connecting many VPN/SD-WAN sites gets laborious (a strong Virtual WAN case).</li>
+      </ul>
+
+      <h2 id="quando">When to use and when to avoid</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Use Hub-Spoke when…</th><th>Reconsider when…</th></tr></thead>
+          <tbody>
+            <tr><td>You need high routing control</td><td>There are many branches and complex global connectivity</td></tr>
+            <tr><td>The number of VNets is moderate</td><td>Many VNets and regions with global transitivity</td></tr>
+            <tr><td>You depend on specific NVAs</td><td>Peering/route operations become too manual</td></tr>
+            <tr><td>Regional or controlled multi-region architecture</td><td>You want a more managed connectivity service</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="checklist">Checklist</h2>
+      <ul class="principle-list">
+        <li><strong>Separation —</strong> Hub in the connectivity subscription, spokes in workload subscriptions?</li>
+        <li><strong>Gateway transit —</strong> Enabled on the hub and <code>use remote gateway</code> on the spokes?</li>
+        <li><strong>Inspection —</strong> Spoke UDR <code>0.0.0.0/0</code> to the firewall, with effective routes validated?</li>
+        <li><strong>Spoke-to-spoke —</strong> Path chosen deliberately (firewall vs. direct peering vs. Private Link)?</li>
+        <li><strong>Multi-region —</strong> A plan for per-region hubs and inter-hub connectivity, if applicable?</li>
+      </ul>
+
+      <h2 id="references">Official references</h2>
+      <ul class="ref-list">
+        <li><a href="https://learn.microsoft.com/azure/architecture/networking/architecture/hub-spoke" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Hub-and-spoke network topology</span></a><span class="ref-desc">Microsoft reference architecture.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/cloud-adoption-framework/ready/azure-best-practices/define-an-azure-network-topology" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Network topology &amp; connectivity (CAF)</span></a><span class="ref-desc">Hub-spoke vs Virtual WAN in the Landing Zone.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/virtual-network/virtual-network-peering-overview" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>VNet Peering &amp; gateway transit</span></a><span class="ref-desc">Transitivity, gateway transit, flags.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/firewall/overview" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Azure Firewall</span></a><span class="ref-desc">Centralized inspection in the hub.</span></li>
+      </ul>
+
+      <div class="next-prev">
+        <a class="is-prev" href="azure-networking-fundamentals.html">
+          <span class="np-kicker">← Part 1</span>
+          <span class="np-title">Azure Networking Fundamentals</span>
+        </a>
+        <a class="is-next" href="azure-networking-virtual-wan.html">
+          <span class="np-kicker">Part 3 →</span>
+          <span class="np-title">Azure Virtual WAN</span>
+        </a>
+      </div>
+    </article>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container footer-grid">
+    <p>© <span data-current-year></span> Henderson Andrade · Microsoft Azure Cloud Architect.</p>
+    <div class="footer-links">
+      <a href="index.html">Blog</a>
+      <a href="../solutions/index.html">Solutions</a>
+      <a href="https://github.com/hendersonandrade" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://br.linkedin.com/in/henderson-andrade-%E2%98%81%EF%B8%8F-22b1ba33/pt" target="_blank" rel="noopener">LinkedIn ↗</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

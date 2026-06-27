@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DNS, Private Link e Segurança de rede no Azure | Henderson Andrade</title>
+  <meta name="description" content="DNS Private Resolver e DNS híbrido, Private Endpoints, segurança em camadas (NSG, Azure Firewall, WAF), controle de egress/ingress e Zero Trust de rede no Azure.">
+  <meta property="og:title" content="DNS, Private Link e Segurança de rede no Azure">
+  <meta property="og:description" content="DNS híbrido com Private Resolver, Private Endpoints, segurança em camadas e Zero Trust aplicado à rede.">
+  <meta property="og:type" content="article">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="canonical" href="https://hendersonandrade.github.io/blog/azure-networking-dns-private-link-security.pt-br.html">
+  <link rel="alternate" hreflang="en" href="https://hendersonandrade.github.io/blog/azure-networking-dns-private-link-security.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://hendersonandrade.github.io/blog/azure-networking-dns-private-link-security.pt-br.html">
+  <link rel="alternate" hreflang="x-default" href="https://hendersonandrade.github.io/blog/azure-networking-dns-private-link-security.html">
+  <meta property="og:url" content="https://hendersonandrade.github.io/blog/azure-networking-dns-private-link-security.pt-br.html">
+  <meta property="og:image" content="https://hendersonandrade.github.io/assets/img/avatar.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://hendersonandrade.github.io/assets/img/avatar.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "DNS, Private Link e Segurança de rede no Azure",
+    "description": "DNS Private Resolver e DNS híbrido, Private Endpoints, segurança em camadas (NSG, Azure Firewall, WAF), controle de egress/ingress e Zero Trust de rede no Azure.",
+    "inLanguage": "pt-BR",
+    "datePublished": "2026-06-19",
+    "dateModified": "2026-06-19",
+    "url": "https://hendersonandrade.github.io/blog/azure-networking-dns-private-link-security.pt-br.html",
+    "mainEntityOfPage": { "@type": "WebPage", "@id": "https://hendersonandrade.github.io/blog/azure-networking-dns-private-link-security.pt-br.html" },
+    "image": "https://hendersonandrade.github.io/assets/img/avatar.png",
+    "keywords": "Azure, DNS Private Resolver, Private Endpoint, Private DNS Zone, Azure Firewall, WAF, Zero Trust, networking security",
+    "articleSection": "Azure · Networking",
+    "author": { "@type": "Person", "name": "Henderson Andrade", "url": "https://hendersonandrade.github.io/" },
+    "publisher": { "@type": "Person", "name": "Henderson Andrade", "url": "https://hendersonandrade.github.io/" }
+  }
+  </script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container navbar">
+    <a class="brand" href="../index.pt-br.html" aria-label="Henderson Andrade — início">
+      <img class="brand-mark" src="../assets/img/ha-monogram.svg" alt="">
+      <span>Henderson Andrade<span class="brand-sub">Azure Cloud Architect</span></span>
+    </a>
+    <button class="nav-toggle" aria-label="Alternar menu de navegação" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-menu">
+      <li><a class="nav-link" href="../index.pt-br.html">Início</a></li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Soluções <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="../solutions/index.pt-br.html"><span class="dropdown-kicker">Portfólio</span><span class="dropdown-title">Todas as soluções</span></a></li>
+          <li><a href="../docs/azureutils/index.pt-br.html"><span class="dropdown-kicker">Pessoal · PowerShell</span><span class="dropdown-title">Módulo AzureUtils</span></a></li>
+          <li><a href="https://trimtechbr.github.io" target="_blank" rel="noopener"><span class="dropdown-kicker">TrimTechBR ↗</span><span class="dropdown-title">AER — Azure Estate Report</span></a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Docs <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="../docs/azureutils/index.pt-br.html"><span class="dropdown-kicker">Comece aqui</span><span class="dropdown-title">Visão geral &amp; instalação</span></a></li>
+          <li><a href="../docs/azureutils/tag-inventory.pt-br.html"><span class="dropdown-kicker">Referência</span><span class="dropdown-title">Inventário de tags</span></a></li>
+          <li><a href="../docs/azureutils/find-commands.pt-br.html"><span class="dropdown-kicker">Referência</span><span class="dropdown-title">Comandos Find</span></a></li>
+          <li><a href="../docs/azureutils/release-publishing.pt-br.html"><span class="dropdown-kicker">Internals</span><span class="dropdown-title">Release &amp; publicação</span></a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <button class="dropdown-trigger" aria-expanded="false">Blog <span class="chevron">▾</span></button>
+        <ul class="dropdown-menu">
+          <li><a href="index.pt-br.html"><span class="dropdown-kicker">Todos</span><span class="dropdown-title">Todos os posts</span></a></li>
+          <li><a href="category-networking.pt-br.html"><span class="dropdown-kicker">Categoria</span><span class="dropdown-title">Redes</span></a></li>
+          <li><a href="category-architecture.pt-br.html"><span class="dropdown-kicker">Categoria</span><span class="dropdown-title">Arquitetura</span></a></li>
+          <li><a href="category-iac.pt-br.html"><span class="dropdown-kicker">Categoria</span><span class="dropdown-title">IaC</span></a></li>
+          <li><a href="category-finops.pt-br.html"><span class="dropdown-kicker">Categoria</span><span class="dropdown-title">FinOps</span></a></li>
+          <li><a href="category-careers.pt-br.html"><span class="dropdown-kicker">Categoria</span><span class="dropdown-title">Carreira</span></a></li>
+        </ul>
+      </li>
+      <li><a class="nav-link" href="../contact.pt-br.html">Contato</a></li>
+      <li><a class="btn btn-secondary" href="https://github.com/hendersonandrade" target="_blank" rel="noopener">GitHub ↗</a></li>
+      <li class="nav-item lang-switch">
+        <a class="lang-link" href="azure-networking-dns-private-link-security.html">EN</a>
+        <span class="lang-sep">/</span>
+        <a class="lang-link is-active" href="azure-networking-dns-private-link-security.pt-br.html">PT</a>
+      </li>
+    </ul>
+  </div>
+</header>
+
+<main class="container">
+  <div class="docs-shell">
+
+    <aside class="docs-sidebar reveal">
+      <div class="side-group">
+        <p class="side-title">Nesta página</p>
+        <ul class="anchor-list">
+          <li><a href="#resumo">Resumo executivo</a></li>
+          <li><a href="#dns">DNS híbrido &amp; Private Resolver</a></li>
+          <li><a href="#armadilhas-dns">Armadilhas de DNS</a></li>
+          <li><a href="#camadas">Segurança em camadas</a></li>
+          <li><a href="#waf">Firewall, WAF &amp; egress</a></li>
+          <li><a href="#zerotrust">Zero Trust de rede</a></li>
+          <li><a href="#checklist">Checklist</a></li>
+          <li><a href="#references">Referências</a></li>
+        </ul>
+      </div>
+      <div class="side-group">
+        <p class="side-title">Série Azure Networking</p>
+        <ul>
+          <li><a href="azure-networking-fundamentals.pt-br.html">1 · Fundamentos</a></li>
+          <li><a href="azure-networking-hub-spoke.pt-br.html">2 · Hub-and-Spoke</a></li>
+          <li><a href="azure-networking-virtual-wan.pt-br.html">3 · Virtual WAN</a></li>
+          <li><a href="azure-networking-vpn-expressroute.pt-br.html">4 · VPN &amp; ExpressRoute</a></li>
+          <li><strong>5 · DNS, Private Link &amp; Segurança</strong> (você está aqui)</li>
+          <li><a href="azure-networking-operations-governance-finops.pt-br.html">6 · Operação, Governança &amp; FinOps</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <article class="docs-content">
+      <nav class="breadcrumb">
+        <a href="../index.pt-br.html">Início</a><span class="sep">/</span>
+        <a href="index.pt-br.html">Blog</a><span class="sep">/</span>
+        <span>DNS, Private Link &amp; Segurança</span>
+      </nav>
+
+      <span class="eyebrow">Redes · Série · Parte 5 de 6</span>
+      <h1>DNS, Private Link e Segurança de rede</h1>
+      <p class="docs-lede">
+        A topologia conecta; o <strong>DNS</strong> faz os nomes resolverem para os lugares certos; a
+        <strong>segurança</strong> controla quem fala com quem. Esta <strong>Parte 5</strong> aprofunda os dois
+        temas que mais quebram (ou salvam) arquiteturas privadas: <strong>DNS híbrido</strong> com o DNS Private
+        Resolver e a <strong>segurança em camadas</strong> — fechando com Zero Trust aplicado à rede.
+      </p>
+
+      <div class="article-meta">
+        <span><span class="am-dot"></span> Henderson Andrade</span>
+        <span>Publicado em 19 jun 2026</span>
+        <span>~15 min de leitura</span>
+        <span>Azure · DNS · Private Link · Segurança</span>
+      </div>
+
+      <div class="badge-row">
+        <span class="badge badge-primary">DNS Private Resolver</span>
+        <span class="badge">Private Endpoints</span>
+        <span class="badge">Azure Firewall · WAF</span>
+        <span class="badge">Série · 5/6</span>
+      </div>
+
+      <h2 id="resumo">Resumo executivo</h2>
+      <div class="note">
+        <span class="ico">ℹ</span>
+        <div><strong>DNS é a maior fonte de erro</strong> em arquiteturas privadas no Azure: um Private Endpoint sem a Private DNS Zone certa resolve para o IP público e a privacidade evapora. O <strong>DNS Private Resolver</strong> substitui as antigas VMs de forwarder, conectando o DNS do Azure ao on-premises nos dois sentidos. Na <strong>segurança</strong>, pense em camadas: segmentação (VNet/subnet/NSG/ASG), inspeção centralizada (Azure Firewall/NVA), proteção de aplicação (WAF no Application Gateway ou Front Door), acesso privado a PaaS (Private Endpoints) e controle de egress. E lembre: <strong>rede privada não é Zero Trust</strong> — Zero Trust exige identidade, privilégio mínimo, inspeção e validação contínua, não só IP privado.</div>
+      </div>
+      <div class="note warn">
+        <span class="ico">⚠</span>
+        <div>Recursos de cada SKU (ex.: capacidades premium do Azure Firewall) e comportamentos de DNS <strong>mudam</strong> — valide na documentação oficial antes de desenhar.</div>
+      </div>
+
+      <h2 id="dns">DNS híbrido e o DNS Private Resolver</h2>
+      <p>
+        O <strong>Azure DNS Private Resolver</strong> resolve o DNS híbrido sem VMs de forwarder. Ele tem
+        <strong>inbound endpoints</strong> (o on-premises consulta nomes privados do Azure) e <strong>outbound
+        endpoints</strong> (workloads do Azure encaminham consultas ao DNS on-premises, via regras de
+        <strong>conditional forwarding</strong>). O fluxo típico:
+      </p>
+      <ul class="principle-list">
+        <li><strong>1 —</strong> Cliente on-premises consulta seu DNS local.</li>
+        <li><strong>2 —</strong> O DNS local <strong>encaminha</strong> a zona privada do Azure para o <em>inbound endpoint</em> do Private Resolver.</li>
+        <li><strong>3 —</strong> Workloads no Azure consultam o DNS configurado na VNet.</li>
+        <li><strong>4 —</strong> O Private Resolver encaminha (conditional forwarding) o que for on-premises ao DNS local pelo <em>outbound endpoint</em>.</li>
+        <li><strong>5 —</strong> O Private Endpoint resolve para o <strong>IP privado</strong> via Private DNS Zone (Parte 1).</li>
+      </ul>
+
+      <h2 id="armadilhas-dns">Armadilhas comuns de DNS</h2>
+      <ul class="principle-list">
+        <li>Criar Private Endpoint <strong>sem configurar DNS</strong> — o FQDN resolve para o IP público.</li>
+        <li><strong>VNet não linkada</strong> à Private DNS Zone do serviço.</li>
+        <li>DNS on-premises <strong>não encaminha</strong> as zonas privadas do Azure.</li>
+        <li><strong>Duplicar</strong> Private DNS Zones por assinatura sem governança (centralize ou padronize).</li>
+        <li>Esquecer que o <strong>FQDN continua o mesmo</strong> — só a resolução muda para o IP privado.</li>
+        <li>Misturar DNS customizado e Azure-provided DNS <strong>sem desenho claro</strong>.</li>
+      </ul>
+
+      <h2 id="camadas">Segurança de rede em camadas</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Camada</th><th>O que faz</th><th>Onde</th></tr></thead>
+          <tbody>
+            <tr><td>Segmentação</td><td>Isola por VNet, subnet, ambiente, criticidade, dados</td><td>VNet/subnet design</td></tr>
+            <tr><td>NSG / ASG</td><td>Filtro L3/L4 stateful, por grupo lógico</td><td>Subnet / NIC</td></tr>
+            <tr><td>Azure Firewall / NVA</td><td>Inspeção centralizada, FQDN, Threat Intel, IDPS (validar SKU)</td><td>Hub / Secured Hub</td></tr>
+            <tr><td>WAF</td><td>Protege aplicações web (OWASP)</td><td>Application Gateway (regional) / Front Door (global)</td></tr>
+            <tr><td>Private Endpoints</td><td>Acesso privado a PaaS, sem exposição pública</td><td>Spokes</td></tr>
+            <tr><td>DDoS Protection</td><td>Mitiga ataques volumétricos</td><td>VNets com superfície pública</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="waf">Firewall, WAF e controle de egress/ingress</h2>
+      <p>
+        Não confunda os papéis: o <strong>Azure Firewall</strong> inspeciona <strong>tráfego de rede</strong>
+        (norte-sul e leste-oeste); o <strong>WAF</strong> protege <strong>aplicações web</strong> — no
+        <strong>Application Gateway</strong> (proteção regional) ou no <strong>Azure Front Door</strong> (proteção
+        global na borda). O <strong>controle de egress</strong> (saída) costuma passar pelo firewall com regras
+        de FQDN; o <strong>ingress</strong> (entrada) por Application Gateway/Front Door com WAF. Inspeção
+        <strong>norte-sul</strong> é o tráfego que entra/sai; <strong>leste-oeste</strong> é entre workloads
+        (spoke-to-spoke da Parte 2).
+      </p>
+
+      <h2 id="zerotrust">Zero Trust aplicado à rede</h2>
+      <div class="note warn">
+        <span class="ico">⚠</span>
+        <div><strong>Rede privada não é sinônimo de Zero Trust.</strong> Zero Trust pressupõe <strong>identidade forte</strong>, <strong>privilégio mínimo</strong>, <strong>segmentação</strong>, <strong>inspeção</strong>, <strong>monitoramento</strong>, <strong>validação contínua</strong>, redução de exposição pública e controle de egress. A rede é uma camada — combine com identidade (Entra ID) e governança (Parte 6).</div>
+      </div>
+
+      <h2 id="checklist">Checklist</h2>
+      <ul class="principle-list">
+        <li><strong>DNS —</strong> Private DNS Zones centralizadas/governadas e VNets corretas linkadas?</li>
+        <li><strong>Híbrido —</strong> On-premises resolve nomes privados do Azure e vice-versa (Private Resolver)?</li>
+        <li><strong>Camadas —</strong> Segmentação + NSG + firewall + WAF + Private Endpoints no lugar?</li>
+        <li><strong>Egress/Ingress —</strong> Saída inspecionada por firewall; entrada protegida por WAF?</li>
+        <li><strong>Zero Trust —</strong> Identidade, privilégio mínimo e validação contínua, não só IP privado?</li>
+      </ul>
+
+      <h2 id="references">Referências oficiais</h2>
+      <ul class="ref-list">
+        <li><a href="https://learn.microsoft.com/azure/dns/dns-private-resolver-overview" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Azure DNS Private Resolver</span></a><span class="ref-desc">Inbound/outbound endpoints, conditional forwarding.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/private-link/private-endpoint-dns" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Private Endpoint &amp; DNS</span></a><span class="ref-desc">Resolução do FQDN para o IP privado.</span></li>
+        <li><a href="https://learn.microsoft.com/azure/web-application-firewall/overview" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Web Application Firewall (WAF)</span></a><span class="ref-desc">Application Gateway e Azure Front Door.</span></li>
+        <li><a href="https://learn.microsoft.com/security/zero-trust/deploy/networks" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Zero Trust para redes</span></a><span class="ref-desc">Segmentação, inspeção e validação contínua.</span></li>
+        <li><a href="https://learn.microsoft.com/security/benchmark/azure/" target="_blank" rel="noopener"><span class="ref-src">Learn</span><span>Microsoft Cloud Security Benchmark</span></a><span class="ref-desc">Controles de segurança de rede recomendados.</span></li>
+      </ul>
+
+      <div class="next-prev">
+        <a class="is-prev" href="azure-networking-vpn-expressroute.pt-br.html">
+          <span class="np-kicker">← Parte 4</span>
+          <span class="np-title">VPN &amp; ExpressRoute</span>
+        </a>
+        <a class="is-next" href="azure-networking-operations-governance-finops.pt-br.html">
+          <span class="np-kicker">Parte 6 →</span>
+          <span class="np-title">Operação, Governança &amp; FinOps</span>
+        </a>
+      </div>
+    </article>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container footer-grid">
+    <p>© <span data-current-year></span> Henderson Andrade · Microsoft Azure Cloud Architect.</p>
+    <div class="footer-links">
+      <a href="index.pt-br.html">Blog</a>
+      <a href="../solutions/index.pt-br.html">Soluções</a>
+      <a href="https://github.com/hendersonandrade" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://br.linkedin.com/in/henderson-andrade-%E2%98%81%EF%B8%8F-22b1ba33/pt" target="_blank" rel="noopener">LinkedIn ↗</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/js/main.js"></script>
+</body>
+</html>
